@@ -47,9 +47,3 @@ def is_circular_match(list_1, list_2):
 
 #         if slot not in choices:
 #             choices[slot] = choice
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i : i + n]
