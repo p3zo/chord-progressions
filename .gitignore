@@ -1,0 +1,32 @@
+# cache
+*.pyc
+__pycache__/
+
+# testing
+coverage
+.pytest_cache/
+.coverage*
+tests/results
+
+# production
+build
+*.egg-info/
+
+# misc
+.DS_Store
+archive/
+*.prof
+*.profile
+README.html
+
+# input
+data/
+
+# output
+output/
+*.mid
+*.csv
+*.png
+
+# ide
+.vscode
