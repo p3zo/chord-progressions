@@ -1,19 +1,17 @@
 import numpy as np
-
 from chord_progressions import logger
 from chord_progressions.chord import (
     get_notes_from_template,
     get_template_from_notes,
     get_template_from_template_string,
 )
-from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.pitch import (
     get_midi_num_from_note,
-    get_pitch_class_from_note,
     get_note_from_midi_num,
+    get_pitch_class_from_note,
 )
+from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import shift_arr_by_one
-
 
 # hard-code some constraints until there is a convincing use-case to make them variable
 N_NOTES_MIN = 1

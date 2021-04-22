@@ -1,15 +1,11 @@
+import os
+
 from setuptools import find_packages, setup
 
-__build__ = 0
-__version__ = f"0.0.1.{__build__}"
+__version__ = "0.4.0"
 
 test_requires = ["pytest", "pytest-cov"]
-dev_requires = [
-    "black",
-    "ipdb",
-    "ipython",
-    "isort",
-]
+dev_requires = ["black", "ipdb", "ipython", "isort", "bumpversion"]
 
 # dependencies for features not yet fully integrated into the core API
 experimental_requires = [
@@ -42,6 +38,7 @@ setup(
     ],
     extras_require={
         "test": test_requires,
-        "dev": test_requires + dev_requires + experimental_requires,
+        "dev": test_requires + dev_requires,
+        "experimental": [experimental_requires],
     },
 )

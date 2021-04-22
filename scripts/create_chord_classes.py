@@ -5,9 +5,8 @@
     MTG-like chord card world.
 """
 
-import pandas as pd
-
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 # from chord_progressions.audio import save_sample_chord_audio

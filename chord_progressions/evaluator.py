@@ -16,7 +16,6 @@ import itertools
 from pprint import pprint
 
 import numpy as np
-
 from chord_progressions.chord import (
     get_chords_from_chord_string,
     get_template_from_notes,
@@ -24,7 +23,6 @@ from chord_progressions.chord import (
     get_type_num_from_type,
     serialize_chords,
 )
-from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.pitch import (
     get_freq_from_note,
     get_midi_num_from_note,
@@ -32,6 +30,7 @@ from chord_progressions.pitch import (
     get_pitch_class_from_note,
 )
 from chord_progressions.solver import select_chords
+from chord_progressions.type_templates import TYPE_TEMPLATES
 
 # created in `create_chord_classes.py`
 # TODO: replace this table with a formula

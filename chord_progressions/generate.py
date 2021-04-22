@@ -5,7 +5,6 @@ import datetime as dt
 import os
 
 import numpy as np
-
 from chord_progressions import META_OUTPUT_DIR, WORDS_FILEPATH, logger
 from chord_progressions.audio import save_audio_progression
 from chord_progressions.midi import save_midi_progression

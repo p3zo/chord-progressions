@@ -11,7 +11,6 @@ Rules:
 """
 
 import numpy as np
-
 from chord_progressions.audio import save_audio_progression
 from chord_progressions.generate import get_run_id
 from chord_progressions.pitch import get_midi_num_from_note, get_note_from_midi_num

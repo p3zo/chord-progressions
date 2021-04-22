@@ -8,8 +8,9 @@ coverage
 .coverage*
 tests/results
 
-# production
-build
+# distribution / packaging
+build/
+dist/
 *.egg-info/
 
 # misc

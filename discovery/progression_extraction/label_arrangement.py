@@ -11,8 +11,6 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import pretty_midi
-
-from progression_extraction import DATA_DIR, SMALL_LMD_PATH, OUTPUT_LABEL_DIR
 from chord_progressions import logger
 from chord_progressions.chord import (
     get_template_from_template_string,
@@ -25,6 +23,7 @@ from chord_progressions.pitch import (
     get_pitch_class_from_midi_num,
 )
 from chord_progressions.solver import get_all_rotations_of_template
+from progression_extraction import DATA_DIR, OUTPUT_LABEL_DIR, SMALL_LMD_PATH
 
 ALL_TEMPLATES = load_type_templates()
 

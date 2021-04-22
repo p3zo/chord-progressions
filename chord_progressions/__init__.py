@@ -1,9 +1,7 @@
 import logging
 import os
 
-
-__version__ = "0.1.0"
-
+__version__ = "0.4.0"  # updated by bumpversion, do not change
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 

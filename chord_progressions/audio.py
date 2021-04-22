@@ -1,10 +1,9 @@
 import os
 
 import numpy as np
-from scipy.io import wavfile
-
 from chord_progressions import WAV_OUTPUT_DIR, logger
 from chord_progressions.pitch import get_freq_from_note, get_n_overtones_harmonic
+from scipy.io import wavfile
 
 SAMPLE_RATE = 44100
 

@@ -1,8 +1,4 @@
-from chord_progressions.utils import (
-    is_circular_match,
-    round_to_base,
-    shift_arr_by_one,
-)
+from chord_progressions.utils import is_circular_match, round_to_base, shift_arr_by_one
 
 
 def test_shift_arr_by_one():

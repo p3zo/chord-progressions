@@ -7,15 +7,14 @@ import os
 import time
 import warnings
 
-import pretty_midi
-
 import hdf5_getters
+import pretty_midi
 from chord_progressions import logger
 from progression_extraction import (
     LMD_PATH,
+    OUTPUT_LABEL_DIR,
     SMALL_LMD_PATH,
     SMALL_LMDH5_PATH,
-    OUTPUT_LABEL_DIR,
 )
 from progression_extraction.msd import get_metadata_msd
 from progression_extraction.parallel import process_parallel

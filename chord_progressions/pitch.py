@@ -331,7 +331,7 @@ def increment_note(note):
 def create_notes_freqs_table():
     """This is a one-off function that was used to create MIDI_NOTES and MIDI_NOTE_FREQUENCIES"""
 
-    from collections import OrderedDict  ## noqa
+    from collections import OrderedDict  # # noqa
 
     notes = OrderedDict()
 

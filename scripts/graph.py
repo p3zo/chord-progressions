@@ -68,7 +68,6 @@ Chord graph
 """
 
 import networkx as nx
-
 from chord_progressions.chord import get_template_from_notes, get_type_num_from_type
 
 

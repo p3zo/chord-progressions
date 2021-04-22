@@ -1,12 +1,12 @@
 from uuid import uuid4
 
-from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.pitch import (
     get_midi_num_from_note,
     get_note_from_midi_num,
     get_note_list,
     get_pitch_class_from_note,
 )
+from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import is_circular_match
 
 

@@ -1,13 +1,12 @@
 import os
+
 import pretty_midi
-
 from progression_extraction.label_arrangement import (
-    get_minimal_segments,
     DATA_DIR,
-    parse_events,
+    get_minimal_segments,
     get_partition_points,
+    parse_events,
 )
-
 
 # TODO: test that a maxiumum of six segment evaluations occur per note
 

@@ -7,11 +7,10 @@ import os
 import time
 from functools import partial
 
-from progression_extraction import SMALL_LMD_PATH, OUTPUT_LABEL_DIR
+from chord_progressions import logger
+from progression_extraction import OUTPUT_LABEL_DIR, SMALL_LMD_PATH
 from progression_extraction.label_arrangement import write_labels
 from progression_extraction.parallel import process_parallel
-from chord_progressions import logger
-
 
 if __name__ == "__main__":
 

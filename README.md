@@ -2,17 +2,9 @@
 
 Use this package to generate and describe chord progressions.
 
-##### Run units tests:
+## Usage
 
-```bash
-pytest
-```
-
-##### Generate a progression locally
-
-```bash
-./run.sh
-```
+See the [Makefile](Makefile) for available actions.
 
 ## TODO
 

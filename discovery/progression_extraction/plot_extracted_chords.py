@@ -4,10 +4,9 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
+from chord_progressions import logger
 from progression_extraction import OUTPUT_LABEL_DIR, PLOT_DIR
 from progression_extraction.label_arrangement import ALL_TEMPLATES
-from chord_progressions import logger
 
 YSCALE = 1
 

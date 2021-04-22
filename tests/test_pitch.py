@@ -1,5 +1,4 @@
 import pytest
-
 from chord_progressions.pitch import (
     MIDI_NOTE_FREQUENCIES,
     MIDI_NOTES,
