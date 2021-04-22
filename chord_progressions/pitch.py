@@ -360,3 +360,8 @@ def get_freq_from_note(note):
     ix = get_midi_num_from_note(note)
 
     return MIDI_NOTE_FREQUENCIES[ix]
+
+
+def get_n_overtones_harmonic(freq, n):
+    """Compute a list of n overtones above a given freq"""
+    return [i * freq for i in range(1, n + 2)]

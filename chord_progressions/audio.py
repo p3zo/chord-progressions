@@ -4,7 +4,7 @@ import numpy as np
 from scipy.io import wavfile
 
 from chord_progressions import WAV_OUTPUT_DIR, logger
-from chord_progressions.pitch import get_freq_from_note
+from chord_progressions.pitch import get_freq_from_note, get_n_overtones_harmonic
 
 SAMPLE_RATE = 44100
 
@@ -15,10 +15,6 @@ def mk_sin(freq, duration, a):
         for n in range(int(duration * SAMPLE_RATE))
     ]
     return np.array(s).reshape(-1, 1)
-
-
-def get_n_overtones_harmonic(freq, n):
-    return [i * freq for i in range(1, n + 2)]
 
 
 def mk_note_buffer(note, duration, n_overtones):
