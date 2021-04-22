@@ -21,10 +21,16 @@ from chord_progressions.audio import get_n_overtones_harmonic
 from chord_progressions.chord import (
     get_chords_from_chord_string,
     get_template_from_notes,
+    get_type_from_chord,
+    get_type_num_from_type,
     serialize_chords,
 )
 from chord_progressions.type_templates import TYPE_TEMPLATES
-from chord_progressions.pitch import get_freq_from_note, get_midi_num_from_note
+from chord_progressions.pitch import (
+    get_freq_from_note,
+    get_midi_num_from_note,
+    get_pitch_class_from_note,
+)
 from chord_progressions.solver import select_chords
 
 # created in `create_chord_classes.py`
@@ -136,14 +142,25 @@ def evaluate_chord(notes):
 
     interval_class_vector = get_interval_class_vector(notes)
 
-    # resonance = get_overtone_agreement(notes)
+    # overtone_agreement = get_overtone_agreement(notes)
 
-    # cardinality = len(notes)
     # evenness = get_evenness(interval_class_vector)
 
+    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
+    assert pc_cardinality <= 12, "Pitch class cardinality > 12"
+
+    chord_type = get_type_from_chord(notes)
+
+    metrics["type_id"] = get_type_num_from_type(chord_type)
+    metrics["type_name"] = chord_type
+    metrics["num_notes"] = len(notes)
+    metrics["num_pitches"] = len(set(notes))
+    metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
     # metrics["evenness"] = evenness
     # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
+    metrics["ambitus"] = get_ambitus(notes)
+    # metrics["overtone_agreement"] = overtone_agreement
 
     return metrics
 
