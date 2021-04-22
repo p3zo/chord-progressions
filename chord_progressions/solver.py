@@ -174,18 +174,33 @@ def get_possible_rotations(template, surrounding_rotations, pct_notes_common):
     return possible
 
 
+def get_template_str(template):
+
+    template_str = (
+        str(template)
+        .replace("[", "")
+        .replace("]", "")
+        .replace(",", "")
+        .replace(" ", "")
+    )
+
+    return template_str
+
+
 def get_all_rotations_of_template(template):
 
-    rotations = [template]
+    rotation_strs = set()
+    rotation_strs.add(get_template_str(template))
 
     prev = template
 
     for i in range(len(template) - 1):
         rotated = shift_arr_by_one(prev)
-        rotations.append(rotated)
+        rotation_strs.add(get_template_str(rotated))
+
         prev = rotated
 
-    return rotations
+     return [[int(j) for j in list(i)] for i in rotation_strs]
 
 
 def choose_random_chord_type(allowed_chord_types):

@@ -287,6 +287,10 @@ def get_pitch_class_from_note(note):
     return ix % 12
 
 
+def get_pitch_class_from_midi_num(note_num):
+    return note_num % 12
+
+
 def get_note_name_from_note(note):
     """Drops the octave part of the note name, e.g. A#4 -> A#"""
 
