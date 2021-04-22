@@ -200,7 +200,7 @@ def get_all_rotations_of_template(template):
 
         prev = rotated
 
-     return [[int(j) for j in list(i)] for i in rotation_strs]
+    return [[int(j) for j in list(i)] for i in rotation_strs]
 
 
 def choose_random_chord_type(allowed_chord_types):
