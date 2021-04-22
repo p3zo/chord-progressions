@@ -1,6 +1,0 @@
-mido==1.2.9
-numpy==1.19.4
-pretty_midi==0.2.9
-pytest
-pytest-cov
-scipy==1.6.2
