@@ -1,4 +1,6 @@
+import pandas as pd
 import numpy as np
+
 from chord_progressions import logger
 from chord_progressions.chord import (
     get_notes_from_template,
@@ -20,8 +22,43 @@ SPACING_CUTOFF = 52  # E3
 MIN_SPACING = 4  # half steps
 
 
-def get_n_common_ones(template_1, template_2):
+def make_note_event_df(notes, times):
 
+    # TODO: do this without pandas
+
+    df = pd.DataFrame([notes, times]).T
+    df.columns = ["note", "absolute_ticks"]
+
+    return df
+
+
+def get_active_note_at_time(note_events, t):
+    """
+    NOTE: note_events must be monophonic.
+
+    Input: a list of `note_on` and `note_off` midi messages.
+
+    Returns: a list of `active` notes at a given time `t` in midi ticks,
+    where `active` is defined as a note_on event occurred before or at time `t`
+    and a `note_off` event has not yet occurred.
+
+    If no note is sounding at the given time, the closest active note is returned.
+    TODO: return the last active note instead of the closest.
+    """
+    distances = (note_events["absolute_ticks"] - t).abs()
+
+    min_ixs = distances[distances == distances.min()].index.tolist()
+
+    closest_events = note_events.iloc[min_ixs]
+
+    # TODO: put more thought into which to return in the case of multiple
+    return closest_events.iloc[0].note
+
+
+def get_n_common_ones(template_1, template_2):
+    """
+    Doesn't consider rotations, e.g. get_n_common_ones([1, 0, 1, 1], [0, 1, 1, 0]) = 1
+    """
     one_indices_1 = [ix for ix, i in enumerate(template_1) if i == 1]
     one_indices_2 = [ix for ix, i in enumerate(template_2) if i == 1]
 
@@ -42,10 +79,6 @@ def get_n_max_matches_between_templates(template_1, template_2):
 
         template_1 = shift_arr_by_one(template_1)
 
-        # TODO: is this needed?
-        # for j in range(len(template_2) - 1):
-        #     template_2 = shift_arr_by_one(template_2)
-
         n = get_n_common_ones(template_1, template_2)
 
         if n > matches:
@@ -55,7 +88,10 @@ def get_n_max_matches_between_templates(template_1, template_2):
 
 
 def high_enough_match(num, denom_1, denom_2, thresh):
-
+    """
+    Returns True if both quotients of a number divided
+    by two denominators are greater than a threshold
+    """
     pct_1 = num / denom_1
     pct_2 = num / denom_2
 
@@ -68,7 +104,12 @@ def template_meets_constraints(
     preceding_rotation,
     succeeding_rotation,
 ):
-
+    """
+    Returns True if `template`
+        - has num notes between `n_notes_min` and `n_notes_max`
+        - has num consecutive notes less than `n_consecutive max`
+        - has at least `pct_notes_common` with both preceding & succeeding rotations
+    """
     if preceding_rotation:
 
         n_max = get_n_max_matches_between_templates(template, preceding_rotation)
@@ -138,7 +179,10 @@ def select_voicing(rotation, note_range_low, note_range_high):
 
 
 def get_rotations_in_common(template, rotation, pct_notes_common):
-
+    """
+    Returns a list of lists with all the rotations of `template` that share
+    at least `pct_notes_common` with `rotation`.
+    """
     matches = []
 
     n = get_n_common_ones(template, rotation)
@@ -159,7 +203,10 @@ def get_rotations_in_common(template, rotation, pct_notes_common):
 
 
 def get_possible_rotations(template, surrounding_rotations, pct_notes_common):
-
+    """
+    Returns a list of lists with all the rotations of `template` that share at least
+    `pct_notes_common` with any `surrounding_rotations`.
+    """
     if not any(surrounding_rotations):
         return get_all_rotations_of_template(template)
 
@@ -231,11 +278,26 @@ def choose_chord_with_constraints(
         allowed_types.remove(chord_type)
 
         if len(allowed_types) == 0:
-            raise ValueError("No chord types meet constraints.")
+            logger.warning("No chord types meet constraints.")
+            return None, None
 
         chord_type, template = choose_random_chord_type(allowed_types)
 
     return chord_type, template
+
+
+def nullify_one_in_array(arr):
+    """
+    Choose one non-null element in an array and replace it with None.
+    """
+    print(f"nullify_one_in_array. Previous: {arr}")
+    if any(arr):
+        true_ixs = [ix for ix, i in enumerate(arr) if i]
+        ix_to_nullify = np.random.choice(true_ixs)
+        arr[ix_to_nullify] = None
+
+    print(f"nullify_one_in_array. After: {arr}")
+    return arr
 
 
 def select_chords(
@@ -249,6 +311,9 @@ def select_chords(
     first_chord,
     adding,
     allowed_chord_types,
+    melody_notes,
+    melody_times,
+    melody_chord_placements,
 ):
     """
     Definitions
@@ -260,6 +325,20 @@ def select_chords(
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
+
+    use_melody = False
+
+    if all([melody_notes, melody_times, melody_chord_placements]):
+
+        use_melody = True
+        melody_note_events = make_note_event_df(melody_notes, melody_times)
+
+        active_melody_notes = [
+            get_active_note_at_time(melody_note_events, p)
+            for p in melody_chord_placements
+        ]
+
+    constraints_relaxed = []
 
     open_ixs = range(n_segments)
     rotations = [[]] * n_segments

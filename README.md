@@ -15,10 +15,14 @@ See the [Makefile](Makefile) for available actions.
 -   [feature] add the possibility of a repeated note in a different octave
 -   [feature] Generalize `noteNumberToFrequency` to use any periodic tuning https://github.com/soul-lang/SOUL/pull/26/files
 -   [feature] use VAE as solver
+-   [feature] take polyphonic melodies in harmonizer
+-   [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
 
 -   [maintainability] merge together chord_strings and duration_strings
 -   [maintainability] break out the merging of chord types into a function and test it
 -   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
+-   [maintainability] break `select_chords` apart into smaller functions
+
 
 ##### Maybe
 

@@ -5,29 +5,52 @@ import datetime as dt
 import os
 
 import numpy as np
-from chord_progressions import META_OUTPUT_DIR, WORDS_FILEPATH, logger
+from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, WORDS_FILEPATH, logger
 from chord_progressions.audio import save_audio_progression
-from chord_progressions.midi import save_midi_progression
+from chord_progressions.midi import make_midi_progression, save_midi_progression
 from chord_progressions.solver import select_chords
 from chord_progressions.utils import round_to_base
 
+
+DEFAULT_TICKS_PER_BEAT = 96
+DEFAULT_BPM = 120
+
 DEFAULT_ALLOWED_CHORD_TYPES = [
+    "whole-tone",
     "minor third",
     "major third",
+    "whole-tone trichord",
+    "major chord",
     "perfect fourth",
     "minor chord",
-    "dorian / minor pentachord",
     "diminished chord",
+    "minor-second quartal tetrachord",
+    "incomplete half-dim-seventh chord",
+    "quartal trichord",
     "augmented chord",
+    "dorian / minor pentachord",
+    "indian-japan pentatonic",
     "major-seventh chord",
     "minor-seventh chord",
     "major-ninth chord",
     "minor-ninth chord",
+    "minor-major ninth chord",
     "indian-japan pentatonic",
     "half-diminished seventh chord",
+    "french-sixth chord|messiaen's truncated 6",
+    "dominant-seventh / german-sixth chord",
     "diminished-seventh chord",
     "dominant-ninth,major-minor|prometheus pentamirror",
     "minor-second quartal tetrachord",
+    "incomplete dominant-seventh chord 2",
+    "dorian tetrachord|phrygian tetrachord",
+    "incomplete minor-seventh chord",
+    "phrygian trichord",
+    "italian sixth|incomplete dominant-seventh chord 1",
+    "dorian hexachord",
+    "natural / genuine / 'black key' / blues pentatonic|slendro|bilahariraga",
+    "dominanth-11th|natural / genuine / lydian hexachord",
+    "phrygian hexamirror",
 ]
 
 
@@ -39,7 +62,7 @@ def get_random_word():
     return words[np.random.randint(len(words))]
 
 
-def get_run_id():
+def get_run_id(name=None):
 
     today = dt.datetime.today()
     hour = today.hour * 60 * 60
@@ -48,6 +71,9 @@ def get_run_id():
     datetime_id = today.strftime("%y%j") + str(hour + minute + second)
 
     word_id = get_random_word()
+
+    if name:
+        return f"{name}_{word_id}_{datetime_id}"
 
     return f"{word_id}_{datetime_id}"
 
@@ -83,17 +109,30 @@ def generate_progression(
     first_chord = None
     adding = False
 
-    chord_types, chords = select_chords(
+    # TODO: bring harmonizer generation code here
+    melody_notes = None
+    melody_times = None
+    melody_chord_placements = None
+
+    chord_types, chords, constraints_relaxed = select_chords(
         n_segments=n_segments,
+        n_notes_min=n_notes_min,
+        n_notes_max=n_notes_max,
         pct_notes_common=pct_notes_common,
         note_range_low=note_range_low,
         note_range_high=note_range_high,
+        n_consecutive_max=n_consecutive_max,
+        drop_probability=drop_probability,
+        max_notes_to_drop=max_notes_to_drop,
         existing_chords=existing_chords,
         existing_types=existing_types,
         locks=locks,
         first_chord=first_chord,
         adding=adding,
         allowed_chord_types=allowed_chord_types,
+        melody_notes=melody_notes,
+        melody_times=melody_times,
+        melody_chord_placements=melody_chord_placements,
     )
 
     durations = get_chord_durations(
@@ -102,9 +141,13 @@ def generate_progression(
 
     run_id = get_run_id()
 
+    # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
     save_audio_progression(run_id, chords, durations, n_overtones)
 
-    save_midi_progression(run_id, chords, durations)
+    midi_progression = make_midi_progression(
+        chords, durations, DEFAULT_BPM, DEFAULT_TICKS_PER_BEAT, run_id
+    )
+    save_midi_progression(midi_progression, run_id, MIDI_OUTPUT_DIR)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
