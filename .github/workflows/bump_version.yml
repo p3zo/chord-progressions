@@ -8,25 +8,24 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     steps:
-    - name: actions/checkout
-      uses: actions/checkout@v2
-      with:
+      - name: actions/checkout
+        uses: actions/checkout@v2
+        with:
           persist-credentials: false
-    - name: Bump minor version
-      with:
-        commit_name: p3zo
-        commit_email: p3zo@users.noreply.github.com
-        login: your-bot-login
-        token: "${{ secrets.BOT_TOKEN }}"
-      shell: bash
-      run: |
-        set -x
-        git config --global user.name "${{ inputs.commit_name }}"
-        git config --global user.email "${{ inputs.commit_email }}"
-        git config --global pull.rebase false
-        BRANCH=${GITHUB_REF#refs/heads/}
-        pip install --no-cache-dir bumpversion
-        git remote add ${{ inputs.login }} https://${{ inputs.token }}@github.com/$GITHUB_REPOSITORY
-        git pull --no-edit ${{ inputs.login }} $BRANCH
-        bumpversion minor
-        git push --tags ${{ inputs.login }} HEAD:$BRANCH
+      - name: Bump minor version
+        with:
+          commit_name: p3zo
+          commit_email: p3zo@users.noreply.github.com
+          login: your-bot-login
+          token: "${{ secrets.BOT_TOKEN }}"
+        run: |
+          set -x
+          git config --global user.name $GITHUB_ACTOR"${{ inputs.commit_name }}"
+          git config --global user.email "${{ inputs.commit_email }}"
+          git config --global pull.rebase false
+          BRANCH=${GITHUB_REF#refs/heads/}
+          pip install --no-cache-dir bumpversion
+          git remote add ${{ inputs.login }} https://${{ inputs.token }}@github.com/$GITHUB_REPOSITORY
+          git pull --no-edit ${{ inputs.login }} $BRANCH
+          bumpversion minor
+          git push --tags ${{ inputs.login }} HEAD:$BRANCH
