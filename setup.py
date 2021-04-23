@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_packages, setup
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 test_requires = ["pytest", "pytest-cov"]
 dev_requires = ["black", "ipdb", "ipython", "isort", "bumpversion"]
