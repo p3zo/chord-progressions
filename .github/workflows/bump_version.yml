@@ -18,7 +18,7 @@ jobs:
         commit_email: p3zo@users.noreply.github.com
         login: your-bot-login
         token: "${{ secrets.BOT_TOKEN }}"
-    - shell: bash
+      shell: bash
       run: |
         set -x
         git config --global user.name "${{ inputs.commit_name }}"
