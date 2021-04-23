@@ -34,7 +34,6 @@ stop:
 	@echo "Bringing Docker down:"
 	docker-compose down
 
-test: build
+test:
 	@echo "Running tests:"
 	$(call run_docker_cmd,pytest)
-	docker-compose down

@@ -11,7 +11,6 @@ from chord_progressions.midi import make_midi_progression, save_midi_progression
 from chord_progressions.solver import select_chords
 from chord_progressions.utils import round_to_base
 
-
 DEFAULT_TICKS_PER_BEAT = 96
 DEFAULT_BPM = 120
 

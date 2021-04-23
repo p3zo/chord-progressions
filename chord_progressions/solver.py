@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from chord_progressions import logger
 from chord_progressions.chord import (
@@ -25,9 +25,11 @@ MIN_SPACING = 4  # half steps
 def make_note_event_df(notes, times):
 
     # TODO: do this without pandas
-
     df = pd.DataFrame([notes, times]).T
     df.columns = ["note", "absolute_ticks"]
+
+    # dtype = np.dtype([("note", int), ("absolute_ticks", int)])
+    # p_all = np.array(zip([notes, times]), dtype=dtype).T
 
     return df
 

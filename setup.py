@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 __version__ = "0.7.0"
 
 test_requires = ["pytest", "pytest-cov"]
-dev_requires = ["black", "ipdb", "ipython", "isort", "bumpversion"]
+dev_requires = ["black", "flake8", "ipdb", "ipython", "isort", "bumpversion"]
 
 # dependencies for features not yet fully integrated into the core API
 experimental_requires = [
@@ -33,6 +33,7 @@ setup(
     install_requires=[
         "mido==1.2.9",
         "numpy==1.19.4",
+        "pandas==1.2.4",
         "pretty_midi==0.2.9",
         "scipy==1.6.2",
     ],
