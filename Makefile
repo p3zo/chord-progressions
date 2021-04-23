@@ -10,11 +10,6 @@ build:
 	@echo "Building image:"
 	docker-compose build
 
-bump: build
-	@echo "Incrementing minor version:"
-	$(call run_docker_cmd,bumpversion minor)
-	docker-compose down
-
 clean:
 	@echo "Cleaning up artifacts:"
 	rm -rf dist

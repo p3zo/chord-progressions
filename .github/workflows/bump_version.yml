@@ -22,5 +22,5 @@ jobs:
           pip install --no-cache-dir bumpversion
           git remote add p3zo https://${{ secrets.BOT_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git pull --no-edit p3zo $BRANCH
-          bumpversion minor
+          bumpversion --tag --commit --commit-args="-a" minor
           git push --tags p3zo HEAD:$BRANCH
