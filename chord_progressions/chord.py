@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from chord_progressions import logger
 from chord_progressions.pitch import (
     get_midi_num_from_note,
     get_note_from_midi_num,
@@ -86,7 +87,7 @@ def get_type_from_chord(chord):
         if chord_is_of_type(chord, chord_type):
             return chord_type
 
-    print("No type template matched chord", chord)
+    logger.debug(f"No type template matched chord: {chord}")
     return ""
 
 
@@ -113,7 +114,7 @@ def get_types_from_chords(chords):
                 result.append(chord_type)
 
         if not match:
-            print("No type template matched chord", chord)
+            logger.debug(f"No type template matched chord: {chord}")
             result.append("")
 
     return result

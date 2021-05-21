@@ -6,7 +6,7 @@ __pycache__/
 coverage
 .pytest_cache/
 .coverage*
-tests/results
+**/tests/results/
 
 # distribution / packaging
 build/

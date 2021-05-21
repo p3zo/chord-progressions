@@ -18,6 +18,7 @@ from pprint import pprint
 import numpy as np
 from chord_progressions.chord import (
     get_chords_from_chord_string,
+    get_note_from_midi_num,
     get_template_from_notes,
     get_type_from_chord,
     get_type_num_from_type,
@@ -135,30 +136,34 @@ def get_overtone_agreement(notes):
 
 
 def evaluate_chord(notes):
-    """list of notes, e.g. ['F2', 'B2', 'D3', 'G#3']"""
+    """list of notes, e.g. [60, 64, 67]"""
 
     metrics = {}
 
-    interval_class_vector = get_interval_class_vector(notes)
+    # TODO: go alll the way through pitch/chord modules and make `note` and `midi_num` consistent
+    # I think we want to change `note` to be midi num and `note_name` to be what's currently `note` e.g. "C4"
+    note_names = [get_note_from_midi_num(n) for n in notes]
 
-    # overtone_agreement = get_overtone_agreement(notes)
+    interval_class_vector = get_interval_class_vector(note_names)
+
+    # overtone_agreement = get_overtone_agreement(note_names)
 
     # evenness = get_evenness(interval_class_vector)
 
-    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
+    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in note_names]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_chord(notes)
+    chord_type = get_type_from_chord(note_names)
 
     metrics["type_id"] = get_type_num_from_type(chord_type)
     metrics["type_name"] = chord_type
-    metrics["num_notes"] = len(notes)
-    metrics["num_pitches"] = len(set(notes))
+    metrics["num_notes"] = len(note_names)
+    metrics["num_pitches"] = len(set(note_names))
     metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
     # metrics["evenness"] = evenness
     # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
-    metrics["ambitus"] = get_ambitus(notes)
+    metrics["ambitus"] = get_ambitus(note_names)
     # metrics["overtone_agreement"] = overtone_agreement
 
     return metrics

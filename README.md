@@ -16,6 +16,7 @@ See the [Makefile](Makefile) for available actions.
 -   [feature] Generalize `noteNumberToFrequency` to use any periodic tuning https://github.com/soul-lang/SOUL/pull/26/files
 -   [feature] use VAE as solver
 
+-   [maintainability] change `note` to be midi num and use `note_name` for what's currently `note`, e.g. "C4"
 -   [maintainability] merge together chord_strings and duration_strings
 -   [maintainability] break out the merging of chord types into a function and test it
 -   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"

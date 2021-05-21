@@ -56,10 +56,10 @@ def mk_midi_progression(chords, durations, run_id):
     return progression
 
 
-def save_midi_progression(run_id, chords, durations):
+def save_midi_progression(run_id, chords, durations, outdir=MIDI_OUTPUT_DIR):
 
     midi_progression = mk_midi_progression(chords, durations, run_id)
 
-    filepath = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
+    filepath = os.path.join(outdir, f"{run_id}.mid")
     midi_progression.save(filepath)
     logger.info(f"Midi saved to {filepath}")
