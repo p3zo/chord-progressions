@@ -1,3 +1,9 @@
+import datetime as dt
+import numpy as np
+
+from chord_progressions import WORDS_FILEPATH
+
+
 def round_to_base(x, base):
     """Rounds a number `x` to the closest `base`"""
     return base * round(x / base)
@@ -47,3 +53,24 @@ def is_circular_match(list_1, list_2):
 
 #         if slot not in choices:
 #             choices[slot] = choice
+
+
+def get_random_word():
+
+    with open(WORDS_FILEPATH) as words_file:
+        words = words_file.read().split()
+
+    return words[np.random.randint(len(words))]
+
+
+def get_run_id():
+
+    today = dt.datetime.today()
+    hour = today.hour * 60 * 60
+    minute = today.minute * 60
+    second = today.second
+    datetime_id = today.strftime("%y%j") + str(hour + minute + second)
+
+    word_id = get_random_word()
+
+    return f"{word_id}_{datetime_id}"

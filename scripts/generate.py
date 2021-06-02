@@ -1,15 +1,17 @@
+"""Generate a chord progression"""
+
 import argparse
 import copy
 import csv
-import datetime as dt
 import os
 
 import numpy as np
-from chord_progressions import META_OUTPUT_DIR, WORDS_FILEPATH, logger
+
+from chord_progressions import META_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
 from chord_progressions.midi import save_midi_progression
 from chord_progressions.solver import select_chords
-from chord_progressions.utils import round_to_base
+from chord_progressions.utils import round_to_base, get_run_id
 
 DEFAULT_ALLOWED_CHORD_TYPES = [
     "minor third",
@@ -29,27 +31,6 @@ DEFAULT_ALLOWED_CHORD_TYPES = [
     "dominant-ninth,major-minor|prometheus pentamirror",
     "minor-second quartal tetrachord",
 ]
-
-
-def get_random_word():
-
-    with open(WORDS_FILEPATH) as words_file:
-        words = words_file.read().split()
-
-    return words[np.random.randint(len(words))]
-
-
-def get_run_id():
-
-    today = dt.datetime.today()
-    hour = today.hour * 60 * 60
-    minute = today.minute * 60
-    second = today.second
-    datetime_id = today.strftime("%y%j") + str(hour + minute + second)
-
-    word_id = get_random_word()
-
-    return f"{word_id}_{datetime_id}"
 
 
 def get_chord_durations(n_segments, duration_min, duration_max, duration_interval):

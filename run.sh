@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python3 chord_progressions/generate.py \
+python3 scripts/generate.py \
     --n_segments=5 \
     --pct_notes_common=1 \
     --note_range_low=36 \
