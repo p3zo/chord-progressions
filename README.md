@@ -1,12 +1,17 @@
 # Chord progressions
 
-Use this package to generate and describe chord progressions.
+Functions for generating and evaluating chord progressions.
 
 ## Usage
 
 See the [Makefile](Makefile) for available actions.
 
 ## TODO
+
+##### Tonal evaluation
+
+-   get key for progression
+-   get function chord name given key
 
 ##### Eventually
 

@@ -4,7 +4,7 @@ define run_docker_cmd
 		"$(1)"
 endef
 
-.PHONY: build bump clean dev generate shell stop test
+.PHONY: build clean dev format generate shell stop test
 
 build:
 	@echo "Building image:"

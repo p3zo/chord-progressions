@@ -1,5 +1,4 @@
 # from http://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
-# TODO: add a blank chord type first
 TYPE_TEMPLATES = {
     "": "",
     "unison": "100000000000",
