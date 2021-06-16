@@ -75,7 +75,7 @@ def get_notes_list_from_midi_nums_str(midi_nums_str):
     return [get_notes_from_midi_nums_str(s) for s in midi_nums_str.split("_")]
 
 
-def get_midi_nums_from_midi_nums_str():
+def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
     """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]"""
     return [m.split("-") for m in midi_nums_str.split("_")]
 
