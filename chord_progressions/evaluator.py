@@ -183,11 +183,11 @@ def get_ambitus(macroharmony):
 def evaluate_notes_list(notes_list):
     metrics = {}
 
-    macroharmony = get_macroharmony(progression)
+    macroharmony = get_macroharmony(notes_list)
 
     metrics["ambitus"] = get_ambitus(macroharmony)
 
-    metrics["density"] = len(macroharmony) / len(progression)
+    metrics["density"] = len(macroharmony) / len(notes_list)
 
     return metrics
 
