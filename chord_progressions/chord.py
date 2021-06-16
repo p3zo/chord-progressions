@@ -14,7 +14,7 @@ from chord_progressions.utils import is_circular_match
 def get_template_from_pitch_classes(pcs):
     template = [0] * 12
 
-    for ix in pitch_classes:
+    for ix in pcs:
         template[ix] = 1
 
     return template
