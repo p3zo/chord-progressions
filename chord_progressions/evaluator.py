@@ -18,7 +18,7 @@ import numpy as np
 from chord_progressions.chord import (
     get_note_from_midi_num,
     get_template_from_notes,
-    get_type_from_chord,
+    get_type_from_notes,
     get_type_num_from_type,
 )
 from chord_progressions.pitch import (
@@ -145,7 +145,7 @@ def evaluate_notes(notes):
     pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_chord(notes)
+    chord_type = get_type_from_notes(notes)
 
     metrics["type_id"] = get_type_num_from_type(chord_type)
     metrics["type_name"] = chord_type
@@ -174,9 +174,7 @@ def get_macroharmony(progression):
 
 
 def get_ambitus(macroharmony):
-    """
-    Ambitus, int, # semitones between the lowest and highest note
-    """
+    """Ambitus, int, # semitones between the lowest and highest note"""
     midi_notes = [get_midi_num_from_note(n) for n in macroharmony]
 
     return max(midi_notes) - min(midi_notes)
@@ -195,6 +193,7 @@ def evaluate_notes_list(notes_list):
 
 
 def evaluate_progression(progression):
+    """Takes a projecttion"""
 
     notes_list = [chord["notes"] for chord in progression]
 
@@ -214,6 +213,7 @@ def get_progression_key(progression):
 
 
 def get_chord_name(chord, progression, key=None):
+
     if not key:
         key = get_progression_key(progression)
 

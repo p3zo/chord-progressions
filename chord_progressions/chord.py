@@ -153,24 +153,24 @@ def get_notes_from_template(template, note_range_low, note_range_high):
     return [n for n in notes if n]
 
 
-def serialize_chord(chord, chord_type, duration, chord_metrics, locked, ix):
+def serialize_chord(notes, chord_type, duration, chord_metrics, locked, ix):
     return {
         "id": str(uuid4()),
         "ix": ix,
         "type": chord_type,
         "duration": duration,
         "typeId": get_type_num_from_type(chord_type),
-        "notes": chord,
+        "notes": notes,
         "locked": str(locked),
         "metrics": chord_metrics,
     }
 
 
-def serialize_chords(chords, chord_types, durations, chord_metrics, chord_locks):
+def serialize_chords(notes_list, chord_types, durations, chord_metrics, chord_locks):
     chord_dicts = []
 
     for ix, (chord, chord_type, duration) in enumerate(
-        list(zip(chords, chord_types, durations))
+        list(zip(notes_list, chord_types, durations))
     ):
 
         locked = list(chord_locks)[ix]
