@@ -271,9 +271,9 @@ def select_notes_list(
 
             open_ixs = [n_segments - 1]
 
-            for ix, notes_list in enumerate(existing_notes_list):
-                rotations[ix] = get_template_from_notes(notes_list)
-                notes_list[ix] = notes_list
+            for ix, notes in enumerate(existing_notes_list):
+                rotations[ix] = get_template_from_notes(notes)
+                notes_list[ix] = notes
                 chord_types[ix] = existing_types[ix]
 
         elif locks:
