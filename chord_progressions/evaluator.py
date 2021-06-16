@@ -131,35 +131,33 @@ def get_overtone_agreement(notes):
     return sum_of_differences
 
 
-def evaluate_chord(notes):
-    """list of notes, e.g. [60, 64, 67]"""
+def evaluate_chord(midi_nums):
+    """list of midi nums, e.g. [60, 64, 67]"""
 
     metrics = {}
 
-    # TODO: go alll the way through pitch/chord modules and make `note` and `midi_num` consistent
-    # I think we want to change `note` to be midi num and `note_name` to be what's currently `note` e.g. "C4"
-    note_names = [get_note_from_midi_num(n) for n in notes]
+    notes = [get_note_from_midi_num(n) for n in midi_nums]
 
-    interval_class_vector = get_interval_class_vector(note_names)
+    interval_class_vector = get_interval_class_vector(notes)
 
-    # overtone_agreement = get_overtone_agreement(note_names)
+    # overtone_agreement = get_overtone_agreement(notes)
 
     # evenness = get_evenness(interval_class_vector)
 
-    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in note_names]))
+    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_chord(note_names)
+    chord_type = get_type_from_chord(notes)
 
     metrics["type_id"] = get_type_num_from_type(chord_type)
     metrics["type_name"] = chord_type
-    metrics["num_notes"] = len(note_names)
-    metrics["num_pitches"] = len(set(note_names))
+    metrics["num_notes"] = len(notes)
+    metrics["num_pitches"] = len(set(notes))
     metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
     # metrics["evenness"] = evenness
     # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
-    metrics["ambitus"] = get_ambitus(note_names)
+    metrics["ambitus"] = get_ambitus(notes)
     # metrics["overtone_agreement"] = overtone_agreement
 
     return metrics
@@ -168,13 +166,13 @@ def evaluate_chord(notes):
 def get_macroharmony(progression):
     """The total collection of notes"""
 
-    notes = set()
+    collection = set()
 
     for chord in progression:
         for note in chord:
-            notes.add(note)
+            collection.add(note)
 
-    return notes
+    return collection
 
 
 def get_ambitus(macroharmony):

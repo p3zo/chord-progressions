@@ -11,10 +11,7 @@ from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import is_circular_match
 
 
-def get_template_from_notes(notes):
-
-    pitch_classes = [get_pitch_class_from_note(n) for n in notes]
-
+def get_template_from_pitch_classes(pcs):
     template = [0] * 12
 
     for ix in pitch_classes:
@@ -23,18 +20,39 @@ def get_template_from_notes(notes):
     return template
 
 
-def get_template_from_template_string(template_string):
-    return [int(i) for i in list(template_string)]
+def get_template_from_notes(notes):
+    """
+    e.g. ["C4", "C3"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    """
+    pitch_classes = [get_pitch_class_from_note(n) for n in notes]
+
+    return get_template_from_pitch_classes(pitch_classes)
+
+
+def get_template_from_midi_nums(midi_nums):
+    """
+    e.g. ["48", "60"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    """
+    pitch_classes = [get_pitch_class_from_note(n) for n in notes]
+
+    return get_template_from_pitch_classes(pitch_classes)
+
+
+def get_template_from_template_str(template_str):
+    """e.g. "101010101010" -> [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]"""
+    return [int(i) for i in list(template_str)]
 
 
 def get_type_from_type_num(num):
+    """Takes the id of a chord type and returns its name"""
     return list(TYPE_TEMPLATES)[num]
 
 
-def get_types_from_type_string(type_str):
+def get_types_from_type_num_str(type_num_str):
+    """Takes a type_num_str and returns a list of type names"""
     types = []
 
-    for num in type_str.split("_"):
+    for num in type_num_str.split("_"):
         if num == "":
             types.append("")
         else:
@@ -44,56 +62,65 @@ def get_types_from_type_string(type_str):
 
 
 def get_type_num_from_type(chord_type):
+    """Takes the name of a chord type and returns its id"""
     if not chord_type:
         return None
 
     return list(TYPE_TEMPLATES).index(chord_type)
 
 
-def get_notes_from_note_string(note_string):
-    return [get_note_from_midi_num(s) for s in note_string.split("-")]
+def get_notes_from_midi_num_str(midi_num_str):
+    """
+    e.g. "60-48" -> ["C4", "C3"]
+    """
+    return [get_note_from_midi_num(s) for s in midi_num_str.split("-")]
 
 
-def get_chords_from_chord_string(chord_str):
-    return [get_notes_from_note_string(s) for s in chord_str.split("_")]
+def get_notes_list_from_midi_num_str(midi_num_str):
+    """
+    e.g. "60-48_62-50" -> [["C4", "C3"], ["D4", "E3"]]
+    """
+    return [get_notes_from_midi_num_str(s) for s in midi_num_str.split("_")]
 
 
-def get_durations_from_duration_string(dur_str):
+def get_durations_from_duration_str(dur_str):
+    """
+    Takes a duration string and returns an array of durations
+
+    e.g. "1m_1m_1m" -> ["1m", "1m", "1m"]
+    """
     return dur_str.split("_")
 
 
-def get_chord_string_from_chords(chords):
-    midi_chords = [[str(get_midi_num_from_note(n)) for n in c] for c in chords]
-
-    return "_".join(["-".join(m) for m in midi_chords])
-
-
-def chord_is_of_type(chord, chord_type):
+def notes_match_chord_type(notes, chord_type):
+    """Returns true if any rotation of `notes` fit `chord_type`"""
     return is_circular_match(
-        get_template_from_notes(chord),
-        get_template_from_template_string(TYPE_TEMPLATES[chord_type]),
+        get_template_from_notes(notes),
+        get_template_from_template_str(TYPE_TEMPLATES[chord_type]),
     )
 
 
-def get_type_from_chord(chord):
+def get_type_from_notes(notes):
     """
-    Returns the first exact template match for the chord
+    Returns the first exact template match
+
+    e.g. ["C4", "C3"] -> "unison"
 
     TODO:
         - find partial matches as well
         - optimize
     """
     for chord_type in list(TYPE_TEMPLATES):
-        if chord_is_of_type(chord, chord_type):
+        if notes_match_chord_type(notes, chord_type):
             return chord_type
 
-    logger.debug(f"No type template matched chord: {chord}")
+    logger.debug(f"No type template matched chord: {notes}")
     return ""
 
 
-def get_types_from_chords(chords):
+def get_types_from_notes_list(notes_list):
     """
-    Returns the first exact template match for each chord
+    Returns the first exact template match for each note list
 
     TODO:
         - find partial matches as well
@@ -101,20 +128,20 @@ def get_types_from_chords(chords):
     """
     result = []
 
-    for chord in chords:
+    for notes in notes_list:
 
         match = False
 
         for chord_type in list(TYPE_TEMPLATES):
             if is_circular_match(
-                get_template_from_notes(chord),
-                get_template_from_template_string(TYPE_TEMPLATES[chord_type]),
+                get_template_from_notes(notes),
+                get_template_from_template_str(TYPE_TEMPLATES[chord_type]),
             ):
                 match = True
                 result.append(chord_type)
 
         if not match:
-            logger.debug(f"No type template matched chord: {chord}")
+            logger.debug(f"No type template matched chord: {notes}")
             result.append("")
 
     return result
@@ -126,7 +153,7 @@ def get_possible_types_of_chord(chord):
 
     for chord_type in list(TYPE_TEMPLATES):
 
-        if chord_is_of_type(chord, chord_type):
+        if notes_match_chord_type(chord, chord_type):
             possible_types.append(chord_type)
 
         # TODO: look for partial matches
@@ -140,7 +167,7 @@ def get_possible_types_of_chord(chord):
 # def chord_contained_in_type(chord, chord_type):
 #     return is_partial_circular_match(
 #         get_template_from_notes(chord),
-#         get_template_from_template_string(TYPE_TEMPLATES[chord_type]),
+#         get_template_from_template_str(TYPE_TEMPLATES[chord_type]),
 #     )
 
 
