@@ -23,7 +23,7 @@ def get_random_progression(n_segments):
 
     locks = "0" * n_segments
 
-    chord_types, notes_list = select_notes_list(
+    notes_list, chord_types = select_notes_list(
         n_segments=n_segments,
         n_notes_min=0,
         n_notes_max=12,
@@ -33,7 +33,7 @@ def get_random_progression(n_segments):
         spacing_cutoff=52,
         min_spacing=4,
         allowed_chord_types=list(TYPE_TEMPLATES),
-        existing_chords=None,
+        existing_notes_list=None,
         existing_types=None,
         locks=locks,
         adding=False,

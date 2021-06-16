@@ -54,10 +54,6 @@ Below are the names used by this library.
     "metrics": `chord_metrics`
     }
 
-*   `template`: list[int], An array of pitch classes in type_templates.
-*   `rotation`: list[int], A template transposed by any number of steps.
-*   `voicing`: list[int], same as `midi_nums`, An array of pitches.
-
 ## Usage
 
 See the [Makefile](Makefile) for available actions.

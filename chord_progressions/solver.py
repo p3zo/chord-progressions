@@ -250,6 +250,11 @@ def select_notes_list(
     adding,
     first_chord,
 ):
+    """
+    - `template`: list[int], An array of pitch classes in type_templates.
+    - `rotation`: list[int], A template transposed by any number of steps.
+    - `voicing`: list[str], notes_list
+    """
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"

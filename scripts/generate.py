@@ -58,18 +58,18 @@ def generate_progression(
     first_chord,
 ):
 
-    existing_chords = None
+    existing_notes_list = None
     existing_types = None
     locks = "0" * n_segments
     first_chord = None
     adding = False
 
-    chord_types, chords = select_notes_list(
+    notes_list, chord_types = select_notes_list(
         n_segments=n_segments,
         pct_notes_common=pct_notes_common,
         note_range_low=note_range_low,
         note_range_high=note_range_high,
-        existing_chords=existing_chords,
+        existing_notes_list=existing_notes_list,
         existing_types=existing_types,
         locks=locks,
         first_chord=first_chord,
@@ -83,9 +83,9 @@ def generate_progression(
 
     run_id = get_run_id()
 
-    save_audio_progression(run_id, chords, durations, n_overtones)
+    save_audio_progression(run_id, notes_list, durations, n_overtones)
 
-    save_midi_progression(run_id, chords, durations)
+    save_midi_progression(run_id, notes_list, durations)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
@@ -102,7 +102,7 @@ def generate_progression(
                 ["duration_max", duration_max],
                 ["duration_interval", duration_interval],
                 ["chord_types", chord_types],
-                ["chords", chords],
+                ["chords", notes_list],
                 ["durations", durations],
             ]
         )
