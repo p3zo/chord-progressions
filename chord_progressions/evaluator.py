@@ -131,12 +131,10 @@ def get_overtone_agreement(notes):
     return sum_of_differences
 
 
-def evaluate_chord(midi_nums):
-    """list of midi nums, e.g. [60, 64, 67]"""
+def evaluate_notes(notes):
+    """list of notes, e.g. ["C4", "E4", "G4"]"""
 
     metrics = {}
-
-    notes = [get_note_from_midi_num(n) for n in midi_nums]
 
     interval_class_vector = get_interval_class_vector(notes)
 
@@ -168,8 +166,8 @@ def get_macroharmony(progression):
 
     collection = set()
 
-    for chord in progression:
-        for note in chord:
+    for notes in progression:
+        for note in notes:
             collection.add(note)
 
     return collection
@@ -184,11 +182,7 @@ def get_ambitus(macroharmony):
     return max(midi_notes) - min(midi_notes)
 
 
-def evaluate_progression(progression, serialized=False):
-
-    if serialized:
-        progression = [chord["notes"] for chord in progression]
-
+def evaluate_notes_list(notes_list):
     metrics = {}
 
     macroharmony = get_macroharmony(progression)
@@ -198,6 +192,13 @@ def evaluate_progression(progression, serialized=False):
     metrics["density"] = len(macroharmony) / len(progression)
 
     return metrics
+
+
+def evaluate_progression(progression):
+
+    notes_list = [chord["notes"] for chord in progression]
+
+    return evaluate_notes_list(notes_list)
 
 
 def get_ofreqs_for_notes(notes, n_overtones):

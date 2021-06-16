@@ -10,7 +10,7 @@ import numpy as np
 from chord_progressions import META_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
 from chord_progressions.midi import save_midi_progression
-from chord_progressions.solver import select_chords
+from chord_progressions.solver import select_notes_list
 from chord_progressions.utils import round_to_base, get_run_id
 
 DEFAULT_ALLOWED_CHORD_TYPES = [
@@ -64,7 +64,7 @@ def generate_progression(
     first_chord = None
     adding = False
 
-    chord_types, chords = select_chords(
+    chord_types, chords = select_notes_list(
         n_segments=n_segments,
         pct_notes_common=pct_notes_common,
         note_range_low=note_range_low,

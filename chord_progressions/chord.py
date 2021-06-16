@@ -21,18 +21,14 @@ def get_template_from_pitch_classes(pcs):
 
 
 def get_template_from_notes(notes):
-    """
-    e.g. ["C4", "C3"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    """
+    """e.g. ["C4", "C3"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
     pitch_classes = [get_pitch_class_from_note(n) for n in notes]
 
     return get_template_from_pitch_classes(pitch_classes)
 
 
 def get_template_from_midi_nums(midi_nums):
-    """
-    e.g. ["48", "60"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    """
+    """e.g. ["48", "60"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
     pitch_classes = [get_pitch_class_from_note(n) for n in notes]
 
     return get_template_from_pitch_classes(pitch_classes)
@@ -69,18 +65,19 @@ def get_type_num_from_type(chord_type):
     return list(TYPE_TEMPLATES).index(chord_type)
 
 
-def get_notes_from_midi_num_str(midi_num_str):
-    """
-    e.g. "60-48" -> ["C4", "C3"]
-    """
-    return [get_note_from_midi_num(s) for s in midi_num_str.split("-")]
+def get_notes_from_midi_nums_str(midi_nums_str):
+    """e.g. "60-48" -> ["C4", "C3"]"""
+    return [get_note_from_midi_num(s) for s in midi_nums_str.split("-")]
 
 
-def get_notes_list_from_midi_num_str(midi_num_str):
-    """
-    e.g. "60-48_62-50" -> [["C4", "C3"], ["D4", "E3"]]
-    """
-    return [get_notes_from_midi_num_str(s) for s in midi_num_str.split("_")]
+def get_notes_list_from_midi_nums_str(midi_nums_str):
+    """e.g. "60-48_62-50" -> [["C4", "C3"], ["D4", "E3"]]"""
+    return [get_notes_from_midi_nums_str(s) for s in midi_nums_str.split("_")]
+
+
+def get_midi_nums_from_midi_nums_str():
+    """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]"""
+    return [m.split("-") for m in midi_nums_str.split("_")]
 
 
 def get_durations_from_duration_str(dur_str):
@@ -145,30 +142,6 @@ def get_types_from_notes_list(notes_list):
             result.append("")
 
     return result
-
-
-def get_possible_types_of_chord(chord):
-    """Returns an array of strings with possible chord types"""
-    possible_types = []
-
-    for chord_type in list(TYPE_TEMPLATES):
-
-        if notes_match_chord_type(chord, chord_type):
-            possible_types.append(chord_type)
-
-        # TODO: look for partial matches
-        # if chord_contained_in_type(chord, chord_type):
-        #     possible_types.append(chord_type)
-
-    return possible_types
-
-
-# TODO: finish this
-# def chord_contained_in_type(chord, chord_type):
-#     return is_partial_circular_match(
-#         get_template_from_notes(chord),
-#         get_template_from_template_str(TYPE_TEMPLATES[chord_type]),
-#     )
 
 
 def get_notes_from_template(template, note_range_low, note_range_high):

@@ -238,17 +238,17 @@ def choose_template_with_constraints(
     return template, template_type
 
 
-def select_chords(
+def select_notes_list(
     n_segments,
     pct_notes_common,
     note_range_low,
     note_range_high,
-    existing_notes_lists,
+    allowed_chord_types,
+    existing_notes_list,
     existing_types,
     locks,
-    first_chord,
     adding,
-    allowed_chord_types,
+    first_chord,
 ):
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
@@ -256,19 +256,19 @@ def select_chords(
 
     open_ixs = range(n_segments)
     rotations = [[]] * n_segments
-    midi_nums_list = [[]] * n_segments
+    notes_list = [[]] * n_segments
     chord_types = [[]] * n_segments
 
-    if existing_notes_lists:
-        logger.info(f"Existing midi_nums_list: {existing_notes_lists}")
+    if existing_notes_list:
+        logger.info(f"Existing notes_list: {existing_notes_list}")
 
         if adding:
 
             open_ixs = [n_segments - 1]
 
-            for ix, notes_list in enumerate(existing_notes_lists):
+            for ix, notes_list in enumerate(existing_notes_list):
                 rotations[ix] = get_template_from_notes(notes_list)
-                midi_nums_list[ix] = notes_list
+                notes_list[ix] = notes_list
                 chord_types[ix] = existing_types[ix]
 
         elif locks:
@@ -278,8 +278,8 @@ def select_chords(
 
             for ix, locked in enumerate(locks):
                 if locked == "1":
-                    rotations[ix] = get_template_from_notes(existing_notes_lists[ix])
-                    midi_nums_list[ix] = existing_notes_lists[ix]
+                    rotations[ix] = get_template_from_notes(existing_notes_list[ix])
+                    notes_list[ix] = existing_notes_list[ix]
                     chord_types[ix] = existing_types[ix]
 
     logger.info(f"Progression indexes to fill: {open_ixs}")
@@ -312,13 +312,13 @@ def select_chords(
 
         voicing = select_voicing(rotation, note_range_low, note_range_high)
 
-        midi_nums_list[ix] = voicing
+        notes_list[ix] = voicing
         chord_types[ix] = chord_type
         rotations[ix] = rotation
 
         logger.info(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
 
-    return chord_types, midi_nums_list
+    return notes_list, chord_types
 
 
 def is_voicing_spaced(voicing):
