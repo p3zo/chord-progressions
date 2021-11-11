@@ -4,10 +4,19 @@ from chord_progressions.solver import (
     get_n_common_ones,
     get_n_max_matches_between_templates,
     get_possible_rotations,
+    get_template_str,
     high_enough_match,
     select_notes_list,
     template_meets_constraints,
 )
+
+
+def test_get_template_str():
+    t1 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    t2 = [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0]
+
+    assert get_template_str(t1) == "111111111111"
+    assert get_template_str(t2) == "100100001000"
 
 
 def test_template_meets_constraints():

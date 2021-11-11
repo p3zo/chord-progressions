@@ -189,16 +189,7 @@ def get_possible_rotations(template, surrounding_rotations, pct_notes_common):
 
 
 def get_template_str(template):
-
-    template_str = (
-        str(template)
-        .replace("[", "")
-        .replace("]", "")
-        .replace(",", "")
-        .replace(" ", "")
-    )
-
-    return template_str
+    return "".join([str(i) for i in template])
 
 
 def get_all_rotations_of_template(template):
