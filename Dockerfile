@@ -9,6 +9,7 @@ COPY tests $APP_DIR/tests/
 COPY requirements.txt $APP_DIR/requirements.txt
 COPY setup.cfg $APP_DIR/setup.cfg
 COPY setup.py $APP_DIR/setup.py
+COPY run.sh $APP_DIR/run.sh
 
 WORKDIR $APP_DIR
 
