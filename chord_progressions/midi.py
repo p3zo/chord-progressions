@@ -4,12 +4,11 @@ import mido
 from chord_progressions import MIDI_OUTPUT_DIR, logger
 from chord_progressions.pitch import get_midi_num_from_note
 
-BPM = 120
-MIDI_TEMPO = mido.bpm2tempo(BPM)
-MIDI_TICKS_PER_BEAT = 480
+DEFAULT_BPM = 120
+DEFAULT_MIDI_TICKS_PER_BEAT = 480
 
 
-def mk_midi_chord(chord, start_tick, end_tick):
+def make_midi_chord(chord, start_tick, end_tick):
 
     note_onsets = []
     note_offsets = []
@@ -30,25 +29,45 @@ def mk_midi_chord(chord, start_tick, end_tick):
     return note_onsets + note_offsets
 
 
-def get_midi_ticks_from_seconds(seconds):
-    return int(mido.second2tick(seconds, MIDI_TICKS_PER_BEAT, MIDI_TEMPO))
+def get_midi_ticks_from_seconds(seconds, bpm, ticks_per_beat):
+    midi_tempo = mido.bpm2tempo(bpm)
+    return int(mido.second2tick(seconds, ticks_per_beat, midi_tempo))
 
 
-def mk_midi_progression(chords, durations, run_id):
+def get_seconds_from_midi_ticks(ticks, bpm, ticks_per_beat):
+    midi_tempo = mido.bpm2tempo(bpm)
+    return mido.tick2second(ticks, ticks_per_beat, midi_tempo)
+
+
+def make_midi_progression(
+    chords,
+    durations,
+    run_id,
+    ticks_per_beat=DEFAULT_MIDI_TICKS_PER_BEAT,
+    bpm=DEFAULT_BPM,
+):
+    """
+    chords: list of lists containing note strings
+    durations: list of floats representing seconds
+        The length of this list must match the length of `chords`
+    bpm: int
+    ticks_per_beat: int
+        The length of a tick is defined in ticks per beat. This value is stored
+        as ticks_per_beat in MidiFile objects and remains fixed throughout a track.
+    run_id: str to be used in filepath and in midi track name
+    """
 
     progression = mido.MidiFile(type=0)
+    progression.ticks_per_beat = ticks_per_beat
 
     track = mido.MidiTrack()
     track.name = run_id
     progression.tracks.append(track)
 
-    track.append(mido.MetaMessage("set_tempo", tempo=MIDI_TEMPO, time=0))
-
     for chord, duration in zip(chords, durations):
+        tick_duration = get_midi_ticks_from_seconds(duration, bpm, ticks_per_beat)
 
-        tick_duration = get_midi_ticks_from_seconds(duration)
-
-        chord = mk_midi_chord(chord, 0, tick_duration)
+        chord = make_midi_chord(chord, 0, tick_duration)
 
         for msg in chord:
             track.append(msg)
@@ -56,10 +75,16 @@ def mk_midi_progression(chords, durations, run_id):
     return progression
 
 
-def save_midi_progression(run_id, chords, durations, outdir=MIDI_OUTPUT_DIR):
+def save_midi_progression(midi_progression, run_id, output_dir):
+    """
+    midi_progression: MidiFile of the entire progression
+    run_id: str to be used in filepath and in midi track name
+    output_dir: str, path to directory
+    """
+    filename = f"{run_id}.mid"
+    midi_progression.filename = filename
 
-    midi_progression = mk_midi_progression(chords, durations, run_id)
-
-    filepath = os.path.join(outdir, f"{run_id}.mid")
+    filepath = os.path.join(output_dir, filename)
     midi_progression.save(filepath)
+
     logger.info(f"Midi saved to {filepath}")

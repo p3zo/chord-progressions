@@ -63,7 +63,7 @@ def get_random_word():
     return words[np.random.randint(len(words))]
 
 
-def get_run_id():
+def get_run_id(name=None):
 
     today = dt.datetime.today()
     hour = today.hour * 60 * 60
@@ -72,5 +72,8 @@ def get_run_id():
     datetime_id = today.strftime("%y%j") + str(hour + minute + second)
 
     word_id = get_random_word()
+
+    if name:
+        return f"{name}_{word_id}_{datetime_id}"
 
     return f"{word_id}_{datetime_id}"

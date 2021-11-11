@@ -61,9 +61,11 @@ See the [Makefile](Makefile) for available actions.
 -   [feature] Generalize `noteNumberToFrequency` to use any periodic tuning https://github.com/soul-lang/SOUL/pull/26/files
 -   [feature] use VAE as solver
 -   [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
+-   [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
 
 -   [maintainability] break out the merging of chord types into a function and test it
 -   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
+-   [maintainability] break `select_chords` apart into smaller functions
 
 ##### Maybe
 

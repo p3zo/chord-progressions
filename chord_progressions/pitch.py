@@ -271,17 +271,17 @@ MIDI_NOTE_FREQUENCIES = [
 
 
 def get_note_from_midi_num(note_num):
-    return MIDI_NOTES[int(note_num)]
+    try:
+        return MIDI_NOTES[int(note_num)]
+    except IndexError:
+        raise IndexError(f"Invalid midi note number: {note_num}")
 
 
 def get_midi_num_from_note(note):
-
     try:
-        ix = MIDI_NOTES.index(note)
+        return MIDI_NOTES.index(note)
     except ValueError:
-        raise ValueError(f"Invalid note name: `{note}`")
-
-    return ix
+        raise ValueError(f"Invalid note name: {note}")
 
 
 def get_pitch_class_from_note(note):

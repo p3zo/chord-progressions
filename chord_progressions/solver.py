@@ -21,7 +21,9 @@ MIN_SPACING = 4  # half steps
 
 
 def get_n_common_ones(template_1, template_2):
-
+    """
+    Doesn't consider rotations, e.g. get_n_common_ones([1, 0, 1, 1], [0, 1, 1, 0]) = 1
+    """
     one_indices_1 = [ix for ix, i in enumerate(template_1) if i == 1]
     one_indices_2 = [ix for ix, i in enumerate(template_2) if i == 1]
 
@@ -55,7 +57,10 @@ def get_n_max_matches_between_templates(template_1, template_2):
 
 
 def high_enough_match(num, denom_1, denom_2, thresh):
-
+    """
+    Returns True if both quotients of a number divided
+    by two denominators are greater than a threshold
+    """
     pct_1 = num / denom_1
     pct_2 = num / denom_2
 
@@ -68,7 +73,12 @@ def template_meets_constraints(
     preceding_rotation,
     succeeding_rotation,
 ):
-
+    """
+    Returns True if `template`
+        - has num notes between `n_notes_min` and `n_notes_max`
+        - has num consecutive notes less than `n_consecutive max`
+        - has at least `pct_notes_common` with both preceding & succeeding rotations
+    """
     if preceding_rotation:
 
         n_max = get_n_max_matches_between_templates(template, preceding_rotation)
@@ -138,7 +148,10 @@ def select_voicing(rotation, note_range_low, note_range_high):
 
 
 def get_rotations_in_common(template, rotation, pct_notes_common):
-
+    """
+    Returns a list of lists with all the rotations of `template` that share
+    at least `pct_notes_common` with `rotation`.
+    """
     matches = []
 
     n = get_n_common_ones(template, rotation)
@@ -159,7 +172,10 @@ def get_rotations_in_common(template, rotation, pct_notes_common):
 
 
 def get_possible_rotations(template, surrounding_rotations, pct_notes_common):
-
+    """
+    Returns a list of lists with all the rotations of `template` that share at least
+    `pct_notes_common` with any `surrounding_rotations`.
+    """
     if not any(surrounding_rotations):
         return get_all_rotations_of_template(template)
 
@@ -231,7 +247,8 @@ def choose_template_with_constraints(
         allowed_types.remove(template_type)
 
         if len(allowed_types) == 0:
-            raise ValueError("No chord types meet constraints.")
+            logger.warning("No chord types meet constraints.")
+            return None, None
 
         template, template_type = choose_random_template(allowed_types)
 

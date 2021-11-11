@@ -9,7 +9,7 @@ import numpy as np
 
 from chord_progressions import META_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
-from chord_progressions.midi import save_midi_progression
+from chord_progressions.midi import DEFAULT_MIDI_TICKS_PER_BEAT, save_midi_progression
 from chord_progressions.solver import select_notes_list
 from chord_progressions.utils import round_to_base, get_run_id
 
@@ -83,9 +83,11 @@ def generate_progression(
 
     run_id = get_run_id()
 
+    # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
     save_audio_progression(run_id, notes_list, durations, n_overtones)
 
-    save_midi_progression(run_id, notes_list, durations)
+    midi_progression = make_midi_progression(notes_list, durations, run_id)
+    save_midi_progression(midi_progression, run_id, MIDI_OUTPUT_DIR)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
