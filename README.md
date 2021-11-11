@@ -6,59 +6,39 @@ Functions for generating and evaluating chord progressions.
 
 Below are the names used by this library.
 
--   `midi_num`: str, "60"
--   `note`: str, "C4"
--   `note_name`: str, "C"
--   `octave`: int, 4
--   `pitch_class`: int, 0
-
--   `midi_nums`: list[int], [60, 48]
--   `notes`: list[str], ["C4", "C3"]
-
--   `midi_nums_str`: str, "60-48" or "60-48_62-52"
--   `note_str`: str, "C4-C3" or "C4-C3_D4-E3"
-
--   `midi_nums_list`: list[list[int]], [[60, 48], [62, 52]]
--   `notes_list`: list[list[str]], [["C4", "C3"], ["D4", "E3"]]
-
--   `chord_type`: str, "unison"
--   `type_num`: int, 1 (todo: add chord prefix)
--   `type_id`: int, same as `type_num` (todo: use only one and add chord prefix)
-
--   `type_num_str`: 1*1 (todo: use only this or type_id_str and add chord* prefix)
--   `chord_types`: [ "unison", "unison" ]
-
--   `duration`: "1m"
--   `durations`: ["1m", "1m", "1m", "1m"]
--   `duration_str`: "1m_1m_1m_1m"
-
--   `template`: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
--   `template_str`: '101010101010'
-
--   `freq`: 440.0
-
--   `chord_index`: int, 1, the chord's position in a progression
-
--   `id`: str, aaaa_bbbb_cccc_dddd, a random uuid assigned to the chord
-
--   `locks`: str, 00100 (todo: rename to lock_str)
-
--   `chord`: {
-    "id": `id`,
-    "ix": `chord_index`,
-    "type": `chord_type`,
-    "duration": `duration`,
-    "typeId": `type_id`,
-    "notes": `notes`,
-    "locked": `lock_str`,
-    "metrics": `chord_metrics`
-    }
-
-- progression: list[`chord`]
-
-*   `template`: list[int], An array of pitch classes in type_templates.
-*   `rotation`: list[int], A template transposed by any number of steps.
-*   `voicing`: list[int], same as `midi_nums`, An array of pitches.
+| Name                             | Type            | Example                                                                                                                                                                  |
+| -------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Row 1 Column 1                   | Row 1 Column 2  | Row 1 Column 3                                                                                                                                                           |
+| midi_num                         | str             | "60"                                                                                                                                                                     |
+| note                             | str             | "C4"                                                                                                                                                                     |
+| note_name                        | str             | "C"                                                                                                                                                                      |
+| octave                           | int             | 4                                                                                                                                                                        |
+| pitch_class                      | int             | 0                                                                                                                                                                        |
+| midi_nums                        | list[int]       | [60, 48]                                                                                                                                                                 |
+| notes                            | list[str]       | ["C4", "C3"]                                                                                                                                                             |
+| midi_nums_str                    | str             | "60-48" or "60-48_62-52"                                                                                                                                                 |
+| note_str                         | str             | "C4-C3" or "C4-C3_D4-E3"                                                                                                                                                 |
+| midi_nums_list                   | list[list[int]] | [[60, 48], [62, 52]]                                                                                                                                                     |
+| notes_list                       | list[list[str]] | [["C4", "C3"], ["D4", "E3"]]                                                                                                                                             |
+| chord_type                       | str             | "unison"                                                                                                                                                                 |
+| type_num                         | int             | 1 (todo: add chord prefix)                                                                                                                                               |
+| type_id                          | int             | same as `type_num` (todo: use only one and add chord prefix)                                                                                                             |
+| type_num_str                     | str             | 1*1 (todo: use only this or type_id_str and add chord* prefix)                                                                                                           |
+| chord_types                      | list[str]       | [ "unison", "unison" ]                                                                                                                                                   |
+| duration                         | str             | "1m"                                                                                                                                                                     |
+| durations                        | list[str]       | ["1m", "1m", "1m", "1m"]                                                                                                                                                 |
+| duration_str                     | str             | "1m_1m_1m_1m"                                                                                                                                                            |
+| template                         | list[int]       | [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]                                                                                                                                     |
+| template_str                     | str             | '101010101010'                                                                                                                                                           |
+| freq                             | float           | 440.0                                                                                                                                                                    |
+| chord_index                      | int             | 1, the chord's position in a progression                                                                                                                                 |
+| id                               | str             | aaaa_bbbb_cccc_dddd, a random uuid assigned to the chord                                                                                                                 |
+| locks (todo: rename to lock_str) | str             | 00100                                                                                                                                                                    |
+| chord                            | dict            | {"id": `id`, "ix": `chord_index`, "type": `chord_type`, "duration": `duration`, "typeId": `type_id`, "notes": `notes`, "locked": `lock_str`, "metrics": `chord_metrics`} |
+| progression                      | list[`chord`]   |
+| template                         | list[int]       | An array of pitch classes in type_templates.                                                                                                                             |
+| rotation                         | list[int]       | A template transposed by any number of steps.                                                                                                                            |
+| voicing                          | list[int]       | same as `midi_nums`, An array of pitches.                                                                                                                                |
 
 ## Usage
 
