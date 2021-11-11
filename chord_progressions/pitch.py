@@ -25,6 +25,7 @@ MIDI_NOTES = [
     "F#0",
     "G0",
     "G#0",
+    # start piano range
     "A0",
     "A#0",
     "B0",
@@ -113,6 +114,7 @@ MIDI_NOTES = [
     "A#7",
     "B7",
     "C8",
+    # end piano range
     "C#8",
     "D8",
     "D#8",
@@ -156,6 +158,7 @@ MIDI_NOTE_FREQUENCIES = [
     23.12,
     24.5,
     25.96,
+    # start piano range
     27.5,
     29.14,
     30.87,
@@ -244,6 +247,7 @@ MIDI_NOTE_FREQUENCIES = [
     3729.31,
     3951.07,
     4186.01,
+    # end piano range
     4434.92,
     4698.64,
     4978.03,
@@ -329,7 +333,7 @@ def increment_note(note):
 
 
 def create_notes_freqs_table():
-    """This is a one-off function that was used to create MIDI_NOTES and MIDI_NOTE_FREQUENCIES"""
+    """This is a one-off function that was used to create the MIDI_NOTES and MIDI_NOTE_FREQUENCIES constants"""
 
     from collections import OrderedDict  # # noqa
 

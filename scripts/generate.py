@@ -1,15 +1,17 @@
+"""Generate a chord progression"""
+
 import argparse
 import copy
 import csv
-import datetime as dt
 import os
 
 import numpy as np
-from chord_progressions import META_OUTPUT_DIR, WORDS_FILEPATH, logger
+
+from chord_progressions import META_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
 from chord_progressions.midi import save_midi_progression
-from chord_progressions.solver import select_chords
-from chord_progressions.utils import round_to_base
+from chord_progressions.solver import select_notes_list
+from chord_progressions.utils import round_to_base, get_run_id
 
 DEFAULT_ALLOWED_CHORD_TYPES = [
     "minor third",
@@ -29,27 +31,6 @@ DEFAULT_ALLOWED_CHORD_TYPES = [
     "dominant-ninth,major-minor|prometheus pentamirror",
     "minor-second quartal tetrachord",
 ]
-
-
-def get_random_word():
-
-    with open(WORDS_FILEPATH) as words_file:
-        words = words_file.read().split()
-
-    return words[np.random.randint(len(words))]
-
-
-def get_run_id():
-
-    today = dt.datetime.today()
-    hour = today.hour * 60 * 60
-    minute = today.minute * 60
-    second = today.second
-    datetime_id = today.strftime("%y%j") + str(hour + minute + second)
-
-    word_id = get_random_word()
-
-    return f"{word_id}_{datetime_id}"
 
 
 def get_chord_durations(n_segments, duration_min, duration_max, duration_interval):
@@ -77,18 +58,18 @@ def generate_progression(
     first_chord,
 ):
 
-    existing_chords = None
+    existing_notes_list = None
     existing_types = None
     locks = "0" * n_segments
     first_chord = None
     adding = False
 
-    chord_types, chords = select_chords(
+    notes_list, chord_types = select_notes_list(
         n_segments=n_segments,
         pct_notes_common=pct_notes_common,
         note_range_low=note_range_low,
         note_range_high=note_range_high,
-        existing_chords=existing_chords,
+        existing_notes_list=existing_notes_list,
         existing_types=existing_types,
         locks=locks,
         first_chord=first_chord,
@@ -102,9 +83,9 @@ def generate_progression(
 
     run_id = get_run_id()
 
-    save_audio_progression(run_id, chords, durations, n_overtones)
+    save_audio_progression(run_id, notes_list, durations, n_overtones)
 
-    save_midi_progression(run_id, chords, durations)
+    save_midi_progression(run_id, notes_list, durations)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
@@ -121,7 +102,7 @@ def generate_progression(
                 ["duration_max", duration_max],
                 ["duration_interval", duration_interval],
                 ["chord_types", chord_types],
-                ["chords", chords],
+                ["chords", notes_list],
                 ["durations", durations],
             ]
         )

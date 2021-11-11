@@ -3,7 +3,7 @@ from chord_progressions import logger
 from chord_progressions.chord import (
     get_notes_from_template,
     get_template_from_notes,
-    get_template_from_template_string,
+    get_template_from_template_str,
 )
 from chord_progressions.pitch import (
     get_midi_num_from_note,
@@ -201,16 +201,16 @@ def get_all_rotations_of_template(template):
     return [[int(j) for j in list(i)] for i in rotation_strs]
 
 
-def choose_random_chord_type(allowed_chord_types):
+def choose_random_template(allowed_chord_types):
 
-    chord_type = allowed_chord_types[np.random.randint(len(allowed_chord_types))]
+    template_type = allowed_chord_types[np.random.randint(len(allowed_chord_types))]
 
-    template = get_template_from_template_string(TYPE_TEMPLATES[chord_type])
+    template = get_template_from_template_str(TYPE_TEMPLATES[template_type])
 
-    return chord_type, template
+    return template, template_type
 
 
-def choose_chord_with_constraints(
+def choose_template_with_constraints(
     allowed_chord_types,
     pct_notes_common,
     preceding_rotation,
@@ -219,7 +219,7 @@ def choose_chord_with_constraints(
 
     allowed_types = allowed_chord_types.copy()
 
-    chord_type, template = choose_random_chord_type(allowed_types)
+    template, template_type = choose_random_template(allowed_types)
 
     while not template_meets_constraints(
         template,
@@ -228,54 +228,52 @@ def choose_chord_with_constraints(
         succeeding_rotation,
     ):
 
-        allowed_types.remove(chord_type)
+        allowed_types.remove(template_type)
 
         if len(allowed_types) == 0:
             raise ValueError("No chord types meet constraints.")
 
-        chord_type, template = choose_random_chord_type(allowed_types)
+        template, template_type = choose_random_template(allowed_types)
 
-    return chord_type, template
+    return template, template_type
 
 
-def select_chords(
+def select_notes_list(
     n_segments,
     pct_notes_common,
     note_range_low,
     note_range_high,
-    existing_chords,
+    allowed_chord_types,
+    existing_notes_list,
     existing_types,
     locks,
-    first_chord,
     adding,
-    allowed_chord_types,
+    first_chord,
 ):
     """
-    Definitions
-        template: An array of pitch classes in type_templates.
-        rotation: A template transposed by any number of steps.
-        voicing: An array of pitches.
+    - `template`: list[int], An array of pitch classes in type_templates.
+    - `rotation`: list[int], A template transposed by any number of steps.
+    - `voicing`: list[str], notes_list
     """
-
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
 
     open_ixs = range(n_segments)
     rotations = [[]] * n_segments
-    chords = [[]] * n_segments
+    notes_list = [[]] * n_segments
     chord_types = [[]] * n_segments
 
-    if existing_chords:
-        logger.info(f"Existing chords:, {existing_chords}")
+    if existing_notes_list:
+        logger.info(f"Existing notes_list: {existing_notes_list}")
 
         if adding:
 
             open_ixs = [n_segments - 1]
 
-            for ix, existing_chord in enumerate(existing_chords):
-                rotations[ix] = get_template_from_notes(existing_chord)
-                chords[ix] = existing_chord
+            for ix, notes in enumerate(existing_notes_list):
+                rotations[ix] = get_template_from_notes(notes)
+                notes_list[ix] = notes
                 chord_types[ix] = existing_types[ix]
 
         elif locks:
@@ -285,8 +283,8 @@ def select_chords(
 
             for ix, locked in enumerate(locks):
                 if locked == "1":
-                    rotations[ix] = get_template_from_notes(existing_chords[ix])
-                    chords[ix] = existing_chords[ix]
+                    rotations[ix] = get_template_from_notes(existing_notes_list[ix])
+                    notes_list[ix] = existing_notes_list[ix]
                     chord_types[ix] = existing_types[ix]
 
     logger.info(f"Progression indexes to fill: {open_ixs}")
@@ -299,7 +297,7 @@ def select_chords(
             rotation = rotations[ix + 1]
             succeeding_rotation = rotation if rotation else None
 
-        chord_type, template = choose_chord_with_constraints(
+        template, chord_type = choose_template_with_constraints(
             allowed_chord_types,
             pct_notes_common,
             preceding_rotation,
@@ -319,13 +317,13 @@ def select_chords(
 
         voicing = select_voicing(rotation, note_range_low, note_range_high)
 
-        chords[ix] = voicing
+        notes_list[ix] = voicing
         chord_types[ix] = chord_type
         rotations[ix] = rotation
 
         logger.info(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
 
-    return chord_types, chords
+    return notes_list, chord_types
 
 
 def is_voicing_spaced(voicing):

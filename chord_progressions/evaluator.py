@@ -13,16 +13,13 @@
 """
 
 import itertools
-from pprint import pprint
 
 import numpy as np
 from chord_progressions.chord import (
-    get_chords_from_chord_string,
     get_note_from_midi_num,
     get_template_from_notes,
-    get_type_from_chord,
+    get_type_from_notes,
     get_type_num_from_type,
-    serialize_chords,
 )
 from chord_progressions.pitch import (
     get_freq_from_note,
@@ -30,8 +27,7 @@ from chord_progressions.pitch import (
     get_n_overtones_harmonic,
     get_pitch_class_from_note,
 )
-from chord_progressions.solver import select_chords
-from chord_progressions.type_templates import TYPE_TEMPLATES
+
 
 # created in `create_chord_classes.py`
 # TODO: replace this table with a formula
@@ -135,106 +131,76 @@ def get_overtone_agreement(notes):
     return sum_of_differences
 
 
-def evaluate_chord(notes):
-    """list of notes, e.g. [60, 64, 67]"""
+def evaluate_notes(notes):
+    """list of notes, e.g. ["C4", "E4", "G4"]"""
 
     metrics = {}
 
-    # TODO: go alll the way through pitch/chord modules and make `note` and `midi_num` consistent
-    # I think we want to change `note` to be midi num and `note_name` to be what's currently `note` e.g. "C4"
-    note_names = [get_note_from_midi_num(n) for n in notes]
+    interval_class_vector = get_interval_class_vector(notes)
 
-    interval_class_vector = get_interval_class_vector(note_names)
-
-    # overtone_agreement = get_overtone_agreement(note_names)
+    # overtone_agreement = get_overtone_agreement(notes)
 
     # evenness = get_evenness(interval_class_vector)
 
-    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in note_names]))
+    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_chord(note_names)
+    chord_type = get_type_from_notes(notes)
 
     metrics["type_id"] = get_type_num_from_type(chord_type)
     metrics["type_name"] = chord_type
-    metrics["num_notes"] = len(note_names)
-    metrics["num_pitches"] = len(set(note_names))
+    metrics["num_notes"] = len(notes)
+    metrics["num_pitches"] = len(set(notes))
     metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
     # metrics["evenness"] = evenness
     # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
-    metrics["ambitus"] = get_ambitus(note_names)
+    metrics["ambitus"] = get_ambitus(notes)
     # metrics["overtone_agreement"] = overtone_agreement
 
     return metrics
 
 
-def get_random_progression(n_segments):
-
-    locks = "0" * n_segments
-
-    chord_types, chords = select_chords(
-        n_segments=n_segments,
-        n_notes_min=0,
-        n_notes_max=12,
-        pct_notes_common=0,
-        note_range_low=60,
-        note_range_high=108,
-        spacing_cutoff=52,
-        min_spacing=4,
-        allowed_chord_types=list(TYPE_TEMPLATES),
-        existing_chords=None,
-        existing_types=None,
-        locks=locks,
-        adding=False,
-        first_chord=None,
-    )
-
-    durations = ["1m"] * len(chords)
-
-    chord_metrics = [evaluate_chord(c) for c in chords]
-
-    return serialize_chords(chords, chord_types, durations, chord_metrics, locks)
-
-
 def get_macroharmony(progression):
     """The total collection of notes"""
 
-    notes = set()
+    collection = set()
 
-    for chord in progression:
-        for note in chord:
-            notes.add(note)
+    for notes in progression:
+        for note in notes:
+            collection.add(note)
 
-    return notes
+    return collection
 
 
 def get_ambitus(macroharmony):
-    """
-    Ambitus, int, # semitones between the lowest and highest note
-    """
+    """Ambitus, int, # semitones between the lowest and highest note"""
     midi_notes = [get_midi_num_from_note(n) for n in macroharmony]
 
     return max(midi_notes) - min(midi_notes)
 
 
-def evaluate_progression(progression, serialized=False):
-
-    if serialized:
-        progression = [chord["notes"] for chord in progression]
-
+def evaluate_notes_list(notes_list):
     metrics = {}
 
-    macroharmony = get_macroharmony(progression)
+    macroharmony = get_macroharmony(notes_list)
 
     metrics["ambitus"] = get_ambitus(macroharmony)
 
-    metrics["density"] = len(macroharmony) / len(progression)
+    metrics["density"] = len(macroharmony) / len(notes_list)
 
     return metrics
 
 
-def get_ofreqs_for_notes(notes):
+def evaluate_progression(progression):
+    """Takes a projecttion"""
+
+    notes_list = [chord["notes"] for chord in progression]
+
+    return evaluate_notes_list(notes_list)
+
+
+def get_ofreqs_for_notes(notes, n_overtones):
 
     freqs = [get_freq_from_note(n) for n in notes]
     ofreqs = [get_n_overtones_harmonic(f, n_overtones) for f in freqs]
@@ -242,50 +208,13 @@ def get_ofreqs_for_notes(notes):
     return ofreqs
 
 
-if __name__ == "__main__":
+def get_progression_key(progression):
+    return
 
-    notesA = ["C1", "D1", "E1"]
 
-    notesB = ["C5", "D5", "E5"]
+def get_chord_name(chord, progression, key=None):
 
-    freqsA = [get_freq_from_note(n) for n in notesA]
+    if not key:
+        key = get_progression_key(progression)
 
-    freqsB = [get_freq_from_note(n) for n in notesB]
-
-    n_overtones = 10
-
-    ofreqsA = [get_n_overtones_harmonic(f, n_overtones) for f in freqsA]
-
-    ofreqsB = [get_n_overtones_harmonic(f, n_overtones) for f in freqsB]
-
-    """
-        Random progression
-    """
-    n_chords = 3
-
-    progression = get_random_progression(n_chords)
-
-    metrics = evaluate_progression(progression, serialized=True)
-
-    pprint(metrics)
-
-    """
-        Without You I Am A Lie - Dustin O'Halloran
-        chordi.co/ZMbw0YXO
-    """
-    chord_str = "37-53-63_39-55-60-63_44-55-60-63-67_46-58-63-65-67"
-    chords = get_chords_from_chord_string(chord_str)
-
-    metrics = evaluate_progression(chords)
-
-    chords[0]
-    ["C#2", "F3", "D#4"]
-
-    """
-        Extension of whole-tone trichord experiments in scratch.md (chordi.co/-jYoWbMr)
-        chordi.co/D5q5jb6V
-    """
-    chord_str = "73-75-77_61-63-65_49-51-53_49-53-63_37-53-63_37-49-53-63-65-73-77_37-39-53_53-73-75_37-39-41-49-51-53-61-63-65-73-75-77"
-    chords = get_chords_from_chord_string(chord_str)
-
-    metrics = evaluate_progression(chords)
+    return

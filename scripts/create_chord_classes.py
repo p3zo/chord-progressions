@@ -10,7 +10,7 @@ import pandas as pd
 import seaborn as sns
 
 # from chord_progressions.audio import save_sample_chord_audio
-from chord_progressions.chord import get_template_from_template_string
+from chord_progressions.chord import get_template_from_template_str
 from chord_progressions.db import load_type_templates
 from chord_progressions.evaluator import evaluate_chord
 from chord_progressions.solver import select_voicing
@@ -43,9 +43,9 @@ if __name__ == "__main__":
 
     for i in range(50):
         print(i)
-        for chord_type, template_string in type_templates.items():
+        for chord_type, template_str in type_templates.items():
 
-            template = get_template_from_template_string(template_string)
+            template = get_template_from_template_str(template_str)
 
             voicing = select_voicing(template, note_range_low, note_range_high)
 

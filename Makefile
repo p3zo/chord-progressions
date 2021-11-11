@@ -4,7 +4,7 @@ define run_docker_cmd
 		"$(1)"
 endef
 
-.PHONY: build bump clean dev generate shell stop test
+.PHONY: build clean dev format generate shell stop test
 
 build:
 	@echo "Building image:"
@@ -24,7 +24,7 @@ format:
 
 generate: dev
 	@echo "Generating a progression locally:"
-	$(call run_docker_cmd,run.sh)
+	docker-compose exec app ./run.sh
 
 shell: dev
 	@echo "Getting a shell inside the container:"
