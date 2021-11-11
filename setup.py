@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_packages, setup
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 
 dev_requires = ["black", "flake8", "ipdb", "ipython", "isort", "bumpversion"]
 
@@ -17,7 +17,7 @@ experimental_requires = [
     "psutil==5.8.0",
     "tables==3.6.1",
     "torch==1.6.0",
-    "torchvision==0.11.0",
+    "torchvision==0.12.0",
     "tqdm==4.51.0",
 ]
 
