@@ -20,6 +20,5 @@ for outdir in [WAV_OUTPUT_DIR, MIDI_OUTPUT_DIR, META_OUTPUT_DIR]:
 # if not os.path.exists(WORDS_FILEPATH):
 #     raise EnvironmentError("Words file does not exist")
 
-logging.basicConfig()
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger("chord-progressions")
-logger.setLevel(logging.DEBUG)
