@@ -284,13 +284,6 @@ def get_midi_num_from_note(note):
         raise ValueError(f"Invalid note name: {note}")
 
 
-def get_pitch_class_from_note(note):
-
-    ix = get_midi_num_from_note(note)
-
-    return ix % 12
-
-
 def get_pitch_class_from_midi_num(note_num):
     return note_num % 12
 
@@ -298,7 +291,8 @@ def get_pitch_class_from_midi_num(note_num):
 def get_note_name_from_note(note):
     """Drops the octave part of the note name, e.g. A#4 -> A#"""
 
-    pitch_class = get_pitch_class_from_note(note)
+    midi_num = get_midi_num_from_note(note) % 12
+    pitch_class = get_pitch_class_from_midi_num(midi_num)
 
     return NOTE_NAMES[pitch_class]
 
@@ -312,7 +306,7 @@ def get_octave_from_note(note):
     return int(octave)
 
 
-def get_freq_from_midi_note(n):
+def get_freq_from_midi_num(n):
     return round(A4 * 2 ** ((n - 69) / 12), 2)
 
 
@@ -333,7 +327,7 @@ def increment_note(note):
 
 
 def create_notes_freqs_table():
-    """This is a one-off function that was used to create the MIDI_NOTES and MIDI_NOTE_FREQUENCIES constants"""
+    """This is a one-off function that was used to create the MIDI_NOTE_FREQUENCIES constant"""
 
     from collections import OrderedDict  # # noqa
 
@@ -342,9 +336,7 @@ def create_notes_freqs_table():
     current_note = "C-1"
 
     for i in range(128):
-
-        notes[current_note] = get_freq_from_midi_note(i)
-
+        notes[current_note] = get_freq_from_midi_num(i)
         current_note = increment_note(current_note)
 
     return notes

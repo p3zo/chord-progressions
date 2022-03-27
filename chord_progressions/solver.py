@@ -61,6 +61,11 @@ def high_enough_match(num, denom_1, denom_2, thresh):
     Returns True if both quotients of a number divided
     by two denominators are greater than a threshold
     """
+
+    # TODO(bug): division by 0 is possible
+    if denom_1 == 0 or denom_2 == 0:
+        return False
+
     pct_1 = num / denom_1
     pct_2 = num / denom_2
 
@@ -258,11 +263,6 @@ def select_notes_list(
     adding,
     first_chord,
 ):
-    """
-    - `template`: list[int], An array of pitch classes in type_templates.
-    - `rotation`: list[int], A template transposed by any number of steps.
-    - `voicing`: list[str], notes_list
-    """
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
