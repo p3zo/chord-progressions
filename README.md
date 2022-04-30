@@ -1,6 +1,35 @@
 # Chord progressions
 
-Functions for generating and evaluating chord progressions.
+A toolkit for extracting, generating and analyzing symbolic chord progressions
+
+## Usage
+
+See the [Makefile](Makefile) for available actions.
+
+## TODO
+
+-   make `note` and `midi_num` consistent throughout all modules
+
+##### Eventually
+
+-   [feature] get key for progression
+-   [feature] get functional names for chords given key
+-   [feature] output variable chord durations from solver
+-   [feature] consider lower and upper structures in select_voicing
+-   [feature] add the possibility of a repeated note in a different octave
+-   [feature] Generalize `noteNumberToFrequency` to use any periodic tuning https://github.com/soul-lang/SOUL/pull/26/files
+-   [feature] use VAE as solver
+-   [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
+-   [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
+
+-   [maintainability] break out the merging of chord types into a function and test it
+-   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
+-   [maintainability] break `select_notes_list` apart into smaller functions
+
+##### Maybe
+
+-   [feature] extend interval class vectors to "polychord-content" vectors
+-   [feature] `chord_contained_in_type` function
 
 ## Definitions
 
@@ -37,33 +66,3 @@ Below are the names used by this library.
 | progression                      | list[`chord`]   |                                                              |                                                                                                                                                                          |
 | rotation                         | list[int]       | A template transposed by any number of steps                 |                                                                                                                                                                          |
 | voicing                          | list[str]       | a notes_list                                                 |                                                                                                                                                                          |
-
-## Usage
-
-See the [Makefile](Makefile) for available actions.
-
-## TODO
-
--   go alll the way through pitch/chord modules and make `note` and `midi_num` consistent.
-
-##### Eventually
-
--   [feature] get key for progression
--   [feature] get functional names for chords given key
--   [feature] output variable chord durations from solver
--   [feature] consider lower and upper structures in select_voicing
--   [feature] add the possibility of a repeated note in a different octave
--   [feature] Generalize `noteNumberToFrequency` to use any periodic tuning https://github.com/soul-lang/SOUL/pull/26/files
--   [feature] use VAE as solver
--   [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
--   [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
-
--   [maintainability] break out the merging of chord types into a function and test it
--   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
--   [maintainability] break `select_notes_list` apart into smaller functions
-
-##### Maybe
-
--   [feature] extend interval class vectors to "polychord-content" vectors
--   [feature] `chord_contained_in_type` function
--   [feature] download midi files from Geocities MIDI archive on the Internet Archive & parse into progressions. find the zip of 100k midi files used by bitmidi.com
