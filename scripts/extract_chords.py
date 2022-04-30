@@ -2,7 +2,8 @@ import argparse
 import os
 
 from chord_progressions.extract import simplify_harmony
-from chord_progressions.extract_harman import label_file, write_labels
+from chord_progressions.extract_harman import label_midi, write_labels
+from chord_progressions.midi import make_midi_progression, save_midi_progression
 
 try:
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -20,7 +21,7 @@ SHORTEST_NOTE = 1 / 64
 SMOOTH_BEAT = 1
 QUANTIZE_BEAT = 1 / 2
 
-filepath = '../data/sample/Sakamoto_MerryChristmasMrLawrence.mid'
+SAMPLE_FILEPATH = '../data/sample/Sakamoto_MerryChristmasMrLawrence.mid'
 
 if __name__ == "__main__":
 
@@ -28,6 +29,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--filepath",
         type=str,
+        default=SAMPLE_FILEPATH,
         help="Path to a midi file",
     )
     args = parser.parse_args()
@@ -42,8 +44,13 @@ if __name__ == "__main__":
     print(f"Wrote chords to {chords_path}")
 
     harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{songname}.csv")
-    harman_labels = label_file(filepath)
-    labels = write_labels(harman_labels, filepath, harman_outpath, songname)
+    harman_labels = label_midi(extracted)
+    harman_results = write_labels(harman_labels, filepath, harman_outpath, songname)
     print(f"Wrote harman labels to {harman_outpath}")
 
-    # TODO: make a midi progression from harman labels
+    chords = [i['notes'] for i in harman_labels]
+    durations = [i['end_time'] - i['start_time'] for i in harman_labels]
+    midi_progression = make_midi_progression(chords, durations, songname)
+    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{songname}.mid")
+    save_midi_progression(midi_progression, midi_progression_path)
+    print(f"Wrote harman chords to {midi_progression_path}")
