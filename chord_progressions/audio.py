@@ -23,7 +23,7 @@ def mk_note_buffer(note, duration, n_overtones):
     freqs = get_n_overtones_harmonic(fundamental, n_overtones)
 
     # make each overtone progressively quieter
-    sins = [mk_sin(f, duration, 1 / 2 ** i) for i, f in enumerate(freqs)]
+    sins = [mk_sin(f, duration, 1 / 2**i) for i, f in enumerate(freqs)]
 
     # TODO: normalize such that all notes have the same amplitude
     # regardless of the number of frequencies

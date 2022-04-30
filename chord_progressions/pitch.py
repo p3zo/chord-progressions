@@ -284,12 +284,19 @@ def get_midi_num_from_note(note):
         raise ValueError(f"Invalid note name: {note}")
 
 
+def get_pitch_class_from_note(note):
+    """Returns the pitch class of a note, e.g. C4"""
+    midi_num = get_midi_num_from_note(note)
+    return get_pitch_class_from_midi_num(midi_num)
+
+
 def get_pitch_class_from_midi_num(note_num):
+    """Returns the pitch class of a midi num, e.g. 48"""
     return note_num % 12
 
 
 def get_note_name_from_note(note):
-    """Drops the octave part of the note name, e.g. A#4 -> A#"""
+    """Drops the octave part of the note, e.g. A#4 -> A#"""
 
     midi_num = get_midi_num_from_note(note) % 12
     pitch_class = get_pitch_class_from_midi_num(midi_num)

@@ -16,7 +16,6 @@ import itertools
 
 import numpy as np
 from chord_progressions.chord import (
-    get_note_from_midi_num,
     get_template_from_notes,
     get_type_from_notes,
     get_type_num_from_type,
@@ -27,7 +26,6 @@ from chord_progressions.pitch import (
     get_n_overtones_harmonic,
     get_pitch_class_from_note,
 )
-
 
 # created in `create_chord_classes.py`
 # TODO: replace this table with a formula

@@ -2,9 +2,9 @@ from uuid import uuid4
 
 from chord_progressions import logger
 from chord_progressions.pitch import (
-    get_midi_num_from_note,
     get_note_from_midi_num,
     get_note_list,
+    get_pitch_class_from_midi_num,
     get_pitch_class_from_note,
 )
 from chord_progressions.type_templates import TYPE_TEMPLATES
@@ -29,7 +29,7 @@ def get_template_from_notes(notes):
 
 def get_template_from_midi_nums(midi_nums):
     """e.g. ["48", "60"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
-    pitch_classes = [get_pitch_class_from_note(n) for n in notes]
+    pitch_classes = [get_pitch_class_from_midi_num(n) for n in midi_nums]
 
     return get_template_from_pitch_classes(pitch_classes)
 
