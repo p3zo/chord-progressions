@@ -6,12 +6,11 @@ import csv
 import os
 
 import numpy as np
-
-from chord_progressions import META_OUTPUT_DIR, logger
+from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
-from chord_progressions.midi import DEFAULT_MIDI_TICKS_PER_BEAT, save_midi_progression
+from chord_progressions.midi import make_midi_progression, save_midi_progression
 from chord_progressions.solver import select_notes_list
-from chord_progressions.utils import round_to_base, get_run_id
+from chord_progressions.utils import get_run_id, round_to_base
 
 DEFAULT_ALLOWED_CHORD_TYPES = [
     "minor third",

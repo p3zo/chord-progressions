@@ -1,7 +1,7 @@
 import os
 
 import mido
-from chord_progressions import MIDI_OUTPUT_DIR, logger
+from chord_progressions import logger
 from chord_progressions.pitch import get_midi_num_from_note
 
 DEFAULT_BPM = 120

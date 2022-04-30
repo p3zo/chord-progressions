@@ -1,6 +1,6 @@
 import datetime as dt
-import numpy as np
 
+import numpy as np
 from chord_progressions import WORDS_FILEPATH
 
 

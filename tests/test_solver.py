@@ -1,4 +1,4 @@
-from chord_progressions.chord import notes_match_chord_type, get_template_from_notes
+from chord_progressions.chord import get_template_from_notes, notes_match_chord_type
 from chord_progressions.solver import (
     get_all_rotations_of_template,
     get_n_common_ones,
