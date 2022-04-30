@@ -10,15 +10,9 @@ test_requires = ["pytest", "pytest-cov"]
 
 # dependencies for features not yet fully integrated into the core API
 experimental_requires = [
-    "joblib==0.17.0",
     "matplotlib==3.3.3",
     "networkx==2.5",
     "pandas==1.2.4",
-    "psutil==5.8.0",
-    "tables==3.6.1",
-    "torch==1.6.0",
-    "torchvision==0.15.0",
-    "tqdm==4.51.0",
 ]
 
 setup(
