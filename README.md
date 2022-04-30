@@ -10,6 +10,10 @@ See the [Makefile](Makefile) for available actions.
 
 -   make `note` and `midi_num` consistent throughout all modules
 
+##### Prioritized
+
+-   `extract_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maxiumum of six segment evaluations occur per note
+
 ##### Eventually
 
 -   [feature] get key for progression
@@ -21,7 +25,12 @@ See the [Makefile](Makefile) for available actions.
 -   [feature] use VAE as solver
 -   [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
 -   [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
+-   [feature] use `bars:beats:sixteenths` format for progression duration
 
+-   [maintainability] use a singular method of counting in `extract_harman.py`
+    -   `get_segment_label` uses counter
+    -   `get_segment_pc_weights` uses defaultdict
+    -   `MinimalSegment.get_pitch_class_weights` uses list.count()
 -   [maintainability] break out the merging of chord types into a function and test it
 -   [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
 -   [maintainability] break `select_notes_list` apart into smaller functions

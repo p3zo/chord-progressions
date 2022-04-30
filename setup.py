@@ -8,9 +8,9 @@ test_requires = ["pytest", "pytest-cov"]
 
 # dependencies for features not yet fully integrated into the core API
 experimental_requires = [
-    "matplotlib==3.3.3",
-    "networkx==2.5",
-    "pandas==1.2.4",
+    "matplotlib==3.5.1",
+    "networkx==2.8",
+    "pandas==1.4.2",
 ]
 
 setup(
@@ -26,10 +26,10 @@ setup(
     package_data={},
     python_requires=">=3.6",
     install_requires=[
-        "mido==1.2.9",
-        "numpy==1.19.4",
+        "mido==1.2.10",
+        "numpy==1.22.3",
         "pretty_midi==0.2.9",
-        "scipy==1.6.2",
+        "scipy==1.8.0",
     ],
     extras_require={
         "test": test_requires,
