@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{songname}.csv")
     harman_labels = label_file(filepath)
-    write_labels(harman_labels, filepath, harman_outpath, songname)
+    labels = write_labels(harman_labels, filepath, harman_outpath, songname)
     print(f"Wrote harman labels to {harman_outpath}")
 
     # TODO: make a midi progression from harman labels

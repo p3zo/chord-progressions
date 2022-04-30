@@ -471,7 +471,7 @@ def label_file(filepath):
 def write_labels(labels, inpath, outpath, arrangement_id):
     if not labels:
         logger.error(f"Failed for {inpath}")
-        return {None: inpath}
+        return {inpath: None}
 
     df = pd.DataFrame(labels)
 
@@ -486,3 +486,5 @@ def write_labels(labels, inpath, outpath, arrangement_id):
     # df.to_json(js_outpath, orient="records")
 
     logger.info(f"Labels saved to {outpath}")
+
+    return {inpath: labels}
