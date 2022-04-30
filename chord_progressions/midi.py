@@ -48,13 +48,17 @@ def make_midi_progression(
 ):
     """
     chords: list of lists containing note strings
+
     durations: list of floats representing seconds
         The length of this list must match the length of `chords`
-    bpm: int
-    ticks_per_beat: int
         The length of a tick is defined in ticks per beat. This value is stored
         as ticks_per_beat in MidiFile objects and remains fixed throughout a track.
+
     run_id: str to be used in filepath and in midi track name
+
+    (optional) ticks_per_beat: int
+
+    (optional) bpm: int
     """
 
     progression = mido.MidiFile(type=0)
