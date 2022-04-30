@@ -12,7 +12,7 @@ import seaborn as sns
 # from chord_progressions.audio import save_sample_chord_audio
 from chord_progressions.chord import get_template_from_template_str
 from chord_progressions.db import load_type_templates
-from chord_progressions.evaluator import evaluate_chord
+from chord_progressions.evaluator import evaluate_notes
 from chord_progressions.solver import select_voicing
 
 sns.set(style="whitegrid")
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
             voicing = select_voicing(template, note_range_low, note_range_high)
 
-            metrics = evaluate_chord(voicing)
+            metrics = evaluate_notes(voicing)
 
             chords.append(
                 {

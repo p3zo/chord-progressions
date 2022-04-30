@@ -6,13 +6,6 @@ dev_requires = ["black", "flake8", "ipdb", "ipython", "isort", "bumpversion"]
 
 test_requires = ["pytest", "pytest-cov"]
 
-# dependencies for features not yet fully integrated into the core API
-experimental_requires = [
-    "matplotlib==3.5.1",
-    "networkx==2.8",
-    "pandas==1.4.2",
-]
-
 setup(
     name="chord-progressions",
     author="p3zo",
@@ -26,14 +19,16 @@ setup(
     package_data={},
     python_requires=">=3.6",
     install_requires=[
+        "matplotlib==3.5.1",
         "mido==1.2.10",
+        "networkx==2.8",
         "numpy==1.22.3",
+        "pandas==1.4.2",
         "pretty_midi==0.2.9",
         "scipy==1.8.0",
     ],
     extras_require={
         "test": test_requires,
         "dev": test_requires + dev_requires,
-        "experimental": [experimental_requires],
     },
 )

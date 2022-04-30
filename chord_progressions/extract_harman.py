@@ -11,12 +11,13 @@ from copy import deepcopy
 
 import networkx as nx
 import numpy as np
+import pandas as pd
 from chord_progressions import logger
 from chord_progressions.chord import (
-    get_template_from_template_string,
+    get_template_from_template_str,
     get_type_num_from_type,
 )
-from chord_progressions.evaluator import evaluate_chord
+from chord_progressions.evaluator import evaluate_notes
 from chord_progressions.extract import load_midi_file
 from chord_progressions.pitch import (
     get_note_from_midi_num,
@@ -34,7 +35,7 @@ TEMPLATE_LABELS = {}
 for template_name, template_str in TYPE_TEMPLATES.items():
 
     template_id = get_type_num_from_type(template_name)
-    template = get_template_from_template_string(template_str)
+    template = get_template_from_template_str(template_str)
 
     if sum(template) >= MIN_NUM_NOTES and sum(template) <= MAX_NUM_NOTES:
         if template_id not in TEMPLATE_LABELS:
@@ -82,18 +83,18 @@ class MinimalSegment:
     def __init__(self):
         self.start = 0  # seconds
         self.end = 0  # seconds
-        self.notes = []  # midi note numbers
+        self.midi_nums = []  # midi note numbers
         self.template_scores = {}
 
-    def update_notes(self, notes, add):
+    def update_midi_nums(self, midi_nums, add):
         if add:
-            self.notes.extend(notes)
+            self.midi_nums.extend(midi_nums)
         else:
-            for p in notes:
-                self.notes.remove(p)
+            for p in midi_nums:
+                self.midi_nums.remove(p)
 
     def get_pitch_classes(self):
-        return [get_pitch_class_from_midi_num(p) for p in self.notes]
+        return [get_pitch_class_from_midi_num(p) for p in self.midi_nums]
 
     def get_pitch_class_weights(self):
         pcs = self.get_pitch_classes()
@@ -104,17 +105,17 @@ class MinimalSegment:
         pc_weights = {pc: pcs.count(pc) for pc in pcs}
         return get_template_scores(pc_weights)
 
-    def get_note_names(self):
-        return [get_note_from_midi_num(n) for n in self.notes]
+    def get_notes(self):
+        return [get_note_from_midi_num(n) for n in self.midi_nums]
 
     def get_note_occurences(self):
-        notes = self.notes
-        return {n: notes.count(n) for n in notes}
+        midi_nums = self.midi_nums
+        return {n: midi_nums.count(n) for n in midi_nums}
 
     def pprint(self):
         logger.debug(f"    start {self.start}")
         logger.debug(f"    end {self.end}")
-        logger.debug(f"    notes {self.get_note_names()}")
+        logger.debug(f"    midi_nums {self.get_notes()}")
 
 
 def parse_events(pmid):
@@ -258,12 +259,12 @@ def get_minimal_segments(p_all):
     s = MinimalSegment()
 
     s.start = p_all[0].time
-    s.update_notes(p_all[0].onsets, 1)
+    s.update_midi_nums(p_all[0].onsets, 1)
 
     for point in p_all[1:]:
         s.end = point.time
 
-        notes = s.notes
+        midi_nums = s.midi_nums
 
         s_m.append(deepcopy(s))
 
@@ -271,10 +272,10 @@ def get_minimal_segments(p_all):
 
         s.start = point.time
 
-        s.update_notes(notes, 1)
-        s.update_notes(point.onsets, 1)
+        s.update_midi_nums(midi_nums, 1)
+        s.update_midi_nums(point.onsets, 1)
 
-        s.update_notes(point.offsets, 0)
+        s.update_midi_nums(point.offsets, 0)
 
     logger.debug(f"\n--- {len(s_m)} minimal segments ---")
 
@@ -312,17 +313,15 @@ def get_segment_label(segment):
     return best_score, best_template
 
 
-def get_segment_notes(segment):
-    """
-    Aggregates the notes in all the minimal segments that comprise a segment.
-    """
+def get_segment_midi_nums(segment):
+    """Aggregates the notes in all the minimal segments that comprise a segment"""
 
-    notes = []
+    midi_nums = []
 
     for ms in segment:
-        notes.extend(ms.get_note_occurences())
+        midi_nums.extend(ms.get_note_occurences())
 
-    return notes
+    return midi_nums
 
 
 def segment_and_label(p_all, s_m):
@@ -353,15 +352,15 @@ def segment_and_label(p_all, s_m):
             continue
 
         uv_segment = s_m[ui:vi]  # preceding segment
-        uv_notes = get_segment_notes(uv_segment)
-        uv_note_names = [get_note_from_midi_num(n) for n in uv_notes]
+        uv_midi_nums = get_segment_midi_nums(uv_segment)
+        uv_notes = [get_note_from_midi_num(n) for n in uv_midi_nums]
 
         # a minimal segment without notes is a rest for all instruments
-        if len(uv_notes) == 0:
+        if len(uv_midi_nums) == 0:
             logger.debug(f"  {vi}/{final_ix} - Continue: No notes in segment")
             continue
 
-        metrics = evaluate_chord(uv_notes)
+        metrics = evaluate_notes(uv_notes)
 
         uv_score, uv_label = get_segment_label(uv_segment)
 
@@ -379,8 +378,8 @@ def segment_and_label(p_all, s_m):
                 "end_segment": vi,
                 "label": uv_label,
                 "score": uv_score,
+                "midi_nums": uv_midi_nums,
                 "notes": uv_notes,
-                "note_names": uv_note_names,
                 "metrics": metrics,
             }
 
@@ -394,12 +393,12 @@ def segment_and_label(p_all, s_m):
             )
 
     final_segment = s_m[ui:final_ix]
-    final_segment_notes = get_segment_notes(uv_segment)
-    final_segment_note_names = [get_note_from_midi_num(n) for n in final_segment_notes]
+    final_segment_midi_nums = get_segment_midi_nums(uv_segment)
+    final_segment_notes = [get_note_from_midi_num(n) for n in final_segment_midi_nums]
     final_segment_metrics = {}
 
-    if len(final_segment_notes) > 0:
-        final_segment_metrics = evaluate_chord(final_segment_notes)
+    if len(final_segment_midi_nums) > 0:
+        final_segment_metrics = evaluate_notes(final_segment_notes)
 
     final_score, final_label = get_segment_label(final_segment)
 
@@ -408,8 +407,8 @@ def segment_and_label(p_all, s_m):
         "end_segment": final_ix,
         "label": final_label,
         "score": final_score,
+        "midi_nums": final_segment_midi_nums,
         "notes": final_segment_notes,
-        "note_names": final_segment_note_names,
         "metrics": final_segment_metrics,
     }
 
@@ -436,8 +435,8 @@ def segment_and_label(p_all, s_m):
             "duration": end - start,
             "label_id": edge["label"],
             "label": template_names[edge["label"]],
+            "midi_nums": edge["midi_nums"],
             "notes": edge["notes"],
-            "note_names": edge["note_names"],
         }
         row.update(edge["metrics"])
 
@@ -467,3 +466,23 @@ def label_file(filepath):
         return None
 
     return label_midi(midi)
+
+
+def write_labels(labels, inpath, outpath, arrangement_id):
+    if not labels:
+        logger.error(f"Failed for {inpath}")
+        return {None: inpath}
+
+    df = pd.DataFrame(labels)
+
+    df[[f"icv{i}" for i in range(6)]] = pd.DataFrame(
+        df.interval_class_vector.tolist(), index=df.index
+    )
+    df["arrangement_id"] = arrangement_id
+
+    df.to_csv(outpath, sep="\t", index=False)
+
+    # js_outpath = outpath.replace("csv", "json")
+    # df.to_json(js_outpath, orient="records")
+
+    logger.info(f"Labels saved to {outpath}")

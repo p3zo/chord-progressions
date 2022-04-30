@@ -2,7 +2,7 @@ import argparse
 import os
 
 from chord_progressions.extract import simplify_harmony
-from chord_progressions.extract_harman import write_harman_labels
+from chord_progressions.extract_harman import label_file, write_labels
 
 try:
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +20,7 @@ SHORTEST_NOTE = 1 / 64
 SMOOTH_BEAT = 1
 QUANTIZE_BEAT = 1 / 2
 
+filepath = '../data/sample/Sakamoto_MerryChristmasMrLawrence.mid'
 
 if __name__ == "__main__":
 
@@ -40,5 +41,9 @@ if __name__ == "__main__":
     extracted.write(chords_path)
     print(f"Wrote chords to {chords_path}")
 
-    harman_outpath = os.path.join(OUTPUT_DIR, f"harman-{songname}.csv")
-    write_harman_labels(filepath, harman_outpath, songname)
+    harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{songname}.csv")
+    harman_labels = label_file(filepath)
+    write_labels(harman_labels, filepath, harman_outpath, songname)
+    print(f"Wrote harman labels to {harman_outpath}")
+
+    # TODO: make a midi progression from harman labels
