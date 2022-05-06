@@ -86,7 +86,7 @@ def generate_progression(
     save_audio_progression(run_id, notes_list, durations, n_overtones)
 
     midi_progression = make_midi_progression(notes_list, durations, run_id)
-    midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, "{run_id}.mid")
+    midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
     save_midi_progression(midi_progression, midi_progression_path)
 
     # metadata
