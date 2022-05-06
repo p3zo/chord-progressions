@@ -31,3 +31,4 @@ output/
 
 # ide
 .vscode
+.idea
