@@ -20,11 +20,11 @@ archive/
 *.profile
 README.html
 
-# input
-data/
-
-# output
+# io
+assets/
+audio/
 output/
+demo/
 *.mid
 *.csv
 *.png

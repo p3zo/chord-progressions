@@ -1,8 +1,8 @@
 import argparse
 import os
 
-from chord_progressions.extract import simplify_harmony
-from chord_progressions.extract_harman import label_midi, write_labels
+from chord_progressions.extract.midi import simplify_harmony
+from chord_progressions.extract.midi_harman import label_midi, write_labels
 from chord_progressions.midi import make_midi_progression, save_midi_progression
 
 try:
@@ -10,7 +10,7 @@ try:
 except:
     THIS_DIR = os.getcwd()
 
-OUTPUT_DIR = os.path.join(THIS_DIR, "../output")
+OUTPUT_DIR = os.path.join(THIS_DIR, "../assets/output")
 
 if not os.path.isdir(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -21,7 +21,7 @@ SHORTEST_NOTE = 1 / 64
 SMOOTH_BEAT = 1
 QUANTIZE_BEAT = 1 / 2
 
-SAMPLE_FILEPATH = '../data/sample/Sakamoto_MerryChristmasMrLawrence.mid'
+SAMPLE_FILEPATH = "../assets/midi/Sakamoto_MerryChristmasMrLawrence.mid"
 
 if __name__ == "__main__":
 
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     harman_results = write_labels(harman_labels, filepath, harman_outpath, songname)
     print(f"Wrote harman labels to {harman_outpath}")
 
-    chords = [i['notes'] for i in harman_labels]
-    durations = [i['end_time'] - i['start_time'] for i in harman_labels]
+    chords = [i["notes"] for i in harman_labels]
+    durations = [i["end_time"] - i["start_time"] for i in harman_labels]
     midi_progression = make_midi_progression(chords, durations, songname)
     midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{songname}.mid")
     save_midi_progression(midi_progression, midi_progression_path)

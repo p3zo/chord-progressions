@@ -18,7 +18,7 @@ from chord_progressions.chord import (
     get_type_num_from_type,
 )
 from chord_progressions.evaluator import evaluate_notes
-from chord_progressions.extract import load_midi_file
+from chord_progressions.extract.midi import load_midi_file
 from chord_progressions.pitch import (
     get_note_from_midi_num,
     get_pitch_class_from_midi_num,

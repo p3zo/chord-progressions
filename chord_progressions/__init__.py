@@ -5,7 +5,7 @@ __version__ = "0.22.0"  # updated by bumpversion, do not change
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
-OUTPUT_DIR = os.path.join(THIS_DIR, "..", "output")
+OUTPUT_DIR = os.path.join(THIS_DIR, "../assets/output")
 WAV_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "wav")
 MIDI_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "midi")
 META_OUTPUT_DIR = os.path.join(OUTPUT_DIR, "meta")
