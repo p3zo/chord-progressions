@@ -12,6 +12,7 @@ coverage
 build/
 dist/
 *.egg-info/
+site
 
 # misc
 .DS_Store

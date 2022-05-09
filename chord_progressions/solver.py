@@ -4,7 +4,9 @@ from chord_progressions.chord import (
     get_notes_from_template,
     get_template_from_notes,
     get_template_from_template_str,
+    serialize_chords,
 )
+from chord_progressions.evaluator import evaluate_notes_list
 from chord_progressions.pitch import (
     get_midi_num_from_note,
     get_note_from_midi_num,
@@ -261,7 +263,6 @@ def select_notes_list(
     existing_types,
     locks,
     adding,
-    first_chord,
 ):
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
@@ -273,7 +274,7 @@ def select_notes_list(
     chord_types = [[]] * n_segments
 
     if existing_notes_list:
-        logger.info(f"Existing notes_list: {existing_notes_list}")
+        logger.debug(f"Existing notes_list: {existing_notes_list}")
 
         if adding:
 
@@ -285,7 +286,7 @@ def select_notes_list(
                 chord_types[ix] = existing_types[ix]
 
         elif locks:
-            logger.info(f"Locks: {locks}")
+            logger.debug(f"Locks: {locks}")
 
             open_ixs = [ix for ix, i in enumerate(locks) if i == "0"]
 
@@ -295,7 +296,7 @@ def select_notes_list(
                     notes_list[ix] = existing_notes_list[ix]
                     chord_types[ix] = existing_types[ix]
 
-    logger.info(f"Progression indexes to fill: {open_ixs}")
+    logger.debug(f"Progression indexes to fill: {open_ixs}")
 
     for ix in open_ixs:
         preceding_rotation = rotations[ix - 1] if ix > 0 else None
@@ -329,7 +330,7 @@ def select_notes_list(
         chord_types[ix] = chord_type
         rotations[ix] = rotation
 
-        logger.info(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
+        logger.debug(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
 
     return notes_list, chord_types
 
@@ -356,7 +357,7 @@ def is_voicing_spaced(voicing):
     return False
 
 
-def shuffle_voicing(notes, note_range_low, note_range_high):
+def shuffle_voicing(notes: list[str], note_range_low: int, note_range_high: int):
     voicing = []
 
     note_range = range(note_range_low, note_range_high + 1)
@@ -385,3 +386,25 @@ def shuffle_voicing(notes, note_range_low, note_range_high):
                 break
 
     return [get_note_from_midi_num(n) for n in sorted(voicing)]
+
+
+def get_random_progression(n_chords: int):
+    locks = "0" * n_chords
+
+    notes_list, chord_types = select_notes_list(
+        n_segments=n_chords,
+        pct_notes_common=0,
+        note_range_low=60,
+        note_range_high=108,
+        allowed_chord_types=list(TYPE_TEMPLATES),
+        existing_notes_list=None,
+        existing_types=None,
+        locks=locks,
+        adding=False,
+    )
+
+    durations = ["1m"] * len(notes_list)
+
+    chord_metrics = [evaluate_notes_list(c) for c in notes_list]
+
+    return serialize_chords(notes_list, chord_types, durations, chord_metrics, locks)

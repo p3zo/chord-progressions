@@ -1,0 +1,35 @@
+site_name: Chord Progressions
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/library-shelves
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+repo_url: https://github.com/p3zo/chord-progressions
+repo_name: p3zo/chord-progressions
+edit_uri: ""
+
+nav:
+  - Introduction: index.md
+  - Extract: extract.md
+  - Analyze: analyze.md
+  - Generate: generate.md
+  - Glossary: glossary.md

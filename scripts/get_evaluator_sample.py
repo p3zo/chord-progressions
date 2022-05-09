@@ -1,37 +1,11 @@
 """
 Evaluates a random chord progression and returns its evaluation.
-
-Useful for checking the state of the evaluator.
+Useful for debugging the evaluator.
 """
 
-from chord_progressions.chord import get_notes_list_from_midi_nums_str, serialize_chords
+from chord_progressions.chord import get_notes_list_from_midi_nums_str
 from chord_progressions.evaluator import evaluate_notes_list, evaluate_progression
-from chord_progressions.solver import select_notes_list
-from chord_progressions.type_templates import TYPE_TEMPLATES
-
-
-def get_random_progression(n_segments):
-
-    locks = "0" * n_segments
-
-    notes_list, chord_types = select_notes_list(
-        n_segments=n_segments,
-        pct_notes_common=0,
-        note_range_low=60,
-        note_range_high=108,
-        allowed_chord_types=list(TYPE_TEMPLATES),
-        existing_notes_list=None,
-        existing_types=None,
-        locks=locks,
-        adding=False,
-        first_chord=None,
-    )
-
-    durations = ["1m"] * len(notes_list)
-
-    chord_metrics = [evaluate_notes_list(c) for c in notes_list]
-
-    return serialize_chords(notes_list, chord_types, durations, chord_metrics, locks)
+from chord_progressions.solver import get_random_progression
 
 
 def evaluate_sample_progression():
