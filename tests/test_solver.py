@@ -73,18 +73,15 @@ def test_select_notes_list():
     n_segments = 50
     pct_notes_common = 0
     allowed_chord_types = ["major chord", "minor chord"]
-    first_chord = None
     existing_notes_list = None
     existing_types = None
     locks = "0" * 6
-    first_chord = None
     adding = False
 
     notes_list, chord_types = select_notes_list(
         n_segments=n_segments,
         pct_notes_common=pct_notes_common,
         allowed_chord_types=allowed_chord_types,
-        first_chord=first_chord,
         existing_notes_list=existing_notes_list,
         existing_types=existing_types,
         locks=locks,

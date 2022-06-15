@@ -10,6 +10,30 @@ from chord_progressions.pitch import (
 from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import is_circular_match
 
+NoteList = list[str]
+MidiNumList = list[int]
+
+
+class Chord:
+    def __init__(self, midi_nums: MidiNumList, duration):
+        self.midi_nums = midi_nums
+        self.duration = duration
+
+        chord_type = get_type_from_notes(midi_nums)
+        self.type = chord_type
+        self.typeId = get_type_num_from_type(chord_type)
+
+        # self.metrics = evaluate_notes_list(notes)
+
+    def values(self):
+        return {
+            "midi_nums": self.midi_nums,
+            "duration": self.duration,
+            "type": self.type,
+            "typeId": self.typeId,
+            # "metrics": self.metrics,
+        }
+
 
 def get_template_from_pitch_classes(pcs):
     template = [0] * 12
@@ -118,6 +142,8 @@ def get_type_from_notes(notes):
 def get_types_from_notes_list(notes_list):
     """
     Returns the first exact template match for each note list
+
+    e.g. [["C4", "C3"], ["C4", "E3"]] -> ["unison", "major third"]
 
     TODO:
         - find partial matches as well

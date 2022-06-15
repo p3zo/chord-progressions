@@ -1,7 +1,7 @@
 import glob
 import os
 
-from chord_progressions.extract.audio import extract_chords_from_audio
+from chord_progressions.extract.audio import extract_progression_from_audio
 from chord_progressions.midi import make_midi_progression, save_midi_progression
 
 try:
@@ -31,7 +31,9 @@ if __name__ == "__main__":
         basename = os.path.basename(filepath)
         trackid = os.path.splitext(basename)[0]
 
-        chords, durations, bpm = extract_chords_from_audio(filepath)
+        progression, start_seconds = extract_progression_from_audio(filepath)
+
+        midi_progression = progression.to_midi(name=trackid, bpm=bpm)
 
         midi_progression = make_midi_progression(
             chords, durations, progression_name=trackid, bpm=bpm

@@ -37,7 +37,7 @@ def is_circular_match(list_1, list_2):
 #     # is ["F1", "A#0", "F#0"] a subset of an Indian-Japan Pentatonic?
 #     # how about ["F0", "F#0", "A#0", "C#1"] and ["", "", "", "C#1"]
 
-#     # may be able to adadpt the `slots` logic from `select_voicing()` here
+#     # may be able to adapt the `slots` logic from `select_voicing()` here
 
 #     one_indices_1 = [ix for ix, i in enumerate(list_1) if i == 1]
 #     one_indices_2 = [ix for ix, i in enumerate(list_2) if i == 1]

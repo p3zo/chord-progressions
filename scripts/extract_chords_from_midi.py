@@ -3,7 +3,7 @@ import os
 
 from chord_progressions.extract.midi import simplify_harmony
 from chord_progressions.extract.midi_harman import label_midi, write_labels
-from chord_progressions.midi import make_midi_progression, save_midi_progression
+from chord_progressions.io.midi import make_midi_progression, save_midi_progression
 
 try:
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))

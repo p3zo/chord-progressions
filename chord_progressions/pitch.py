@@ -278,6 +278,7 @@ def get_note_from_midi_num(note_num):
 
 
 def get_midi_num_from_note(note):
+    print("note", note)
     try:
         return MIDI_NOTES.index(note)
     except ValueError:

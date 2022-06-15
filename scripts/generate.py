@@ -8,7 +8,11 @@ import os
 import numpy as np
 from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, logger
 from chord_progressions.audio import save_audio_progression
-from chord_progressions.midi import make_midi_progression, save_midi_progression
+from chord_progressions.chord import Chord
+from chord_progressions.io.midi import make_midi_progression
+from chord_progressions.midi import save_midi_progression
+from chord_progressions.pitch import get_midi_num_from_note
+from chord_progressions.progression import Progression
 from chord_progressions.solver import select_notes_list
 from chord_progressions.utils import get_run_id, round_to_base
 
@@ -54,13 +58,11 @@ def generate_progression(
     duration_interval,
     n_overtones,
     allowed_chord_types,
-    first_chord,
 ):
 
     existing_notes_list = None
     existing_types = None
     locks = "0" * n_segments
-    first_chord = None
     adding = False
 
     notes_list, chord_types = select_notes_list(
@@ -71,7 +73,6 @@ def generate_progression(
         existing_notes_list=existing_notes_list,
         existing_types=existing_types,
         locks=locks,
-        first_chord=first_chord,
         adding=adding,
         allowed_chord_types=allowed_chord_types,
     )
@@ -85,7 +86,16 @@ def generate_progression(
     # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
     save_audio_progression(run_id, notes_list, durations, n_overtones)
 
-    midi_progression = make_midi_progression(notes_list, durations, run_id)
+    print("notes list", notes_list)
+    chords = [
+        Chord([get_midi_num_from_note(n) for n in nl], d)
+        for nl, d in zip(notes_list, durations)
+    ]
+
+    progression = Progression(chords)
+    midi_progression = make_midi_progression(progression, name=run_id)
+
+    # midi_progression = make_midi_progression(notes_list, durations, run_id)
     midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
     save_midi_progression(midi_progression, midi_progression_path)
 
@@ -176,12 +186,6 @@ if __name__ == "__main__":
         help="Number of harmonic overtones used when generating audio buffers.",
     )
     parser.add_argument(
-        "--first_chord",
-        type=list,
-        default=None,
-        help="Specify the first chord of the progression",
-    )
-    parser.add_argument(
         "--note_range_low",
         type=int,
         default=36,
@@ -214,5 +218,4 @@ if __name__ == "__main__":
         duration_interval=args.duration_interval,
         n_overtones=args.n_overtones,
         allowed_chord_types=DEFAULT_ALLOWED_CHORD_TYPES,
-        first_chord=args.first_chord,
     )

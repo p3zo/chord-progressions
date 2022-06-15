@@ -47,14 +47,13 @@ MIN_MAX_EVENNESS_BY_CARDINALITY = [
 
 def get_interval_class_vector(chord):
     """
-    The interval classes designated by each digit ascend from left to right, i.e.
-
-        minor seconds / major sevenths (1 or 11 semitones)
-        major seconds / minor sevenths (2 or 10 semitones)
-        minor thirds / major sixths (3 or 9 semitones)
-        major thirds / minor sixths (4 or 8 semitones)
-        perfect fourths / perfect fifths (5 or 7 semitones)
-        tritones (6 semitones)
+    Returns a vector of interval classes.
+        0: minor second / major seventh (1 or 11 semitones)
+        1: major second / minor seventh (2 or 10 semitones)
+        2: minor third / major sixth (3 or 9 semitones)
+        3: major third / minor sixth (4 or 8 semitones)
+        4: perfect fourth / perfect fifth (5 or 7 semitones)
+        5: tritone (6 semitones)
     """
     vec = [0] * 6
 
@@ -191,8 +190,6 @@ def evaluate_notes_list(notes_list):
 
 
 def evaluate_progression(progression):
-    """Takes a projecttion"""
-
     notes_list = [chord["notes"] for chord in progression]
 
     return evaluate_notes_list(notes_list)

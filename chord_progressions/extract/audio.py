@@ -20,11 +20,12 @@ import essentia.standard as es
 import essentia.streaming as ess
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from chord_progressions.pitch import get_note_from_midi_num
+from chord_progressions.chord import Chord
+from chord_progressions.progression import Progression
 from pylab import imshow
 
 OST = "elliott"
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 AUDIO_DIR = os.path.join(THIS_DIR, f"../../assets/audio/{OST}")
 MARKED_AUDIO_DIR = os.path.join(AUDIO_DIR, "mp3-44100-marked")
 ACCOMPANIMENT_DIR = os.path.join(AUDIO_DIR, "split_accompaniment")
@@ -135,7 +136,13 @@ def get_beats(x, trackid):
     return bpm, beats
 
 
-def extract_chords_from_audio(filepath):
+def extract_progression_from_audio(filepath):
+    """
+    Returns
+        progression: Progression, a progression object extracted from an audio file
+        segment_start_times: list(float): the start times of each chord in seconds
+    """
+
     basename = os.path.basename(filepath)
     trackid = os.path.splitext(basename)[0]
 
@@ -145,12 +152,7 @@ def extract_chords_from_audio(filepath):
     print(f"HPCP shape: {hpcp.shape}")
     plot_hpcp(hpcp, trackid)
 
-    bpm, beats = get_beats(x, trackid)
-
-    # Save the bpm to the track metadata file
-    tracks_df = pd.read_csv(TRACKS_PATH)
-    tracks_df.loc[tracks_df["trackid"] == trackid, "bpm"] = bpm
-    tracks_df.to_csv(TRACKS_PATH, index=False)
+    beats = get_beats(x, trackid)
 
     segment_start_times = beats[::BEATS_PER_SEGMENT]
     frames_per_second = SAMPLE_RATE / FRAME_SIZE
@@ -173,7 +175,9 @@ def extract_chords_from_audio(filepath):
         segment_pcs.append(pcs)
 
     midi_num_chords = [[PC_MIDI_NUMS[pc] for pc in seg] for seg in segment_pcs]
-    chords = [[get_note_from_midi_num(i) for i in m] for m in midi_num_chords]
-    durations = beat_durations
+    chords = [
+        Chord(notes=m, duration=b) for m, b in zip(midi_num_chords, beat_durations)
+    ]
+    progression = Progression(chords)
 
-    return chords, durations, bpm
+    return progression, segment_start_times

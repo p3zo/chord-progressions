@@ -4,6 +4,8 @@
 
 See the [Makefile](Makefile) for available actions.
 
+## Docs
+
 The documentation uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build a static site from
 Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving.
 Use `mkdocs build` to build the site.
