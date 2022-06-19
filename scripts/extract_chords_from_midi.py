@@ -3,7 +3,7 @@ import os
 
 from chord_progressions.extract.midi import simplify_harmony
 from chord_progressions.extract.midi_harman import label_midi, write_labels
-from chord_progressions.io.midi import make_midi_progression, save_midi_progression
+from chord_progressions.progression import Progression
 
 try:
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -36,21 +36,21 @@ if __name__ == "__main__":
 
     filepath = args.filepath
 
-    songname = os.path.splitext(os.path.basename(filepath))[0]
+    track_name = os.path.splitext(os.path.basename(filepath))[0]
 
     extracted = simplify_harmony(filepath, SHORTEST_NOTE, SMOOTH_BEAT, QUANTIZE_BEAT)
-    chords_path = os.path.join(OUTPUT_DIR, f"chords-{songname}.mid")
+    chords_path = os.path.join(OUTPUT_DIR, f"chords-{track_name}.mid")
     extracted.write(chords_path)
     print(f"Wrote chords to {chords_path}")
 
-    harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{songname}.csv")
+    harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{track_name}.csv")
     harman_labels = label_midi(extracted)
-    harman_results = write_labels(harman_labels, filepath, harman_outpath, songname)
+    harman_results = write_labels(harman_labels, filepath, harman_outpath, track_name)
     print(f"Wrote harman labels to {harman_outpath}")
 
-    chords = [i["notes"] for i in harman_labels]
+    chords = [i["chord"] for i in harman_labels]
     durations = [i["end_time"] - i["start_time"] for i in harman_labels]
-    midi_progression = make_midi_progression(chords, durations, songname)
-    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{songname}.mid")
-    save_midi_progression(midi_progression, midi_progression_path)
-    print(f"Wrote harman chords to {midi_progression_path}")
+    progression = Progression(chords, durations, name=track_name)
+
+    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.mid")
+    progression.save_midi(midi_progression_path)

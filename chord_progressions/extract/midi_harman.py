@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from chord_progressions import logger
 from chord_progressions.chord import (
+    Chord,
     get_template_from_template_str,
     get_type_num_from_type,
 )
@@ -343,7 +344,7 @@ def segment_and_label(p_all, s_m):
 
     final_ix = len(p_all) - 1
 
-    ui = 0  # index of the preceeding vertex
+    ui = 0  # index of the preceding vertex
 
     for vi, p in enumerate(p_all):
 
@@ -437,6 +438,7 @@ def segment_and_label(p_all, s_m):
             "label": template_names[edge["label"]],
             "midi_nums": edge["midi_nums"],
             "notes": edge["notes"],
+            "chord": Chord(edge["midi_nums"]),
         }
         row.update(edge["metrics"])
 

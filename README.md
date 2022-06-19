@@ -31,7 +31,7 @@ Use `mkdocs build` to build the site.
   tuning https://github.com/soul-lang/SOUL/pull/26/files
 - [feature] use VAE as solver
 - [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
-- [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
+- [feature] `io.midi.get_midi_from_progression` needs an `offset` param for when the first chord isn't at 0
 - [feature] use `bars:beats:sixteenths` format for progression duration
 
 - [maintainability] use a singular method of counting in `extract_harman.py`

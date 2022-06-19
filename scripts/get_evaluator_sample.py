@@ -3,6 +3,8 @@ Evaluates a random chord progression and returns its evaluation.
 Useful for debugging the evaluator.
 """
 
+from tqdm import tqdm
+
 from chord_progressions.chord import get_notes_list_from_midi_nums_str
 from chord_progressions.evaluator import evaluate_notes_list, evaluate_progression
 from chord_progressions.solver import get_random_progression
@@ -34,6 +36,6 @@ if __name__ == "__main__":
     sample_metrics_2 = evaluate_sample_progression_2()
 
     random_metrics = []
-    for i in range(10000):
-        progression = get_random_progression(n_segments=3)
+    for i in tqdm(range(10000)):
+        progression = get_random_progression(n_chords=3)
         random_metrics.append(evaluate_progression(progression))

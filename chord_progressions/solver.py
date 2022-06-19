@@ -1,17 +1,17 @@
 import numpy as np
 from chord_progressions import logger
 from chord_progressions.chord import (
+    Chord,
     get_notes_from_template,
-    get_template_from_notes,
+    get_template_from_midi_nums,
     get_template_from_template_str,
-    serialize_chords,
 )
-from chord_progressions.evaluator import evaluate_notes_list
 from chord_progressions.pitch import (
     get_midi_num_from_note,
     get_note_from_midi_num,
     get_pitch_class_from_note,
 )
+from chord_progressions.progression import Progression
 from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import shift_arr_by_one
 
@@ -143,13 +143,12 @@ def select_voicing(rotation, note_range_low, note_range_high):
         for ix in set(pitch_class_assignments.values()):
             selected_pitches[ix] = 1
 
-        voicing = get_notes_from_template(
+        selected_notes = get_notes_from_template(
             selected_pitches, note_range_low, note_range_high
         )
+        voicing = [get_midi_num_from_note(n) for n in selected_notes]
 
-        midi_nums = [get_midi_num_from_note(n) for n in voicing]
-
-        spaced = is_voicing_spaced(midi_nums)
+        spaced = is_voicing_spaced(voicing)
 
     return voicing
 
@@ -253,37 +252,33 @@ def choose_template_with_constraints(
     return template, template_type
 
 
-def select_notes_list(
-    n_segments,
-    pct_notes_common,
-    note_range_low,
-    note_range_high,
-    allowed_chord_types,
-    existing_notes_list,
-    existing_types,
-    locks,
-    adding,
+def select_chords(
+    n_chords=5,
+    pct_notes_common=0,
+    note_range_low=60,
+    note_range_high=108,
+    allowed_chord_types=list(TYPE_TEMPLATES),
+    existing_chords=None,
+    locks="000000",
+    adding=False,
 ):
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
 
-    open_ixs = range(n_segments)
-    rotations = [[]] * n_segments
-    notes_list = [[]] * n_segments
-    chord_types = [[]] * n_segments
+    open_ixs = range(n_chords)
+    rotations = [[]] * n_chords
+    notes_list = [[]] * n_chords
 
-    if existing_notes_list:
-        logger.debug(f"Existing notes_list: {existing_notes_list}")
+    if existing_chords:
+        logger.debug(f"Existing notes_list: {existing_chords}")
 
         if adding:
+            open_ixs = [n_chords - 1]
 
-            open_ixs = [n_segments - 1]
-
-            for ix, notes in enumerate(existing_notes_list):
-                rotations[ix] = get_template_from_notes(notes)
-                notes_list[ix] = notes
-                chord_types[ix] = existing_types[ix]
+            for ix, midi_nums in enumerate(existing_chords):
+                rotations[ix] = get_template_from_midi_nums(midi_nums)
+                notes_list[ix] = midi_nums
 
         elif locks:
             logger.debug(f"Locks: {locks}")
@@ -292,17 +287,16 @@ def select_notes_list(
 
             for ix, locked in enumerate(locks):
                 if locked == "1":
-                    rotations[ix] = get_template_from_notes(existing_notes_list[ix])
-                    notes_list[ix] = existing_notes_list[ix]
-                    chord_types[ix] = existing_types[ix]
+                    rotations[ix] = get_template_from_midi_nums(existing_chords[ix])
+                    notes_list[ix] = existing_chords[ix]
 
-    logger.debug(f"Progression indexes to fill: {open_ixs}")
+    logger.debug(f"Indexes to fill: {open_ixs}")
 
     for ix in open_ixs:
         preceding_rotation = rotations[ix - 1] if ix > 0 else None
 
         succeeding_rotation = None
-        if ix < n_segments - 1:
+        if ix < n_chords - 1:
             rotation = rotations[ix + 1]
             succeeding_rotation = rotation if rotation else None
 
@@ -327,12 +321,11 @@ def select_notes_list(
         voicing = select_voicing(rotation, note_range_low, note_range_high)
 
         notes_list[ix] = voicing
-        chord_types[ix] = chord_type
         rotations[ix] = rotation
 
         logger.debug(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
 
-    return notes_list, chord_types
+    return [Chord(c) for c in notes_list]
 
 
 def is_voicing_spaced(voicing):
@@ -389,22 +382,15 @@ def shuffle_voicing(notes: list[str], note_range_low: int, note_range_high: int)
 
 
 def get_random_progression(n_chords: int):
-    locks = "0" * n_chords
-
-    notes_list, chord_types = select_notes_list(
-        n_segments=n_chords,
+    chords = select_chords(
+        n_chords=n_chords,
         pct_notes_common=0,
         note_range_low=60,
         note_range_high=108,
         allowed_chord_types=list(TYPE_TEMPLATES),
-        existing_notes_list=None,
-        existing_types=None,
-        locks=locks,
+        existing_chords=None,
+        locks="0" * n_chords,
         adding=False,
     )
 
-    durations = ["1m"] * len(notes_list)
-
-    chord_metrics = [evaluate_notes_list(c) for c in notes_list]
-
-    return serialize_chords(notes_list, chord_types, durations, chord_metrics, locks)
+    return Progression(chords)

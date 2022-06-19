@@ -1,7 +1,5 @@
-import os
-
 import numpy as np
-from chord_progressions import WAV_OUTPUT_DIR, logger
+from chord_progressions import logger
 from chord_progressions.pitch import get_freq_from_note, get_n_overtones_harmonic
 from scipy.io import wavfile
 
@@ -90,24 +88,19 @@ def mk_arpeggiated_chord_buffer(chord, duration, seqs, n_overtones):
 
 
 def save_sample_chord_audio(chord, chord_type):
-
     buf = mk_chord_buffer(chord, duration=1, n_overtones=1)
     filename = chord_type.replace("/", "_").replace(" ", "")
-
-    wavfile.write(f"sample_chords/{filename}.wav", SAMPLE_RATE, buf)
+    outpath = f"sample_chords/{filename}.wav"
+    save_audio_buffer(buf, outpath)
 
 
 def make_audio_progression(chords, durations, n_overtones):
-
-    buffers = [mk_chord_buffer(f, d, n_overtones) for f, d in zip(chords, durations)]
+    buffers = [
+        mk_chord_buffer(c.notes, d, n_overtones) for c, d in zip(chords, durations)
+    ]
 
     return np.concatenate(buffers)
 
 
-def save_audio_progression(run_id, chords, durations, n_overtones):
-
-    audio_buffer = make_audio_progression(chords, durations, n_overtones)
-
-    filepath = os.path.join(WAV_OUTPUT_DIR, f"{run_id}.wav")
-    wavfile.write(filepath, SAMPLE_RATE, audio_buffer)
-    logger.info(f"Audio saved to {filepath}")
+def save_audio_buffer(buf, outpath):
+    wavfile.write(outpath, SAMPLE_RATE, buf)

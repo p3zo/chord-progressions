@@ -20,29 +20,14 @@ import essentia.standard as es
 import essentia.streaming as ess
 import matplotlib.pyplot as plt
 import numpy as np
+from chord_progressions import logger
 from chord_progressions.chord import Chord
 from chord_progressions.progression import Progression
 from pylab import imshow
 
-OST = "elliott"
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-AUDIO_DIR = os.path.join(THIS_DIR, f"../../assets/audio/{OST}")
-MARKED_AUDIO_DIR = os.path.join(AUDIO_DIR, "mp3-44100-marked")
-ACCOMPANIMENT_DIR = os.path.join(AUDIO_DIR, "split_accompaniment")
-
-OUTPUT_DIR = os.path.join(THIS_DIR, f"../../assets/output/{OST}")
-OUTPUT_PLOT_DIR = os.path.join(OUTPUT_DIR, "plots")
-TRACKS_PATH = os.path.join(OUTPUT_DIR, "tracks.csv")
-
-for outpath in [MARKED_AUDIO_DIR, OUTPUT_PLOT_DIR]:
-    if not os.path.exists(outpath):
-        os.makedirs(outpath)
-
-
 SAMPLE_RATE = 44100  # Hz
 FRAME_SIZE = 4096  # samples
 HPCP_THRESH = 0.35
-BEATS_PER_SEGMENT = 4
 
 PC_MIDI_NUMS = list(range(69, 81))
 
@@ -108,7 +93,7 @@ def get_essentia_features(filepath):
     return pool["audio"], feats
 
 
-def plot_hpcp(hpcp, trackid):
+def plot_hpcp(hpcp, figpath):
     plt.rcParams["figure.figsize"] = (15, 6)
     imshow(hpcp.T, aspect="auto", origin="lower", interpolation="none")
     plt.yticks(
@@ -116,28 +101,57 @@ def plot_hpcp(hpcp, trackid):
         labels=["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
     )
     plt.title("HPCPs in frames")
-    figpath = os.path.join(OUTPUT_PLOT_DIR, f"{trackid}_hpcp.png")
     plt.savefig(figpath)
     plt.clf()
     print(f"Saved HPCP plot to {figpath}")
 
 
-def get_beats(x, trackid):
+def get_beats(x, marked_audio_path=None):
     # Compute beat positions and BPM
     rhythm_extractor = es.RhythmExtractor2013(method="multifeature")
     bpm, beats, beats_confidence, _, beats_intervals = rhythm_extractor(x)
+    print(f"  BPM: {bpm}")
 
-    # Mark beat positions in the audio and write it to a file
-    marker = es.AudioOnsetsMarker(onsets=beats, type="noise")
-    marked_audio = marker(x)
-    outpath = os.path.join(MARKED_AUDIO_DIR, f"{trackid}_beats.mp3")
-    es.MonoWriter(filename=outpath)(marked_audio)
+    if marked_audio_path:
+        # Mark beat positions in the audio and write it to a file
+        marker = es.AudioOnsetsMarker(onsets=beats, type="noise")
+        marked_audio = marker(x)
+        es.MonoWriter(filename=marked_audio_path)(marked_audio)
 
-    return bpm, beats
+    return beats, bpm
 
 
-def extract_progression_from_audio(filepath):
+def get_meter(signal, beats):
+    """Estimate the time signature of a signal by finding the highest correlation between salient beat loudness bands"""
+    loudness, loudness_band_ratio = es.BeatsLoudness(
+        beats=beats,  # list of beat positions (in seconds)
+        beatWindowDuration=0.1,  # seconds, dur of window in which to look for beat start (centered on beat positions)
+        beatDuration=0.05,  # duration of window in which the beat will be restricted [s]
+        frequencyBands=[
+            20,
+            150,
+            400,
+            3200,
+            7000,
+            22000,
+        ],  # the list of bands to compute energy ratios, hz
+        sampleRate=SAMPLE_RATE,
+    )(signal)
+
+    beatogram = es.Beatogram(size=16)(  # size: number of beats for dynamic filtering
+        loudness, loudness_band_ratio
+    )
+
+    return es.Meter()(beatogram)
+
+
+def extract_progression_from_audio(filepath, plot_dir=None, marked_audio_dir=None):
     """
+    Params
+        filepath: str, Path to an audio file
+        plot_dir: str, if passed, writes intermediate plots. Useful for debugging.
+        marked_audio_dir: str, writes an audio file with beat position markers. Useful for debugging.
+
     Returns
         progression: Progression, a progression object extracted from an audio file
         segment_start_times: list(float): the start times of each chord in seconds
@@ -149,12 +163,18 @@ def extract_progression_from_audio(filepath):
     x, feats = get_essentia_features(filepath)
 
     hpcp = feats["hpcp"]
-    print(f"HPCP shape: {hpcp.shape}")
-    plot_hpcp(hpcp, trackid)
+    logger.info(f"  HPCP shape: {hpcp.shape}")
 
-    beats = get_beats(x, trackid)
+    hpcp_figpath = os.path.join(plot_dir, f"{trackid}_hpcp.png")
+    plot_hpcp(hpcp, hpcp_figpath)
 
-    segment_start_times = beats[::BEATS_PER_SEGMENT]
+    marked_audio_path = os.path.join(marked_audio_dir, f"{trackid}_beats.mp3")
+    beats, bpm = get_beats(x, marked_audio_path)
+
+    meter = get_meter(x, beats)
+    print(f"  Estimated meter: {meter}")
+
+    segment_start_times = beats[:: int(meter)]
     frames_per_second = SAMPLE_RATE / FRAME_SIZE
     quarter_note_beat_samples = [
         int(i * frames_per_second) for i in segment_start_times
@@ -174,10 +194,8 @@ def extract_progression_from_audio(filepath):
         pcs = np.where(normalized_mean > HPCP_THRESH)[0].tolist()
         segment_pcs.append(pcs)
 
-    midi_num_chords = [[PC_MIDI_NUMS[pc] for pc in seg] for seg in segment_pcs]
-    chords = [
-        Chord(notes=m, duration=b) for m, b in zip(midi_num_chords, beat_durations)
-    ]
-    progression = Progression(chords)
+    chords = [Chord([PC_MIDI_NUMS[pc] for pc in seg]) for seg in segment_pcs]
+    # TODO: convert beat_durations to Tone Time values relative to bpm and add them to Progression
+    progression = Progression(chords, beat_durations, bpm=bpm, name=filepath)
 
-    return progression, segment_start_times
+    return progression

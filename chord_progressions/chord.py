@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from chord_progressions import logger
 from chord_progressions.pitch import (
     get_note_from_midi_num,
@@ -15,23 +13,40 @@ MidiNumList = list[int]
 
 
 class Chord:
-    def __init__(self, midi_nums: MidiNumList, duration):
-        self.midi_nums = midi_nums
-        self.duration = duration
+    def __init__(self, midi_nums: MidiNumList):
+        """
+        midi_nums:
+            list of midi nums, e.g. [60, 64, 67]
 
-        chord_type = get_type_from_notes(midi_nums)
+        TODO: should chords have durations when not part of a progression?
+        duration:
+            float, seconds
+                The length of this list must match the length of `chords`
+                The length of a tick is defined in ticks per beat. This value is stored
+                as ticks_per_beat in MidiFile objects and remains fixed throughout a track.
+
+            str, Tone Time
+        """
+        self.midi_nums = midi_nums
+        # self.duration = duration
+
+        chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
         self.typeId = get_type_num_from_type(chord_type)
 
+        self.notes = [get_note_from_midi_num(n) for n in midi_nums]
+
+        self.metrics = {}
         # self.metrics = evaluate_notes_list(notes)
 
-    def values(self):
+    def json(self):
         return {
             "midi_nums": self.midi_nums,
-            "duration": self.duration,
+            # "duration": self.duration,
             "type": self.type,
             "typeId": self.typeId,
-            # "metrics": self.metrics,
+            "notes": self.notes,
+            "metrics": self.metrics,
         }
 
 
@@ -52,7 +67,7 @@ def get_template_from_notes(notes):
 
 
 def get_template_from_midi_nums(midi_nums):
-    """e.g. ["48", "60"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
+    """e.g. [48, 60] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
     pitch_classes = [get_pitch_class_from_midi_num(n) for n in midi_nums]
 
     return get_template_from_pitch_classes(pitch_classes)
@@ -139,6 +154,16 @@ def get_type_from_notes(notes):
     return ""
 
 
+def get_type_from_midi_nums(midi_nums):
+    """
+    Returns the first exact template match
+
+    e.g. [48, 60] -> "unison"
+    """
+    notes = [get_note_from_midi_num(n) for n in midi_nums]
+    return get_type_from_notes(notes)
+
+
 def get_types_from_notes_list(notes_list):
     """
     Returns the first exact template match for each note list
@@ -177,32 +202,3 @@ def get_notes_from_template(template, note_range_low, note_range_high):
     notes = [all_notes[ix] if is_onset else 0 for ix, is_onset in enumerate(template)]
 
     return [n for n in notes if n]
-
-
-def serialize_chord(notes, chord_type, duration, chord_metrics, locked, ix):
-    return {
-        "id": str(uuid4()),
-        "ix": ix,
-        "type": chord_type,
-        "duration": duration,
-        "typeId": get_type_num_from_type(chord_type),
-        "notes": notes,
-        "locked": str(locked),
-        "metrics": chord_metrics,
-    }
-
-
-def serialize_chords(notes_list, chord_types, durations, chord_metrics, chord_locks):
-    chord_dicts = []
-
-    for ix, (chord, chord_type, duration) in enumerate(
-        list(zip(notes_list, chord_types, durations))
-    ):
-
-        locked = list(chord_locks)[ix]
-
-        chord_dicts.append(
-            serialize_chord(chord, chord_type, duration, chord_metrics[ix], locked, ix)
-        )
-
-    return chord_dicts

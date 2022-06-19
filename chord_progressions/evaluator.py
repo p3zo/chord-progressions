@@ -190,7 +190,7 @@ def evaluate_notes_list(notes_list):
 
 
 def evaluate_progression(progression):
-    notes_list = [chord["notes"] for chord in progression]
+    notes_list = [chord.midi_nums for chord in progression]
 
     return evaluate_notes_list(notes_list)
 
