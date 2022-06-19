@@ -77,7 +77,7 @@ def test_select_chords():
     locks = "0" * 6
     adding = False
 
-    notes_list, chord_types = select_chords(
+    chords = select_chords(
         n_chords=n_chords,
         pct_notes_common=pct_notes_common,
         allowed_chord_types=allowed_chord_types,
@@ -88,11 +88,7 @@ def test_select_chords():
         note_range_low=21,
     )
 
-    assert len(notes_list) == n_chords
-    assert len(chord_types) == n_chords
-
-    for notes, chord_type in zip(notes_list, chord_types):
-        assert notes_match_chord_type(notes, chord_type)
+    assert len(chords) == n_chords
 
 
 def test_get_all_rotations_of_template():
