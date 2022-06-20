@@ -17,8 +17,7 @@ harman_labels = label_midi(extracted)
 ## Extract chords from an audio file
 
 ```python
-from chord_progressions.extract.audio import extract_chords_from_audio
-chords, durations, bpm = chords = extract_chords_from_audio('my_file.wav')
-```
+from chord_progressions.extract.audio import extract_progression_from_audio
 
-[//]: # (TODO: `label_audio_file&#40;&#41;` that returns a progression)
+progression = extract_progression_from_audio('my_file.wav')
+```

@@ -153,8 +153,7 @@ def extract_progression_from_audio(filepath, plot_dir=None, marked_audio_dir=Non
         marked_audio_dir: str, writes an audio file with beat position markers. Useful for debugging.
 
     Returns
-        progression: Progression, a progression object extracted from an audio file
-        segment_start_times: list(float): the start times of each chord in seconds
+        progression: Progression, the extracted progression object
     """
 
     basename = os.path.basename(filepath)

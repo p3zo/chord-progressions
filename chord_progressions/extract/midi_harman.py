@@ -5,6 +5,7 @@ the HarmAn algorithm by Pardo & Birmingham:
 https://interactiveaudiolab.github.io/assets/papers/pardo-birmingham-cmj02.pdf
 """
 
+import os
 import time
 from collections import Counter, defaultdict
 from copy import deepcopy
@@ -19,11 +20,18 @@ from chord_progressions.chord import (
     get_type_num_from_type,
 )
 from chord_progressions.evaluator import evaluate_notes
-from chord_progressions.extract.midi import load_midi_file
+from chord_progressions.extract import (
+    DEFAULT_QUANTIZE_BEAT,
+    DEFAULT_SHORTEST_NOTE,
+    DEFAULT_SMOOTH_BEAT,
+)
+from chord_progressions.extract.midi import simplify_harmony
+from chord_progressions.io.midi import load_midi_file
 from chord_progressions.pitch import (
     get_note_from_midi_num,
     get_pitch_class_from_midi_num,
 )
+from chord_progressions.progression import Progression
 from chord_progressions.solver import get_all_rotations_of_template
 from chord_progressions.type_templates import TYPE_TEMPLATES
 
@@ -470,10 +478,13 @@ def label_file(filepath):
     return label_midi(midi)
 
 
-def write_labels(labels, inpath, outpath, arrangement_id):
+def write_labels(labels, inpath, outpath, arrangement_id=None):
     if not labels:
         logger.error(f"Failed for {inpath}")
         return {inpath: None}
+
+    if not arrangement_id:
+        arrangement_id = os.path.splitext(os.path.basename(inpath))[0]
 
     df = pd.DataFrame(labels)
 
@@ -490,3 +501,47 @@ def write_labels(labels, inpath, outpath, arrangement_id):
     logger.info(f"Labels saved to {outpath}")
 
     return {inpath: labels}
+
+
+def extract_progression_from_midi(
+    filepath,
+    shortest_note=DEFAULT_SHORTEST_NOTE,
+    smooth_beat=DEFAULT_SMOOTH_BEAT,
+    quantize_beat=DEFAULT_QUANTIZE_BEAT,
+    simplified_path=None,
+    harman_labels_path=None,
+):
+    """
+    Params
+        filepath: str, Path to a midi file
+        shortest_note: float, see params for `simplify_harmony()`
+        smooth_beat: float, see params for `simplify_harmony()`
+        quantize_beat: float, see params for `simplify_harmony()`
+        simplified_path: str, if passed writes a midi file with simplified harmony. Useful for debugging.
+        simplified_path: str, if passed writes a csv file with the output harman labels. Useful for debugging.
+
+    Returns
+        progression: Progression, the extracted progression object
+        segment_start_times: list(float): the start times of each chord in seconds
+    """
+
+    midi = load_midi_file(filepath)
+
+    simplified = simplify_harmony(filepath, shortest_note, smooth_beat, quantize_beat)
+
+    if simplified_path:
+        simplified.write(simplified_path)
+        print(f"Wrote simplified midi to {simplified_path}")
+
+    harman_labels = label_midi(simplified)
+
+    if harman_labels_path:
+        _ = write_labels(harman_labels, filepath, harman_labels_path)
+
+    chords = [i["chord"] for i in harman_labels]
+    durations = [i["end_time"] - i["start_time"] for i in harman_labels]
+
+    bpms = [i[0] for i in midi.get_tempo_changes() if i[0] > 0]
+
+    # TODO: support tempo changes in progressions
+    return Progression(chords, durations, bpm=bpms[0], name=filepath)

@@ -1,6 +1,22 @@
+import warnings
+
 import mido
+import pretty_midi
 from chord_progressions import DEFAULT_BPM, DEFAULT_MIDI_TICKS_PER_BEAT
 from chord_progressions.midi import get_midi_ticks_from_seconds, make_midi_chord
+
+
+def load_midi_file(filepath):
+    # warnings can be verbose when midi has no metadata e.g. tempo, key, time signature
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+        try:
+            midi = pretty_midi.PrettyMIDI(filepath)
+        except Exception as e:
+            print(f"Failed loading file {filepath}: {e}")
+            return
+
+    return midi
 
 
 def get_midi_from_progression(
