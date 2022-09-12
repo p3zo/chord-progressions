@@ -272,7 +272,7 @@ def select_chords(
 
     open_ixs = range(n_chords)
     rotations = [[]] * n_chords
-    notes_list = [[]] * n_chords
+    chord_notes = [[]] * n_chords
 
     if existing_chords:
         logger.debug(f"Existing chords: {existing_chords}")
@@ -282,7 +282,7 @@ def select_chords(
 
             for ix, midi_nums in enumerate(existing_chords):
                 rotations[ix] = get_template_from_midi_nums(midi_nums)
-                notes_list[ix] = midi_nums
+                chord_notes[ix] = midi_nums
 
         elif locks:
             logger.debug(f"Locks: {locks}")
@@ -292,7 +292,7 @@ def select_chords(
             for ix, locked in enumerate(locks):
                 if locked == "1":
                     rotations[ix] = get_template_from_midi_nums(existing_chords[ix])
-                    notes_list[ix] = existing_chords[ix]
+                    chord_notes[ix] = existing_chords[ix]
 
     logger.debug(f"Indexes to fill: {open_ixs}")
 
@@ -324,12 +324,12 @@ def select_chords(
 
         voicing = select_voicing(rotation, note_range_low, note_range_high)
 
-        notes_list[ix] = voicing
+        chord_notes[ix] = voicing
         rotations[ix] = rotation
 
         logger.debug(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
 
-    return [Chord(c) for c in notes_list]
+    return [Chord(c) for c in chord_notes]
 
 
 def is_voicing_spaced(voicing):
