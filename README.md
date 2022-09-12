@@ -17,7 +17,7 @@ Use `mkdocs build` to build the site.
 ##### Prioritized
 
 - mk progressions from extracted harman labels
-- `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maxiumum of six
+- `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maximum of six
   segment evaluations occur per note
 
 ##### Eventually
