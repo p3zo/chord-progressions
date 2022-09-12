@@ -30,6 +30,11 @@ if __name__ == "__main__":
         default=SAMPLE_FILEPATH,
         help="Path to a midi file",
     )
+    parser.add_argument(
+        "--sonify",
+        action="store_true",
+        help="Create a .wav file with a sonification of the extracted chords",
+    )
     args = parser.parse_args()
 
     filepath = args.filepath
@@ -45,5 +50,6 @@ if __name__ == "__main__":
     midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.mid")
     progression.save_midi(midi_progression_path)
 
-    audio_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.wav")
-    progression.save_audio(audio_progression_path)
+    if args.sonify:
+        audio_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.wav")
+        progression.save_audio(audio_progression_path)
