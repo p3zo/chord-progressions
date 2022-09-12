@@ -1,4 +1,6 @@
 """
+NOTE: experimental. Essentia not included in dependencies.
+
 Implementation details:
 
 For each frame:
