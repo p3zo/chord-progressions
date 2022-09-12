@@ -4,6 +4,7 @@ from chord_progressions.pitch import (
     get_note_list,
     get_pitch_class_from_midi_num,
     get_pitch_class_from_note,
+    get_midi_num_from_note,
 )
 from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import is_circular_match
@@ -13,7 +14,15 @@ MidiNumList = list[int]
 
 
 class Chord:
-    def __init__(self, midi_nums: MidiNumList):
+    def __init__(self, notes):
+        # TODO: replace typechecking with @singledispatchmethod pattern
+        # See https://realpython.com/python-multiple-constructors/#checking-argument-types-in-__init__
+        if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
+            notes = [get_midi_num_from_note(n) for n in notes]
+
+        self.initialize_from_midi_nums(notes)
+
+    def initialize_from_midi_nums(self, midi_nums: MidiNumList):
         """
         midi_nums:
             list of midi nums, e.g. [60, 64, 67]
@@ -196,7 +205,6 @@ def get_types_from_notes_list(notes_list):
 
 
 def get_notes_from_template(template, note_range_low, note_range_high):
-
     all_notes = get_note_list(note_range_low, note_range_high)
 
     notes = [all_notes[ix] if is_onset else 0 for ix, is_onset in enumerate(template)]
