@@ -13,7 +13,6 @@ Rules:
 import os
 
 import numpy as np
-
 from chord_progressions.chord import Chord
 from chord_progressions.pitch import get_midi_num_from_note
 from chord_progressions.progression import Progression
@@ -75,7 +74,7 @@ def get_voice_led_progression(start):
 
     chords = [Chord([n for n in c]) for c in midi_chords]
 
-    durations = [1] * len(chords) # seconds
+    durations = [1] * len(chords)  # seconds
 
     run_id = get_run_id()
 

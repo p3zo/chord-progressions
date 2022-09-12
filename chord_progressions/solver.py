@@ -259,9 +259,13 @@ def select_chords(
     note_range_high=108,
     allowed_chord_types=list(TYPE_TEMPLATES),
     existing_chords=None,
-    locks="000000",
+    locks=None,
     adding=False,
 ):
+
+    if type(locks) != str:
+        locks = "0" * n_chords
+
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
@@ -271,7 +275,7 @@ def select_chords(
     notes_list = [[]] * n_chords
 
     if existing_chords:
-        logger.debug(f"Existing notes_list: {existing_chords}")
+        logger.debug(f"Existing chords: {existing_chords}")
 
         if adding:
             open_ixs = [n_chords - 1]

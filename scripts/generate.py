@@ -31,8 +31,7 @@ DEFAULT_ALLOWED_CHORD_TYPES = [
 ]
 
 
-def get_chord_durations(n_chords, duration_min, duration_max, duration_interval):
-
+def get_random_chord_durations(n_chords, duration_min, duration_max, duration_interval):
     if duration_min == duration_max:
         durations = [duration_min] * n_chords
 
@@ -44,17 +43,16 @@ def get_chord_durations(n_chords, duration_min, duration_max, duration_interval)
 
 
 def generate_progression(
-    n_chords,
-    pct_notes_common,
-    note_range_low,
-    note_range_high,
-    duration_min,
-    duration_max,
-    duration_interval,
-    n_overtones,
-    allowed_chord_types,
+        n_chords,
+        pct_notes_common,
+        note_range_low,
+        note_range_high,
+        duration_min,
+        duration_max,
+        duration_interval,
+        n_overtones,
+        allowed_chord_types,
 ):
-
     existing_chords = None
     locks = "0" * n_chords
     adding = False
@@ -70,7 +68,7 @@ def generate_progression(
         allowed_chord_types=allowed_chord_types,
     )
 
-    durations = get_chord_durations(
+    durations = get_random_chord_durations(
         n_chords, duration_min, duration_max, duration_interval
     )
 
@@ -89,7 +87,6 @@ def generate_progression(
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
 
     with open(meta_filepath, "w") as fh:
-
         writer = csv.writer(fh, delimiter="\t")
 
         writer.writerows(
@@ -107,7 +104,6 @@ def generate_progression(
 
 
 def validate_args(args):
-
     if args.n_chords < 1:
         raise ValueError("`n_chords` must be > 0")
 
@@ -131,7 +127,6 @@ def validate_args(args):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--n_chords", type=int, default=4, help="Number of chords to generate."

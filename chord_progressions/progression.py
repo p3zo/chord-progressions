@@ -30,6 +30,9 @@ class Progression:
 
         self.ids = [str(uuid4()) for i in range(len(chords))]
 
+        # TODO: add metrics
+        self.metrics = {}
+
     def __iter__(self):
         for chord in self.chords:
             yield chord
