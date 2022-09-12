@@ -51,5 +51,7 @@ if __name__ == "__main__":
     progression.save_midi(midi_progression_path)
 
     if args.sonify:
-        audio_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.wav")
+        audio_progression_path = os.path.join(
+            OUTPUT_DIR, f"harman-chords_{track_name}.wav"
+        )
         progression.save_audio(audio_progression_path)

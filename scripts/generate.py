@@ -43,15 +43,15 @@ def get_random_chord_durations(n_chords, duration_min, duration_max, duration_in
 
 
 def generate_progression(
-        n_chords,
-        pct_notes_common,
-        note_range_low,
-        note_range_high,
-        duration_min,
-        duration_max,
-        duration_interval,
-        n_overtones,
-        allowed_chord_types,
+    n_chords,
+    pct_notes_common,
+    note_range_low,
+    note_range_high,
+    duration_min,
+    duration_max,
+    duration_interval,
+    n_overtones,
+    allowed_chord_types,
 ):
     existing_chords = None
     locks = "0" * n_chords
