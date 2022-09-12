@@ -116,7 +116,7 @@ def get_notes_list_from_midi_nums_str(midi_nums_str):
 
 def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
     """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]"""
-    return [m.split("-") for m in midi_nums_str.split("_")]
+    return [[int(i) for i in m.split("-")] for m in midi_nums_str.split("_")]
 
 
 def get_durations_from_duration_str(dur_str):
