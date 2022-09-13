@@ -75,7 +75,6 @@ def test_select_chords():
     allowed_chord_types = ["major chord", "minor chord"]
     existing_chords = None
     locks = "0" * 6
-    adding = False
 
     chords = select_chords(
         n_chords=n_chords,
@@ -83,7 +82,6 @@ def test_select_chords():
         allowed_chord_types=allowed_chord_types,
         existing_chords=existing_chords,
         locks=locks,
-        adding=adding,
         note_range_high=108,
         note_range_low=21,
     )

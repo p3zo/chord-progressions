@@ -260,7 +260,6 @@ def select_chords(
     allowed_chord_types=list(TYPE_TEMPLATES),
     existing_chords=None,
     locks=None,
-    adding=False,
 ):
 
     if type(locks) != str:
@@ -277,14 +276,13 @@ def select_chords(
     if existing_chords:
         logger.debug(f"Existing chords: {existing_chords}")
 
-        if adding:
-            open_ixs = [n_chords - 1]
+        open_ixs = [n_chords - 1]
 
-            for ix, midi_nums in enumerate(existing_chords):
-                rotations[ix] = get_template_from_midi_nums(midi_nums)
-                chord_notes[ix] = midi_nums
+        for ix, midi_nums in enumerate(existing_chords):
+            rotations[ix] = get_template_from_midi_nums(midi_nums)
+            chord_notes[ix] = midi_nums
 
-        elif locks:
+        if locks:
             logger.debug(f"Locks: {locks}")
 
             open_ixs = [ix for ix, i in enumerate(locks) if i == "0"]
@@ -394,7 +392,6 @@ def get_random_progression(n_chords: int):
         allowed_chord_types=list(TYPE_TEMPLATES),
         existing_chords=None,
         locks="0" * n_chords,
-        adding=False,
     )
 
     return Progression(chords)

@@ -55,7 +55,6 @@ def generate_progression(
 ):
     existing_chords = None
     locks = "0" * n_chords
-    adding = False
 
     chords = select_chords(
         n_chords=n_chords,
@@ -64,7 +63,6 @@ def generate_progression(
         note_range_high=note_range_high,
         existing_chords=existing_chords,
         locks=locks,
-        adding=adding,
         allowed_chord_types=allowed_chord_types,
     )
 
