@@ -10,10 +10,20 @@ Rules:
     - Can change by semitone or whole tone up or done
 """
 
+import os
+
 import numpy as np
-from chord_progressions.audio import save_audio_progression
-from chord_progressions.pitch import get_midi_num_from_note, get_note_from_midi_num
+from chord_progressions.chord import Chord
+from chord_progressions.pitch import get_midi_num_from_note
+from chord_progressions.progression import Progression
 from chord_progressions.utils import get_run_id
+
+try:
+    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+except:
+    THIS_DIR = os.getcwd()
+
+OUTPUT_AUDIO_DIR = os.path.join(THIS_DIR, "../assets/output/wav")
 
 
 def choose_change_amount():
@@ -62,14 +72,16 @@ def get_voice_led_progression(start):
 
         midi_chords.append(chord)
 
-    chords = [[get_note_from_midi_num(n) for n in c] for c in midi_chords]
+    chords = [Chord([n for n in c]) for c in midi_chords]
+
+    durations = [1] * len(chords)  # seconds
 
     run_id = get_run_id()
 
-    duration = 0.5  # seconds
-    durations = [duration] * len(chords)
+    progression = Progression(chords, durations, name=run_id)
 
-    save_audio_progression(run_id, chords, durations, n_overtones=0)
+    audio_outpath = os.path.join(OUTPUT_AUDIO_DIR, f"{run_id}.wav")
+    progression.save_audio(audio_outpath, n_overtones=0)
 
     return chords
 

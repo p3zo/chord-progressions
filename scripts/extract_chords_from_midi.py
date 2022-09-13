@@ -1,9 +1,7 @@
 import argparse
 import os
 
-from chord_progressions.extract.midi import simplify_harmony
-from chord_progressions.extract.midi_harman import label_midi, write_labels
-from chord_progressions.midi import make_midi_progression, save_midi_progression
+from chord_progressions.extract.midi_harman import extract_progression_from_midi
 
 try:
     THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -32,25 +30,28 @@ if __name__ == "__main__":
         default=SAMPLE_FILEPATH,
         help="Path to a midi file",
     )
+    parser.add_argument(
+        "--sonify",
+        action="store_true",
+        help="Create a .wav file with a sonification of the extracted chords",
+    )
     args = parser.parse_args()
 
     filepath = args.filepath
 
-    songname = os.path.splitext(os.path.basename(filepath))[0]
+    track_name = os.path.splitext(os.path.basename(filepath))[0]
 
-    extracted = simplify_harmony(filepath, SHORTEST_NOTE, SMOOTH_BEAT, QUANTIZE_BEAT)
-    chords_path = os.path.join(OUTPUT_DIR, f"chords-{songname}.mid")
-    extracted.write(chords_path)
-    print(f"Wrote chords to {chords_path}")
+    simplified_path = os.path.join(OUTPUT_DIR, f"chords-{track_name}.mid")
+    harman_labels_path = os.path.join(OUTPUT_DIR, f"harman-labels_{track_name}.csv")
+    progression = extract_progression_from_midi(
+        filepath, simplified_path=simplified_path, harman_labels_path=harman_labels_path
+    )
 
-    harman_outpath = os.path.join(OUTPUT_DIR, f"harman-labels_{songname}.csv")
-    harman_labels = label_midi(extracted)
-    harman_results = write_labels(harman_labels, filepath, harman_outpath, songname)
-    print(f"Wrote harman labels to {harman_outpath}")
+    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.mid")
+    progression.save_midi(midi_progression_path)
 
-    chords = [i["notes"] for i in harman_labels]
-    durations = [i["end_time"] - i["start_time"] for i in harman_labels]
-    midi_progression = make_midi_progression(chords, durations, songname)
-    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{songname}.mid")
-    save_midi_progression(midi_progression, midi_progression_path)
-    print(f"Wrote harman chords to {midi_progression_path}")
+    if args.sonify:
+        audio_progression_path = os.path.join(
+            OUTPUT_DIR, f"harman-chords_{track_name}.wav"
+        )
+        progression.save_audio(audio_progression_path)

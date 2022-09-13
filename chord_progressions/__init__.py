@@ -22,3 +22,8 @@ for outdir in [WAV_OUTPUT_DIR, MIDI_OUTPUT_DIR, META_OUTPUT_DIR]:
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("chord-progressions")
+
+# Config
+# TODO: move to config
+DEFAULT_BPM = 120
+DEFAULT_MIDI_TICKS_PER_BEAT = 480

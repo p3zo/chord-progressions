@@ -6,10 +6,9 @@ import csv
 import os
 
 import numpy as np
-from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, logger
-from chord_progressions.audio import save_audio_progression
-from chord_progressions.midi import make_midi_progression, save_midi_progression
-from chord_progressions.solver import select_notes_list
+from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, WAV_OUTPUT_DIR, logger
+from chord_progressions.progression import Progression
+from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_run_id, round_to_base
 
 DEFAULT_ALLOWED_CHORD_TYPES = [
@@ -32,20 +31,19 @@ DEFAULT_ALLOWED_CHORD_TYPES = [
 ]
 
 
-def get_chord_durations(n_segments, duration_min, duration_max, duration_interval):
-
+def get_random_chord_durations(n_chords, duration_min, duration_max, duration_interval):
     if duration_min == duration_max:
-        durations = [duration_min] * n_segments
+        durations = [duration_min] * n_chords
 
     else:
-        durations = np.random.uniform(duration_min, duration_max, n_segments)
+        durations = np.random.uniform(duration_min, duration_max, n_chords)
         durations = [round_to_base(d, duration_interval) for d in durations]
 
     return durations
 
 
 def generate_progression(
-    n_segments,
+    n_chords,
     pct_notes_common,
     note_range_low,
     note_range_high,
@@ -54,58 +52,49 @@ def generate_progression(
     duration_interval,
     n_overtones,
     allowed_chord_types,
-    first_chord,
 ):
+    existing_chords = None
+    locks = "0" * n_chords
 
-    existing_notes_list = None
-    existing_types = None
-    locks = "0" * n_segments
-    first_chord = None
-    adding = False
-
-    notes_list, chord_types = select_notes_list(
-        n_segments=n_segments,
+    chords = select_chords(
+        n_chords=n_chords,
         pct_notes_common=pct_notes_common,
         note_range_low=note_range_low,
         note_range_high=note_range_high,
-        existing_notes_list=existing_notes_list,
-        existing_types=existing_types,
+        existing_chords=existing_chords,
         locks=locks,
-        first_chord=first_chord,
-        adding=adding,
         allowed_chord_types=allowed_chord_types,
     )
 
-    durations = get_chord_durations(
-        n_segments, duration_min, duration_max, duration_interval
+    durations = get_random_chord_durations(
+        n_chords, duration_min, duration_max, duration_interval
     )
 
     run_id = get_run_id()
 
-    # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
-    save_audio_progression(run_id, notes_list, durations, n_overtones)
+    progression = Progression(chords, durations, name=run_id)
 
-    midi_progression = make_midi_progression(notes_list, durations, run_id)
+    # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
+    audio_progression_path = os.path.join(WAV_OUTPUT_DIR, f"{run_id}.wav")
+    progression.save_audio(audio_progression_path)
+
     midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
-    save_midi_progression(midi_progression, midi_progression_path)
+    progression.save_midi(outpath=midi_progression_path)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
 
     with open(meta_filepath, "w") as fh:
-
         writer = csv.writer(fh, delimiter="\t")
 
         writer.writerows(
             [
-                ["n_segments", n_segments],
+                ["n_chords", n_chords],
                 ["n_overtones", n_overtones],
                 ["duration_min", duration_min],
                 ["duration_max", duration_max],
                 ["duration_interval", duration_interval],
-                ["chord_types", chord_types],
-                ["chords", notes_list],
-                ["durations", durations],
+                ["progression_json", progression.json()],
             ]
         )
 
@@ -113,9 +102,8 @@ def generate_progression(
 
 
 def validate_args(args):
-
-    if args.n_segments < 1:
-        raise ValueError("`n_segments` must be > 0")
+    if args.n_chords < 1:
+        raise ValueError("`n_chords` must be > 0")
 
     if args.n_overtones < 0:
         raise ValueError("`n_overtones` must be >= 0")
@@ -137,10 +125,9 @@ def validate_args(args):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--n_segments", type=int, default=4, help="Number of chords to generate."
+        "--n_chords", type=int, default=4, help="Number of chords to generate."
     )
     # TODO: add a param for `n_unique_chords`
     # TODO: add params for lowest_note and highest_note
@@ -176,12 +163,6 @@ if __name__ == "__main__":
         help="Number of harmonic overtones used when generating audio buffers.",
     )
     parser.add_argument(
-        "--first_chord",
-        type=list,
-        default=None,
-        help="Specify the first chord of the progression",
-    )
-    parser.add_argument(
         "--note_range_low",
         type=int,
         default=36,
@@ -205,7 +186,7 @@ if __name__ == "__main__":
     print(f"note_range_low {note_range_low}, note_range_high {note_range_high}")
 
     generate_progression(
-        n_segments=args.n_segments,
+        n_chords=args.n_chords,
         note_range_low=note_range_low,
         note_range_high=note_range_high,
         pct_notes_common=args.pct_notes_common,
@@ -214,5 +195,4 @@ if __name__ == "__main__":
         duration_interval=args.duration_interval,
         n_overtones=args.n_overtones,
         allowed_chord_types=DEFAULT_ALLOWED_CHORD_TYPES,
-        first_chord=args.first_chord,
     )

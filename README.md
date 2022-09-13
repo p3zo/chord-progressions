@@ -4,6 +4,8 @@
 
 See the [Makefile](Makefile) for available actions.
 
+## Docs
+
 The documentation uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build a static site from
 Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving.
 Use `mkdocs build` to build the site.
@@ -15,7 +17,7 @@ Use `mkdocs build` to build the site.
 ##### Prioritized
 
 - mk progressions from extracted harman labels
-- `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maxiumum of six
+- `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maximum of six
   segment evaluations occur per note
 
 ##### Eventually
@@ -29,7 +31,7 @@ Use `mkdocs build` to build the site.
   tuning https://github.com/soul-lang/SOUL/pull/26/files
 - [feature] use VAE as solver
 - [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
-- [feature] make_midi_progression needs an `offset` param for when the first chord isn't at 0
+- [feature] `io.midi.get_midi_from_progression` needs an `offset` param for when the first chord isn't at 0
 - [feature] use `bars:beats:sixteenths` format for progression duration
 
 - [maintainability] use a singular method of counting in `extract_harman.py`

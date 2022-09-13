@@ -1,16 +1,16 @@
 """Process polyphonic midi to make it more well-suited for chord extraction"""
 
-import warnings
 from functools import partial
 
 import numpy as np
 import pandas as pd
 import pretty_midi
-
-# note values, e.g. 1/4 = quarter note, 1/64 = 64th note
-DEFAULT_SHORTEST_NOTE = 1 / 64
-DEFAULT_SMOOTH_BEAT = 1
-DEFAULT_QUANTIZE_BEAT = 1 / 2
+from chord_progressions.extract import (
+    DEFAULT_QUANTIZE_BEAT,
+    DEFAULT_SHORTEST_NOTE,
+    DEFAULT_SMOOTH_BEAT,
+)
+from chord_progressions.io.midi import load_midi_file
 
 
 def parse_notes(pmid):
@@ -28,19 +28,6 @@ def parse_notes(pmid):
     notes = np.array(points, dtype=dtype)
 
     return np.sort(notes, order="start")
-
-
-def load_midi_file(filepath):
-    # warnings can be verbose when midi has no metadata e.g. tempo, key, time signature
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RuntimeWarning)
-        try:
-            midi = pretty_midi.PrettyMIDI(filepath)
-        except Exception as e:
-            print(f"Failed loading file {filepath}: {e}")
-            return
-
-    return midi
 
 
 def round_to_target(target, x):

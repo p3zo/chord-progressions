@@ -15,11 +15,6 @@
 import itertools
 
 import numpy as np
-from chord_progressions.chord import (
-    get_template_from_notes,
-    get_type_from_notes,
-    get_type_num_from_type,
-)
 from chord_progressions.pitch import (
     get_freq_from_note,
     get_midi_num_from_note,
@@ -47,20 +42,17 @@ MIN_MAX_EVENNESS_BY_CARDINALITY = [
 
 def get_interval_class_vector(chord):
     """
-    The interval classes designated by each digit ascend from left to right, i.e.
-
-        minor seconds / major sevenths (1 or 11 semitones)
-        major seconds / minor sevenths (2 or 10 semitones)
-        minor thirds / major sixths (3 or 9 semitones)
-        major thirds / minor sixths (4 or 8 semitones)
-        perfect fourths / perfect fifths (5 or 7 semitones)
-        tritones (6 semitones)
+    Returns a vector of interval classes.
+        0: minor second / major seventh (1 or 11 semitones)
+        1: major second / minor seventh (2 or 10 semitones)
+        2: minor third / major sixth (3 or 9 semitones)
+        3: major third / minor sixth (4 or 8 semitones)
+        4: perfect fourth / perfect fifth (5 or 7 semitones)
+        5: tritone (6 semitones)
     """
     vec = [0] * 6
 
-    template = get_template_from_notes(chord)
-
-    one_indices = [ix for ix, i in enumerate(template) if i == 1]
+    one_indices = [ix for ix, i in enumerate(chord.template) if i == 1]
     pairs = list(itertools.combinations(one_indices, 2))
 
     intervals = [p[1] - p[0] for p in pairs]
@@ -143,10 +135,10 @@ def evaluate_notes(notes):
     pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_notes(notes)
+    # chord_type = get_type_from_notes(notes)
 
-    metrics["type_id"] = get_type_num_from_type(chord_type)
-    metrics["type_name"] = chord_type
+    # metrics["type_id"] = get_type_num_from_type(chord_type)
+    # metrics["type_name"] = chord_type
     metrics["num_notes"] = len(notes)
     metrics["num_pitches"] = len(set(notes))
     metrics["pc_cardinality"] = pc_cardinality
@@ -191,9 +183,7 @@ def evaluate_notes_list(notes_list):
 
 
 def evaluate_progression(progression):
-    """Takes a projecttion"""
-
-    notes_list = [chord["notes"] for chord in progression]
+    notes_list = [chord.midi_nums for chord in progression]
 
     return evaluate_notes_list(notes_list)
 

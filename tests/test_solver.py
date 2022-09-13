@@ -1,4 +1,4 @@
-from chord_progressions.chord import get_template_from_notes, notes_match_chord_type
+from chord_progressions.chord import get_template_from_notes
 from chord_progressions.solver import (
     get_all_rotations_of_template,
     get_n_common_ones,
@@ -6,7 +6,7 @@ from chord_progressions.solver import (
     get_possible_rotations,
     get_template_str,
     high_enough_match,
-    select_notes_list,
+    select_chords,
     template_meets_constraints,
 )
 
@@ -69,35 +69,24 @@ def test_template_meets_constraints():
     )
 
 
-def test_select_notes_list():
-    n_segments = 50
+def test_select_chords():
+    n_chords = 50
     pct_notes_common = 0
     allowed_chord_types = ["major chord", "minor chord"]
-    first_chord = None
-    existing_notes_list = None
-    existing_types = None
+    existing_chords = None
     locks = "0" * 6
-    first_chord = None
-    adding = False
 
-    notes_list, chord_types = select_notes_list(
-        n_segments=n_segments,
+    chords = select_chords(
+        n_chords=n_chords,
         pct_notes_common=pct_notes_common,
         allowed_chord_types=allowed_chord_types,
-        first_chord=first_chord,
-        existing_notes_list=existing_notes_list,
-        existing_types=existing_types,
+        existing_chords=existing_chords,
         locks=locks,
-        adding=adding,
         note_range_high=108,
         note_range_low=21,
     )
 
-    assert len(notes_list) == n_segments
-    assert len(chord_types) == n_segments
-
-    for notes, chord_type in zip(notes_list, chord_types):
-        assert notes_match_chord_type(notes, chord_type)
+    assert len(chords) == n_chords
 
 
 def test_get_all_rotations_of_template():
