@@ -15,11 +15,6 @@
 import itertools
 
 import numpy as np
-from chord_progressions.chord import (
-    get_template_from_notes,
-    get_type_from_notes,
-    get_type_num_from_type,
-)
 from chord_progressions.pitch import (
     get_freq_from_note,
     get_midi_num_from_note,
@@ -57,9 +52,7 @@ def get_interval_class_vector(chord):
     """
     vec = [0] * 6
 
-    template = get_template_from_notes(chord)
-
-    one_indices = [ix for ix, i in enumerate(template) if i == 1]
+    one_indices = [ix for ix, i in enumerate(chord.template) if i == 1]
     pairs = list(itertools.combinations(one_indices, 2))
 
     intervals = [p[1] - p[0] for p in pairs]
@@ -142,10 +135,10 @@ def evaluate_notes(notes):
     pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    chord_type = get_type_from_notes(notes)
+    # chord_type = get_type_from_notes(notes)
 
-    metrics["type_id"] = get_type_num_from_type(chord_type)
-    metrics["type_name"] = chord_type
+    # metrics["type_id"] = get_type_num_from_type(chord_type)
+    # metrics["type_name"] = chord_type
     metrics["num_notes"] = len(notes)
     metrics["num_pitches"] = len(set(notes))
     metrics["pc_cardinality"] = pc_cardinality

@@ -44,9 +44,10 @@ class Chord:
         self.type = chord_type
         self.typeId = get_type_num_from_type(chord_type)
 
-        self.notes = [get_note_from_midi_num(n) for n in midi_nums]
-
+        notes = [get_note_from_midi_num(n) for n in midi_nums]
+        self.notes = notes
         self.metrics = evaluate_notes_list(notes)
+        self.template = get_template_from_notes(notes)
 
     def json(self):
         return {
