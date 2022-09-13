@@ -40,7 +40,13 @@ class Progression:
     def __len__(self):
         return len(self.chords)
 
-    def json(self):
+    def __repr__(self):
+        return self.to_string()
+
+    def to_string(self):
+        return str(self.to_json())
+
+    def to_json(self):
         result = []
 
         for ix, (chord, chord_id, duration, locked) in enumerate(

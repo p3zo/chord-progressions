@@ -94,7 +94,7 @@ def generate_progression(
                 ["duration_min", duration_min],
                 ["duration_max", duration_max],
                 ["duration_interval", duration_interval],
-                ["progression_json", progression.json()],
+                ["progression_json", progression.to_json()],
             ]
         )
 
