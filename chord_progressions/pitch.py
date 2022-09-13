@@ -285,7 +285,7 @@ def get_midi_num_from_note(note):
 
 
 def get_pitch_class_from_note(note):
-    """Returns the pitch class of a note, e.g. C4"""
+    """Returns the pitch class of a note, e.g. get_pitch_class_from_note(C4) -> 0"""
     midi_num = get_midi_num_from_note(note)
     return get_pitch_class_from_midi_num(midi_num)
 
