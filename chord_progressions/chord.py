@@ -1,11 +1,11 @@
 from chord_progressions import logger
 from chord_progressions.evaluate import evaluate_notes_list
 from chord_progressions.pitch import (
+    get_midi_num_from_note,
     get_note_from_midi_num,
     get_note_list,
     get_pitch_class_from_midi_num,
     get_pitch_class_from_note,
-    get_midi_num_from_note,
 )
 from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import is_circular_match
@@ -125,8 +125,16 @@ def get_notes_list_from_midi_nums_str(midi_nums_str):
 
 
 def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
-    """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]"""
-    return [[int(i) for i in m.split("-")] for m in midi_nums_str.split("_")]
+    """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]
+    If any chord in `midi_nums_str` is invalid, returns an empty string for that chord"""
+    midi_nums_list = []
+    for m in midi_nums_str.split("_"):
+        try:
+            midi_nums_list.append([int(i) for i in m.split("-")])
+        except:
+            pass
+
+    return midi_nums_list
 
 
 def get_durations_from_duration_str(dur_str):
