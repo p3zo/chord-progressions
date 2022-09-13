@@ -1,7 +1,12 @@
 import datetime as dt
+from uuid import uuid4
 
 import numpy as np
 from chord_progressions import WORDS_FILEPATH
+
+
+def get_n_random_uuids(n):
+    return [str(uuid4()) for i in range(n)]
 
 
 def round_to_base(x, base):

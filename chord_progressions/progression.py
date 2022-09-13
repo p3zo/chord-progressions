@@ -1,9 +1,8 @@
-from uuid import uuid4
-
 from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
+from chord_progressions.utils import get_n_random_uuids
 
 
 class Progression:
@@ -28,7 +27,7 @@ class Progression:
             locks = [0] * len(chords)
         self.locks = locks
 
-        self.ids = [str(uuid4()) for i in range(len(chords))]
+        self.ids = get_n_random_uuids(len(chords))
 
         # TODO: add metrics
         self.metrics = {}
@@ -63,7 +62,6 @@ class Progression:
 
     def as_audio(self, n_overtones=2):
         durations_seconds = [dur * (60 / self.bpm) for dur in self.durations]
-
         return make_audio_progression(self.chords, durations_seconds, n_overtones)
 
     def save_audio(self, outpath, n_overtones=2):
