@@ -264,7 +264,9 @@ def select_chords(
     if type(locks) != str:
         locks = "0" * n_chords
     elif len(locks) != n_chords:
-        logger.error("`locks` has a different length from `n_chords`. Falling back to all locks.")
+        logger.error(
+            "`locks` has a different length from `n_chords`. Falling back to all locks."
+        )
         locks = "1" * n_chords
 
     # allow all chord types if none are specified

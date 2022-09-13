@@ -5,6 +5,7 @@ from chord_progressions.io.midi import get_midi_from_progression
 from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_n_random_uuids
 
+
 # TODO: allow progression to be initialized as random or empty?
 class Progression:
     def __init__(
