@@ -7,4 +7,4 @@ EXPECTATIONS = [
 
 def test_get_template_from_notes():
     for ex in EXPECTATIONS:
-        assert Chord(ex['notes']).template == ex["template"]
+        assert Chord(ex["notes"]).template == ex["template"]
