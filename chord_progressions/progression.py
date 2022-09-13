@@ -25,7 +25,7 @@ class Progression:
         self.name = name
 
         if not locks:
-            locks = [0] * len(chords)
+            locks = "0" * len(chords)
         self.locks = locks
 
         self.ids = get_n_random_uuids(len(chords))
