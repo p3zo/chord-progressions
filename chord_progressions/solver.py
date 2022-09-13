@@ -11,7 +11,6 @@ from chord_progressions.pitch import (
     get_note_from_midi_num,
     get_pitch_class_from_note,
 )
-from chord_progressions.progression import Progression
 from chord_progressions.type_templates import TYPE_TEMPLATES
 from chord_progressions.utils import shift_arr_by_one
 
@@ -264,6 +263,9 @@ def select_chords(
 
     if type(locks) != str:
         locks = "0" * n_chords
+    elif len(locks) != n_chords:
+        logger.error("`locks` has a different length from `n_chords`. Falling back to all locks.")
+        locks = "1" * n_chords
 
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
@@ -275,8 +277,6 @@ def select_chords(
 
     if existing_chords:
         logger.debug(f"Existing chords: {existing_chords}")
-
-        open_ixs = [n_chords - 1]
 
         for ix, midi_nums in enumerate(existing_chords):
             rotations[ix] = get_template_from_midi_nums(midi_nums)
@@ -381,17 +381,3 @@ def shuffle_voicing(notes: list[str], note_range_low: int, note_range_high: int)
                 break
 
     return [get_note_from_midi_num(n) for n in sorted(voicing)]
-
-
-def get_random_progression(n_chords: int):
-    chords = select_chords(
-        n_chords=n_chords,
-        pct_notes_common=0,
-        note_range_low=60,
-        note_range_high=108,
-        allowed_chord_types=list(TYPE_TEMPLATES),
-        existing_chords=None,
-        locks="0" * n_chords,
-    )
-
-    return Progression(chords)
