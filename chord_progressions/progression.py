@@ -2,9 +2,10 @@ from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
+from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_n_random_uuids
 
-
+# TODO: allow progression to be initialized as random or empty?
 class Progression:
     def __init__(
         self,
@@ -86,3 +87,19 @@ class Progression:
         mid.filename = outpath
         mid.save(outpath)
         logger.info(f"Midi saved to {outpath}")
+
+    def get_new_solution(self):
+        """Given existing locked chords and constraints, returns a new chord progression of the same length
+        TODO: allow solver constraints to be passed as arguments"""
+
+        existing_chords = self.chords
+
+        # Use the default parameters
+        select_chords(
+            n_chords=len(existing_chords),
+            existing_chords=existing_chords,
+            pct_notes_common=0,
+            note_range_low=60,
+            note_range_high=108,
+            locks=self.locks,
+        )
