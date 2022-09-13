@@ -36,6 +36,9 @@ class Progression:
         for chord in self.chords:
             yield chord
 
+    def __len__(self):
+        return len(self.chords)
+
     def json(self):
         result = []
 
