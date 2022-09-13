@@ -19,7 +19,7 @@ from chord_progressions.chord import (
     get_template_from_template_str,
     get_type_num_from_type,
 )
-from chord_progressions.evaluator import evaluate_notes
+from chord_progressions.evaluate import evaluate_notes
 from chord_progressions.extract import (
     DEFAULT_QUANTIZE_BEAT,
     DEFAULT_SHORTEST_NOTE,

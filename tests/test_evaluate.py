@@ -1,4 +1,4 @@
-from chord_progressions.evaluator import get_evenness, get_interval_class_vector
+from chord_progressions.evaluate import get_evenness, get_interval_class_vector
 
 EXPECTATIONS = [
     {"notes": ["C4"], "icv": [0, 0, 0, 0, 0, 0], "evenness": 0},  # unison

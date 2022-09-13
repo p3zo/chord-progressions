@@ -1,4 +1,5 @@
 from chord_progressions import logger
+from chord_progressions.evaluate import evaluate_notes_list
 from chord_progressions.pitch import (
     get_note_from_midi_num,
     get_note_list,
@@ -45,8 +46,7 @@ class Chord:
 
         self.notes = [get_note_from_midi_num(n) for n in midi_nums]
 
-        self.metrics = {}
-        # self.metrics = evaluate_notes_list(notes)
+        self.metrics = evaluate_notes_list(notes)
 
     def json(self):
         return {
