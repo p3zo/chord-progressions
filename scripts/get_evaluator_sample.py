@@ -2,11 +2,12 @@
 Evaluates a random chord progression and returns its evaluation.
 Useful for debugging the evaluator.
 """
-from tqdm import tqdm
-
 from chord_progressions.chord import get_notes_list_from_midi_nums_str
 from chord_progressions.evaluate import evaluate_notes_list, evaluate_progression
+from chord_progressions.progression import Progression
 from chord_progressions.solver import select_chords
+from chord_progressions.type_templates import TYPE_TEMPLATES
+from tqdm import tqdm
 
 
 def get_random_progression(n_chords: int):
