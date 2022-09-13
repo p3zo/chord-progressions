@@ -6,11 +6,10 @@ from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_n_random_uuids
 
 
-# TODO: allow progression to be initialized as random or empty?
 class Progression:
     def __init__(
         self,
-        chords: list[Chord],
+        chords: list[Chord] = [],
         durations: list[str] = None,
         bpm: float = DEFAULT_BPM,
         locks: list[int] = None,
@@ -96,7 +95,7 @@ class Progression:
         existing_chords = self.chords
 
         # Use the default parameters
-        select_chords(
+        return select_chords(
             n_chords=len(existing_chords),
             existing_chords=existing_chords,
             pct_notes_common=0,
