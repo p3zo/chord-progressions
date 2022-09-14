@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from chord_progressions import logger
 from chord_progressions.evaluate import evaluate_notes_list
 from chord_progressions.pitch import (
@@ -38,6 +40,8 @@ class Chord:
         self.notes = notes
         self.metrics = evaluate_notes_list(notes)
         self.template = get_template_from_notes(notes)
+
+        self.id = str(uuid4())
 
     def __repr__(self):
         return "Chord " + self.to_string()

@@ -5,10 +5,8 @@ from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
 from chord_progressions.solver import select_chords
-from chord_progressions.utils import get_n_random_uuids
 
 
-# TODO: allow Progressions to be initialized `from_audio` and `from_midi` via extraction from a filepath
 class Progression:
     """
     A sequence of chords with metadata such as chord durations, bpm, chord locks.
@@ -51,8 +49,6 @@ class Progression:
         self.bpm = bpm
         self.name = name
 
-        self.ids = get_n_random_uuids(len(chords))
-
         # TODO: add metrics
         self.metrics = {}
 
@@ -77,7 +73,6 @@ class Progression:
         ):
             result.append(
                 {
-                    "id": chord_id,
                     "ix": ix,
                     "duration": duration,
                     "locked": str(locked),
