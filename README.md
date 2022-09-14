@@ -15,7 +15,7 @@ Use `mkdocs build` to build the site.
 - [bug] `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a maximum of
   six segment evaluations occur per note
 
-- [feature] define __getitem__ for progressions to select e.g. the first chord using progression[0]
+- [feature] use `bars:beats:sixteenths` format for Chord durations
 - [feature] allow Progressions to be initialized `from_audio` and `from_midi` via extraction from a filepath
 - [feature] mk progressions from extracted harman labels
 - [feature] get key for progression
@@ -28,7 +28,6 @@ Use `mkdocs build` to build the site.
 - [feature] use VAE as solver
 - [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
 - [feature] `io.midi.get_midi_from_progression` needs an `offset` param for when the first chord isn't at 0
-- [feature] use `bars:beats:sixteenths` format for progression duration
 
 - [maintainability] mk `pitch_class` refer to "C" and call 0 `pitch_class_ix`
 - [maintainability] use a singular method of counting in `extract_harman.py`

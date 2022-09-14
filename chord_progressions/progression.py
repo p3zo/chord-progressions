@@ -53,6 +53,9 @@ class Progression:
     def __repr__(self):
         return "Progression " + self.to_string()
 
+    def __getitem__(self, ix):
+        return self.chords[ix]
+
     def to_string(self):
         return json.dumps(self.to_json(), indent=4)
 
