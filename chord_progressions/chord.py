@@ -39,7 +39,13 @@ class Chord:
         self.metrics = evaluate_notes_list(notes)
         self.template = get_template_from_notes(notes)
 
-    def json(self):
+    def __repr__(self):
+        return "Chord " + self.to_string()
+
+    def to_string(self):
+        return str(self.to_json())
+
+    def to_json(self):
         return {
             "midi_nums": self.midi_nums,
             "type": self.type,

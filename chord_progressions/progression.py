@@ -1,3 +1,5 @@
+import json
+
 from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
@@ -6,27 +8,48 @@ from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_n_random_uuids
 
 
+# TODO: allow Progressions to be initialized `from_audio` and `from_midi` via extraction from a filepath
 class Progression:
+    """
+    A sequence of chords with metadata such as chord durations, bpm, chord locks.
+
+    Parameters
+    ----------
+    chords: list[Chord], default []
+        The chords in the progression.
+    durations: list[int], default None
+        The duration of each chord in the progression, specified in beats. Defaults to 1 beat per chord if not provided.
+            TODO: allow duration to be specified as Tone.barsBeatsSixteenths notation
+            See https://github.com/Tonejs/Tone.js/wiki/Time#transport-time
+    locks: str, default None
+        Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
+        Defaults to all unlocked if not provided.
+    bpm: float, default DEFAULT_BPM
+        The beats per minute (BPM) of the progression.
+    name: str, default ""
+        The name of the progression.
+    """
+
     def __init__(
         self,
         chords: list[Chord] = [],
-        durations: list[str] = None,
+        durations: list[int] = None,
+        locks: str = None,
         bpm: float = DEFAULT_BPM,
-        locks: list[int] = None,
         name: str = "",
     ):
         self.chords = chords
 
         if not durations:
-            durations = ["1m"] * len(chords)
+            durations = [1] * len(chords)
         self.durations = durations
-
-        self.bpm = bpm
-        self.name = name
 
         if not locks:
             locks = "0" * len(chords)
         self.locks = locks
+
+        self.bpm = bpm
+        self.name = name
 
         self.ids = get_n_random_uuids(len(chords))
 
@@ -41,10 +64,10 @@ class Progression:
         return len(self.chords)
 
     def __repr__(self):
-        return self.to_string()
+        return "Progression " + self.to_string()
 
     def to_string(self):
-        return str(self.to_json())
+        return json.dumps(self.to_json(), indent=4)
 
     def to_json(self):
         result = []
