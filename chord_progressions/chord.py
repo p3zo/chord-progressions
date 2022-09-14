@@ -23,14 +23,18 @@ class Chord:
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
-        self.initialize_from_midi_nums(notes)
+        self.init_from_midi_nums(notes)
 
-    def initialize_from_midi_nums(self, midi_nums: MidiNumList):
+    def init_from_midi_nums(self, midi_nums: MidiNumList = [], duration: int = 1):
         """
-        midi_nums:
-            list of midi nums, e.g. [60, 64, 67]
+        midi_nums: list[int], default []
+            List of midi nums, e.g. [60, 64, 67]
+
+        duration: int, default 1
+            The duration of the chord, specified in seconds
         """
         self.midi_nums = midi_nums
+        self.duration = duration or 1
 
         chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
@@ -51,7 +55,9 @@ class Chord:
 
     def to_json(self):
         return {
+            "id": self.id,
             "midi_nums": self.midi_nums,
+            "duration": self.duration,
             "type": self.type,
             "typeId": self.typeId,
             "notes": self.notes,

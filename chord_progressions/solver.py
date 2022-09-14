@@ -280,7 +280,8 @@ def select_chords(
     if existing_chords:
         logger.debug(f"Existing chords: {existing_chords}")
 
-        for ix, midi_nums in enumerate(existing_chords):
+        for ix, chord in enumerate(existing_chords):
+            midi_nums = chord.midi_nums
             rotations[ix] = get_template_from_midi_nums(midi_nums)
             chord_notes[ix] = midi_nums
 

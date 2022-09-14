@@ -9,16 +9,12 @@ from chord_progressions.solver import select_chords
 
 class Progression:
     """
-    A sequence of chords with metadata such as chord durations, bpm, chord locks.
+    A sequence of chords with metadata such as bpm & chord locks.
 
     Parameters
     ----------
     chords: list[Chord], default []
         The chords in the progression.
-    durations: list[int], default None
-        The duration of each chord in the progression, specified in beats. Defaults to 1 beat per chord if not provided.
-            TODO: allow duration to be specified as Tone.barsBeatsSixteenths notation
-            See https://github.com/Tonejs/Tone.js/wiki/Time#transport-time
     locks: str, default None
         Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
         Defaults to all unlocked if not provided.
@@ -31,16 +27,11 @@ class Progression:
     def __init__(
         self,
         chords: list[Chord] = [],
-        durations: list[int] = None,
         locks: str = None,
         bpm: float = DEFAULT_BPM,
         name: str = "",
     ):
         self.chords = chords
-
-        if not durations:
-            durations = [1] * len(chords)
-        self.durations = durations
 
         if not locks:
             locks = "0" * len(chords)
@@ -68,14 +59,12 @@ class Progression:
     def to_json(self):
         result = []
 
-        for ix, (chord, duration, locked) in enumerate(
-            list(zip(self.chords, self.durations, self.locks))
-        ):
+        for ix, (chord, locked) in enumerate(list(zip(self.chords, self.locks))):
             result.append(
                 {
                     "id": chord.id,
                     "ix": ix,
-                    "duration": duration,
+                    "duration": chord.duration,
                     "locked": locked,
                     "type": chord.type,
                     "typeId": chord.typeId,
@@ -87,7 +76,8 @@ class Progression:
         return result
 
     def to_audio(self, n_overtones=2, outpath=None):
-        durations_seconds = [dur * (60 / self.bpm) for dur in self.durations]
+        durations = [c.duration for c in self.chords]
+        durations_seconds = [dur * (60 / self.bpm) for dur in durations]
         audio_buffer = make_audio_progression(
             self.chords, durations_seconds, n_overtones
         )
@@ -96,9 +86,7 @@ class Progression:
             logger.info(f"Audio saved to {outpath}")
 
     def to_midi(self, outpath=None):
-        mid = get_midi_from_progression(
-            self.chords, self.durations, self.bpm, self.name
-        )
+        mid = get_midi_from_progression(self.chords, self.bpm, self.name)
         if outpath:
             mid.filename = outpath
             mid.save(outpath)
@@ -120,4 +108,4 @@ class Progression:
             locks=self.locks,
         )
 
-        return Progression(chords, self.durations)
+        return Progression(chords)
