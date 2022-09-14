@@ -27,18 +27,8 @@ class Chord:
         """
         midi_nums:
             list of midi nums, e.g. [60, 64, 67]
-
-        TODO: should chords have durations when not part of a progression?
-        duration:
-            float, seconds
-                The length of this list must match the length of `chords`
-                The length of a tick is defined in ticks per beat. This value is stored
-                as ticks_per_beat in MidiFile objects and remains fixed throughout a track.
-
-            str, Tone Time
         """
         self.midi_nums = midi_nums
-        # self.duration = duration
 
         chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
@@ -52,7 +42,6 @@ class Chord:
     def json(self):
         return {
             "midi_nums": self.midi_nums,
-            # "duration": self.duration,
             "type": self.type,
             "typeId": self.typeId,
             "notes": self.notes,
@@ -135,15 +124,6 @@ def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
             pass
 
     return midi_nums_list
-
-
-def get_durations_from_duration_str(dur_str):
-    """
-    Takes a duration string and returns an array of durations
-
-    e.g. "1m_1m_1m" -> ["1m", "1m", "1m"]
-    """
-    return dur_str.split("_")
 
 
 def notes_match_chord_type(notes, chord_type):
