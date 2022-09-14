@@ -56,43 +56,31 @@ class Progression:
                 {
                     "id": chord_id,
                     "ix": ix,
-                    "type": chord.type,
-                    "typeId": chord.typeId,
-                    "notes": chord.notes,
                     "duration": duration,
                     "locked": str(locked),
-                    "metrics": chord.metrics,
+                    "chord": chord.to_json(),
                 }
             )
 
         return result
 
-    def from_audio(self, filepath):
-        return
-
-    def as_audio(self, n_overtones=2):
+    def to_audio(self, n_overtones=2, outpath=None):
         durations_seconds = [dur * (60 / self.bpm) for dur in self.durations]
-        return make_audio_progression(self.chords, durations_seconds, n_overtones)
+        audio_buffer = make_audio_progression(
+            self.chords, durations_seconds, n_overtones
+        )
+        if outpath:
+            save_audio_buffer(audio_buffer, outpath)
+            logger.info(f"Audio saved to {outpath}")
 
-    def save_audio(self, outpath, n_overtones=2):
-        audio_buffer = self.as_audio(n_overtones)
-        save_audio_buffer(audio_buffer, outpath)
-        logger.info(f"Audio saved to {outpath}")
-
-    def from_midi(self):
-        return
-
-    def as_midi(self):
-        return get_midi_from_progression(
+    def to_midi(self, outpath=None):
+        mid = get_midi_from_progression(
             self.chords, self.durations, self.bpm, self.name
         )
-
-    def save_midi(self, outpath):
-        """Saves the progression a .mid file"""
-        mid = self.as_midi()
-        mid.filename = outpath
-        mid.save(outpath)
-        logger.info(f"Midi saved to {outpath}")
+        if outpath:
+            mid.filename = outpath
+            mid.save(outpath)
+            logger.info(f"Midi saved to {outpath}")
 
     def get_new_solution(self):
         """Given existing locked chords and constraints, returns a new chord progression of the same length

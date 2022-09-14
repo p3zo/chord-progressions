@@ -52,6 +52,6 @@ if __name__ == "__main__":
         )
 
         midi_progression_path = os.path.join(OUTPUT_MIDI_DIR, f"{trackid}.mid")
-        progression.save_midi(midi_progression_path)
+        progression.to_midi(outpath=midi_progression_path)
 
         # TODO: plot transition matrix (https://github.com/seffka/ACE2017/blob/master/plots/plot_transition_matrix.py)
