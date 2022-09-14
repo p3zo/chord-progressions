@@ -68,15 +68,19 @@ class Progression:
     def to_json(self):
         result = []
 
-        for ix, (chord, chord_id, duration, locked) in enumerate(
-            list(zip(self.chords, self.ids, self.durations, self.locks))
+        for ix, (chord, duration, locked) in enumerate(
+            list(zip(self.chords, self.durations, self.locks))
         ):
             result.append(
                 {
+                    "id": chord.id,
                     "ix": ix,
                     "duration": duration,
-                    "locked": str(locked),
-                    "chord": chord.to_json(),
+                    "locked": locked,
+                    "type": chord.type,
+                    "typeId": chord.typeId,
+                    "notes": chord.notes,
+                    "metrics": chord.metrics,
                 }
             )
 
@@ -107,7 +111,7 @@ class Progression:
         existing_chords = self.chords
 
         # Use the default parameters
-        return select_chords(
+        chords = select_chords(
             n_chords=len(existing_chords),
             existing_chords=existing_chords,
             pct_notes_common=0,
@@ -115,3 +119,5 @@ class Progression:
             note_range_high=108,
             locks=self.locks,
         )
+
+        return Progression(chords, self.durations)
