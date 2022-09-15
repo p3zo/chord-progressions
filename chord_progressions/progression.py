@@ -47,6 +47,7 @@ class Progression:
         return str(self.to_json())
 
     def to_json(self):
+        # TODO: progression-level attrs like name, bpm
         result = []
 
         for ix, (chord, chord_id, duration, locked) in enumerate(
