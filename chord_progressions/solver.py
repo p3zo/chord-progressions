@@ -334,22 +334,24 @@ def select_chords(
 
 
 def is_voicing_spaced(voicing):
-    """Use the harmonic series spacing to inform voicing - highs closer and lows farther apart.
+    """Use the spacing of the harmonic series to inform voicing: highs closer and lows further apart.
 
-    Voicing is an array of midi note numbers
+    Parameters
+    ----------
+    voicing: list[int]
+        An array of midi note numbers
     """
-    notes_below_c3 = sorted([n for n in voicing if n < SPACING_CUTOFF])
+    notes_below_cutoff = sorted([n for n in voicing if n < SPACING_CUTOFF])
 
-    spacings_below_c3 = []
-    for ix, n in enumerate(notes_below_c3):
+    spacings_below_cutoff = []
+    for ix, n in enumerate(notes_below_cutoff):
         if ix == 0:
             continue
 
-        spacing = n - notes_below_c3[ix - 1]
+        spacing = n - notes_below_cutoff[ix - 1]
+        spacings_below_cutoff.append(spacing)
 
-        spacings_below_c3.append(spacing)
-
-    if all([i >= MIN_SPACING for i in spacings_below_c3]):
+    if all([i >= MIN_SPACING for i in spacings_below_cutoff]):
         return True
 
     return False

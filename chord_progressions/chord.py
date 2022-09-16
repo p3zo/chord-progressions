@@ -76,6 +76,7 @@ class Chord:
 
 
 def get_template_from_pitch_classes(pcs):
+    """e.g. [0, 4, 7] -> [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]"""
     template = [0] * 12
 
     for ix in pcs:
@@ -85,7 +86,7 @@ def get_template_from_pitch_classes(pcs):
 
 
 def get_template_from_notes(notes):
-    """e.g. ["C4", "C3"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
+    """e.g. ["C4", "E4", "G4"] -> [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]"""
     pitch_classes = [get_pitch_class_from_note(n) for n in notes]
 
     return get_template_from_pitch_classes(pitch_classes)
@@ -220,6 +221,7 @@ def get_types_from_notes_list(notes_list):
 
 
 def get_notes_from_template(template, note_range_low, note_range_high):
+    """e.g. [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0] -> ["C", "E", "G"]"""
     all_notes = get_note_list(note_range_low, note_range_high)
 
     notes = [all_notes[ix] if is_onset else 0 for ix, is_onset in enumerate(template)]

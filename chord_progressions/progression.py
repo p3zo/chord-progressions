@@ -9,7 +9,7 @@ from chord_progressions.solver import select_chords
 
 class Progression:
     """
-    A sequence of chords with metadata such as bpm & chord locks.
+    A sequence of Chords with metadata such as bpm & chord locks.
 
     Parameters
     ----------
