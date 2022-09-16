@@ -67,6 +67,7 @@ class Progression:
         return json.dumps(self.to_json(), indent=4)
 
     def to_json(self):
+        # TODO: progression-level attrs like name, bpm
         result = []
 
         for ix, (chord, locked) in enumerate(list(zip(self.chords, self.locks))):

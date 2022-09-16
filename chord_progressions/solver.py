@@ -260,6 +260,9 @@ def select_chords(
     existing_chords=None,
     locks=None,
 ):
+    # allow all chord types if none are specified
+    if len(allowed_chord_types) == 0:
+        allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
 
     if type(locks) != str:
         locks = "0" * n_chords
@@ -269,11 +272,9 @@ def select_chords(
         )
         locks = "1" * n_chords
 
-    # allow all chord types if none are specified
-    if len(allowed_chord_types) == 0:
-        allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
+    logger.debug(f"Locks: {locks}")
 
-    open_ixs = range(n_chords)
+    open_ixs = [ix for ix, i in enumerate(locks) if i == "0"]
     rotations = [[]] * n_chords
     chord_notes = [[]] * n_chords
 
@@ -285,16 +286,7 @@ def select_chords(
             rotations[ix] = get_template_from_midi_nums(midi_nums)
             chord_notes[ix] = midi_nums
 
-        if locks:
-            logger.debug(f"Locks: {locks}")
-
-            open_ixs = [ix for ix, i in enumerate(locks) if i == "0"]
-
-            for ix, locked in enumerate(locks):
-                if locked == "1":
-                    rotations[ix] = get_template_from_midi_nums(existing_chords[ix])
-                    chord_notes[ix] = existing_chords[ix]
-
+    print(f"Indexes to fill: {open_ixs}")
     logger.debug(f"Indexes to fill: {open_ixs}")
 
     for ix in open_ixs:
