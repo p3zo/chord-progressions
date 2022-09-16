@@ -31,6 +31,13 @@ class Progression:
         bpm: float = DEFAULT_BPM,
         name: str = "",
     ):
+        if not isinstance(chords, list):
+            raise ValueError("`chords` must be a list")
+
+        # convert a midi_nums_list to Chords
+        if isinstance(chords, list) and len(chords) > 0 and isinstance(chords[0], list):
+            chords = [Chord(c) for c in chords]
+
         self.chords = chords
 
         if not locks:
@@ -96,18 +103,14 @@ class Progression:
             logger.info(f"Midi saved to {outpath}")
 
     def get_new_solution(self):
-        """Given existing locked chords and constraints, returns a new chord progression of the same length
-        TODO: allow solver constraints to be passed as arguments"""
+        """Given existing locked chords and constraints, returns a new chord progression of the same length"""
 
         existing_chords = self.chords
 
-        # Use the default parameters
+        # TODO: allow solver constraints to be passed as arguments
         chords = select_chords(
             n_chords=len(existing_chords),
             existing_chords=existing_chords,
-            pct_notes_common=0,
-            note_range_low=60,
-            note_range_high=108,
             locks=self.locks,
         )
 

@@ -31,8 +31,6 @@ class Chord:
     """
 
     def __init__(self, notes: list = [], duration: int = 1):
-        # TODO: replace typechecking with @singledispatchmethod pattern
-        # See https://realpython.com/python-multiple-constructors/#checking-argument-types-in-__init__
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
@@ -42,7 +40,7 @@ class Chord:
         if any([i < 0 or i > 128 for i in midi_nums]):
             raise ValueError("The valid range of midi numbers is 0 to 128")
 
-        self.midi_nums = list(set(midi_nums))
+        self.midi_nums = sorted(list(set(midi_nums)))
 
         self.duration = duration or 1
 
