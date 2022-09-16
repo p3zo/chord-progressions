@@ -116,3 +116,15 @@ class Progression:
         )
 
         return Progression(chords)
+
+    def get_addition(self):
+        existing_chords = self.chords
+
+        # TODO: allow solver constraints to be passed as arguments
+        chords = select_chords(
+            n_chords=len(existing_chords) + 1,
+            existing_chords=existing_chords,
+            locks="1" * len(existing_chords) + "0",
+        )
+
+        return Progression(chords)

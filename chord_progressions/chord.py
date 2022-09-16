@@ -30,13 +30,15 @@ class Chord:
         The duration of the chord, specified in seconds.
     """
 
-    def __init__(self, notes: list = [], duration: int = 1):
+    def __init__(self, notes: list = [], duration: int = 1, id: str = None):
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
-        self.init_from_midi_nums(notes, duration)
+        self.init_from_midi_nums(midi_nums=notes, duration=duration, id=id)
 
-    def init_from_midi_nums(self, midi_nums: MidiNumList = [], duration: int = 1):
+    def init_from_midi_nums(
+        self, midi_nums: MidiNumList = [], duration: int = 1, id: str = None
+    ):
         if any([i < 0 or i > 128 for i in midi_nums]):
             raise ValueError("The valid range of midi numbers is 0 to 128")
 
@@ -53,7 +55,9 @@ class Chord:
         self.metrics = evaluate_notes_list(notes)
         self.template = get_template_from_notes(notes)
 
-        self.id = str(uuid4())
+        if not id:
+            id = str(uuid4())
+        self.id = id
 
     def __repr__(self):
         return "Chord " + self.to_string()

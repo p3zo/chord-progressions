@@ -43,47 +43,37 @@ def test_template_meets_constraints():
     assert template_meets_constraints(
         template=t2,
         pct_notes_common=pct_notes_common,
-        preceding_rotation=t1,
-        succeeding_rotation=None,
+        prev_rotation=t1,
+        next_rotation=None,
     )
 
     assert template_meets_constraints(
         template=t3,
         pct_notes_common=pct_notes_common,
-        preceding_rotation=t1,
-        succeeding_rotation=None,
+        prev_rotation=t1,
+        next_rotation=None,
     )
 
     assert template_meets_constraints(
         template=t3,
         pct_notes_common=pct_notes_common,
-        preceding_rotation=t2,
-        succeeding_rotation=None,
+        prev_rotation=t2,
+        next_rotation=None,
     )
 
     assert template_meets_constraints(
         template=t4,
         pct_notes_common=pct_notes_common,
-        preceding_rotation=t5,
-        succeeding_rotation=None,
+        prev_rotation=t5,
+        next_rotation=None,
     )
 
 
 def test_select_chords():
     n_chords = 50
-    pct_notes_common = 0
-    allowed_chord_types = ["major chord", "minor chord"]
-    existing_chords = None
-    locks = "0" * 6
 
     chords = select_chords(
         n_chords=n_chords,
-        pct_notes_common=pct_notes_common,
-        allowed_chord_types=allowed_chord_types,
-        existing_chords=existing_chords,
-        locks=locks,
-        note_range_high=108,
-        note_range_low=21,
     )
 
     assert len(chords) == n_chords
@@ -166,9 +156,9 @@ def test_get_possible_rotations():
 
     template = [0, 1, 0, 1]
 
-    preceding_rotation = [0, 1, 1, 0]
-    succeeding_rotation = [1, 0, 0, 1]
-    surrounding_rotations = [preceding_rotation, succeeding_rotation]
+    prev_rotation = [0, 1, 1, 0]
+    next_rotation = [1, 0, 0, 1]
+    surrounding_rotations = [prev_rotation, next_rotation]
 
     pct_notes_common = 1
 
