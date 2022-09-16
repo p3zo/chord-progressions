@@ -17,23 +17,33 @@ MidiNumList = list[int]
 
 
 class Chord:
-    def __init__(self, notes):
+    """A set of unique notes with duration.
+
+    Parameters
+    ----------
+    notes: list[Chord], default []
+        The set of notes in the chord. Can be specified as a list of midi numbers or as a list of note names.
+            e.g. Chord([60, 64, 67])
+            e.g. Chord(["C4", "E4", "G4"])
+
+    duration: int, default 1
+        The duration of the chord, specified in seconds.
+    """
+
+    def __init__(self, notes: list = [], duration: int = 1):
         # TODO: replace typechecking with @singledispatchmethod pattern
         # See https://realpython.com/python-multiple-constructors/#checking-argument-types-in-__init__
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
-        self.init_from_midi_nums(notes)
+        self.init_from_midi_nums(notes, duration)
 
     def init_from_midi_nums(self, midi_nums: MidiNumList = [], duration: int = 1):
-        """
-        midi_nums: list[int], default []
-            List of midi nums, e.g. [60, 64, 67]
+        if any([i < 0 or i > 128 for i in midi_nums]):
+            raise ValueError("The valid range of midi numbers is 0 to 128")
 
-        duration: int, default 1
-            The duration of the chord, specified in seconds
-        """
-        self.midi_nums = midi_nums
+        self.midi_nums = list(set(midi_nums))
+
         self.duration = duration or 1
 
         chord_type = get_type_from_midi_nums(midi_nums)
