@@ -104,28 +104,28 @@ class Progression:
             mid.save(outpath)
             logger.info(f"Midi saved to {outpath}")
 
-    def get_new_solution(self):
+    def get_new_solution(self, **constraints):
         """Given existing locked chords and constraints, returns a new chord progression of the same length"""
 
         existing_chords = self.chords
 
-        # TODO: allow solver constraints to be passed as arguments
         chords = select_chords(
             n_chords=len(existing_chords),
             existing_chords=existing_chords,
             locks=self.locks,
+            **constraints,
         )
 
         return Progression(chords)
 
-    def get_addition(self):
+    def get_addition(self, **constraints):
         existing_chords = self.chords
 
-        # TODO: allow solver constraints to be passed as arguments
         chords = select_chords(
             n_chords=len(existing_chords) + 1,
             existing_chords=existing_chords,
             locks="1" * len(existing_chords) + "0",
+            **constraints,
         )
 
         return Progression(chords)

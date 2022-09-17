@@ -277,13 +277,19 @@ def choose_template_with_constraints(
 
 def select_chords(
     n_chords=5,
+    existing_chords=None,
+    locks=None,
     pct_notes_common=0,
     note_range_low=60,
     note_range_high=108,
-    allowed_chord_types=list(TYPE_TEMPLATES),
-    existing_chords=None,
-    locks=None,
+    allowed_chord_types=[],
 ):
+    print("Selecting chords")
+    print(f"{pct_notes_common=}")
+    print(f"{note_range_low=}")
+    print(f"{note_range_high=}")
+    print(f"{allowed_chord_types=}")
+
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
