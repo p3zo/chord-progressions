@@ -284,11 +284,11 @@ def select_chords(
     note_range_high=108,
     allowed_chord_types=[],
 ):
-    print("Selecting chords")
-    print(f"{pct_notes_common=}")
-    print(f"{note_range_low=}")
-    print(f"{note_range_high=}")
-    print(f"{allowed_chord_types=}")
+    logger.debug("Selecting chords")
+    logger.debug(f"{pct_notes_common=}")
+    logger.debug(f"{note_range_low=}")
+    logger.debug(f"{note_range_high=}")
+    logger.debug(f"{allowed_chord_types=}")
 
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
