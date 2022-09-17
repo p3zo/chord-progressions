@@ -1,34 +1,51 @@
+import json
+
 from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
 from chord_progressions.solver import select_chords
-from chord_progressions.utils import get_n_random_uuids
 
 
 class Progression:
+    """
+    A sequence of Chords with metadata such as bpm & chord locks.
+
+    Parameters
+    ----------
+    chords: list[Chord], default []
+        The chords in the progression.
+    locks: str, default None
+        Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
+        Defaults to all unlocked if not provided.
+    bpm: float, default DEFAULT_BPM
+        The beats per minute (BPM) of the progression.
+    name: str, default ""
+        The name of the progression.
+    """
+
     def __init__(
         self,
         chords: list[Chord] = [],
-        durations: list[str] = None,
+        locks: str = None,
         bpm: float = DEFAULT_BPM,
-        locks: list[int] = None,
         name: str = "",
     ):
+        if not isinstance(chords, list):
+            raise ValueError("`chords` must be a list")
+
+        # convert a midi_nums_list to Chords
+        if isinstance(chords, list) and len(chords) > 0 and isinstance(chords[0], list):
+            chords = [Chord(c) for c in chords]
+
         self.chords = chords
-
-        if not durations:
-            durations = ["1m"] * len(chords)
-        self.durations = durations
-
-        self.bpm = bpm
-        self.name = name
 
         if not locks:
             locks = "0" * len(chords)
         self.locks = locks
 
-        self.ids = get_n_random_uuids(len(chords))
+        self.bpm = bpm
+        self.name = name
 
         # TODO: add metrics
         self.metrics = {}
@@ -41,72 +58,74 @@ class Progression:
         return len(self.chords)
 
     def __repr__(self):
-        return self.to_string()
+        return "Progression " + self.to_string()
+
+    def __getitem__(self, ix):
+        return self.chords[ix]
 
     def to_string(self):
-        return str(self.to_json())
+        return json.dumps(self.to_json(), indent=4)
 
     def to_json(self):
-        # TODO: progression-level attrs like name, bpm
+        # TODO: include progression-level attrs like name, bpm
         result = []
 
-        for ix, (chord, chord_id, duration, locked) in enumerate(
-            list(zip(self.chords, self.ids, self.durations, self.locks))
-        ):
+        for ix, (chord, locked) in enumerate(list(zip(self.chords, self.locks))):
             result.append(
                 {
-                    "id": chord_id,
+                    "id": chord.id,
                     "ix": ix,
+                    "duration": chord.duration,
+                    "locked": locked,
                     "type": chord.type,
                     "typeId": chord.typeId,
                     "notes": chord.notes,
-                    "duration": duration,
-                    "locked": str(locked),
+                    "midi_nums": chord.midi_nums,
                     "metrics": chord.metrics,
                 }
             )
 
         return result
 
-    def from_audio(self, filepath):
-        return
-
-    def as_audio(self, n_overtones=2):
-        durations_seconds = [dur * (60 / self.bpm) for dur in self.durations]
-        return make_audio_progression(self.chords, durations_seconds, n_overtones)
-
-    def save_audio(self, outpath, n_overtones=2):
-        audio_buffer = self.as_audio(n_overtones)
-        save_audio_buffer(audio_buffer, outpath)
-        logger.info(f"Audio saved to {outpath}")
-
-    def from_midi(self):
-        return
-
-    def as_midi(self):
-        return get_midi_from_progression(
-            self.chords, self.durations, self.bpm, self.name
+    def to_audio(self, n_overtones=2, outpath=None):
+        durations = [c.duration for c in self.chords]
+        durations_seconds = [dur * (60 / self.bpm) for dur in durations]
+        audio_buffer = make_audio_progression(
+            self.chords, durations_seconds, n_overtones
         )
+        if outpath:
+            save_audio_buffer(audio_buffer, outpath)
+            logger.info(f"Audio saved to {outpath}")
 
-    def save_midi(self, outpath):
-        """Saves the progression a .mid file"""
-        mid = self.as_midi()
-        mid.filename = outpath
-        mid.save(outpath)
-        logger.info(f"Midi saved to {outpath}")
+    def to_midi(self, outpath=None):
+        mid = get_midi_from_progression(self.chords, self.bpm, self.name)
+        if outpath:
+            mid.filename = outpath
+            mid.save(outpath)
+            logger.info(f"Midi saved to {outpath}")
 
-    def get_new_solution(self):
-        """Given existing locked chords and constraints, returns a new chord progression of the same length
-        TODO: allow solver constraints to be passed as arguments"""
+    def get_new_solution(self, **constraints):
+        """Given existing locked chords and constraints, returns a new chord progression of the same length"""
 
         existing_chords = self.chords
 
-        # Use the default parameters
-        return select_chords(
+        chords = select_chords(
             n_chords=len(existing_chords),
             existing_chords=existing_chords,
-            pct_notes_common=0,
-            note_range_low=60,
-            note_range_high=108,
             locks=self.locks,
+            **constraints,
         )
+
+        return Progression(chords)
+
+    def get_addition(self, **constraints):
+        existing_chords = self.chords
+
+        chords = select_chords(
+            n_chords=len(existing_chords) + 1,
+            existing_chords=existing_chords,
+            locks="1" * len(existing_chords) + "0",
+            **constraints,
+        )
+
+        return Progression(chords)

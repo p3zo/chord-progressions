@@ -81,7 +81,7 @@ def get_voice_led_progression(start):
     progression = Progression(chords, durations, name=run_id)
 
     audio_outpath = os.path.join(OUTPUT_AUDIO_DIR, f"{run_id}.wav")
-    progression.save_audio(audio_outpath, n_overtones=0)
+    progression.to_audio(outpath=audio_outpath, n_overtones=0)
 
     return chords
 

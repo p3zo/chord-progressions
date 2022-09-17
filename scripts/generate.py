@@ -74,12 +74,11 @@ def generate_progression(
 
     progression = Progression(chords, durations, name=run_id)
 
-    # TODO: separate `make_audio_progression` from `save_audio_progression`, like midi
     audio_progression_path = os.path.join(WAV_OUTPUT_DIR, f"{run_id}.wav")
-    progression.save_audio(audio_progression_path)
+    progression.to_audio(outpath=audio_progression_path)
 
     midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
-    progression.save_midi(outpath=midi_progression_path)
+    progression.to_midi(outpath=midi_progression_path)
 
     # metadata
     meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")

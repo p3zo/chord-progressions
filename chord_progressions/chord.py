@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from chord_progressions import logger
 from chord_progressions.evaluate import evaluate_notes_list
 from chord_progressions.pitch import (
@@ -15,30 +17,34 @@ MidiNumList = list[int]
 
 
 class Chord:
-    def __init__(self, notes):
-        # TODO: replace typechecking with @singledispatchmethod pattern
-        # See https://realpython.com/python-multiple-constructors/#checking-argument-types-in-__init__
+    """A set of unique notes with duration.
+
+    Parameters
+    ----------
+    notes: list[Chord], default []
+        The set of notes in the chord. Can be specified as a list of midi numbers or as a list of note names.
+            e.g. Chord([60, 64, 67])
+            e.g. Chord(["C4", "E4", "G4"])
+
+    duration: int, default 1
+        The duration of the chord, specified in seconds.
+    """
+
+    def __init__(self, notes: list = [], duration: int = 1, id: str = None):
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
-        self.initialize_from_midi_nums(notes)
+        self.init_from_midi_nums(midi_nums=notes, duration=duration, id=id)
 
-    def initialize_from_midi_nums(self, midi_nums: MidiNumList):
-        """
-        midi_nums:
-            list of midi nums, e.g. [60, 64, 67]
+    def init_from_midi_nums(
+        self, midi_nums: MidiNumList = [], duration: int = 1, id: str = None
+    ):
+        if any([i < 0 or i > 128 for i in midi_nums]):
+            raise ValueError("The valid range of midi numbers is 0 to 128")
 
-        TODO: should chords have durations when not part of a progression?
-        duration:
-            float, seconds
-                The length of this list must match the length of `chords`
-                The length of a tick is defined in ticks per beat. This value is stored
-                as ticks_per_beat in MidiFile objects and remains fixed throughout a track.
+        self.midi_nums = sorted(list(set(midi_nums)))
 
-            str, Tone Time
-        """
-        self.midi_nums = midi_nums
-        # self.duration = duration
+        self.duration = duration or 1
 
         chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
@@ -49,11 +55,21 @@ class Chord:
         self.metrics = evaluate_notes_list(notes)
         self.template = get_template_from_notes(notes)
 
-    # TODO: rename `json` to `to_json`
-    def json(self):
+        if not id:
+            id = str(uuid4())
+        self.id = id
+
+    def __repr__(self):
+        return "Chord " + self.to_string()
+
+    def to_string(self):
+        return str(self.to_json())
+
+    def to_json(self):
         return {
+            "id": self.id,
             "midi_nums": self.midi_nums,
-            # "duration": self.duration,
+            "duration": self.duration,
             "type": self.type,
             "typeId": self.typeId,
             "notes": self.notes,
@@ -62,6 +78,7 @@ class Chord:
 
 
 def get_template_from_pitch_classes(pcs):
+    """e.g. [0, 4, 7] -> [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]"""
     template = [0] * 12
 
     for ix in pcs:
@@ -71,7 +88,7 @@ def get_template_from_pitch_classes(pcs):
 
 
 def get_template_from_notes(notes):
-    """e.g. ["C4", "C3"] -> [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"""
+    """e.g. ["C4", "E4", "G4"] -> [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]"""
     pitch_classes = [get_pitch_class_from_note(n) for n in notes]
 
     return get_template_from_pitch_classes(pitch_classes)
@@ -136,15 +153,6 @@ def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
             pass
 
     return midi_nums_list
-
-
-def get_durations_from_duration_str(dur_str):
-    """
-    Takes a duration string and returns an array of durations
-
-    e.g. "1m_1m_1m" -> ["1m", "1m", "1m"]
-    """
-    return dur_str.split("_")
 
 
 def notes_match_chord_type(notes, chord_type):
@@ -215,6 +223,7 @@ def get_types_from_notes_list(notes_list):
 
 
 def get_notes_from_template(template, note_range_low, note_range_high):
+    """e.g. [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0] -> ["C", "E", "G"]"""
     all_notes = get_note_list(note_range_low, note_range_high)
 
     notes = [all_notes[ix] if is_onset else 0 for ix, is_onset in enumerate(template)]

@@ -76,8 +76,8 @@ def high_enough_match(num, denom_1, denom_2, thresh):
 def template_meets_constraints(
     template,
     pct_notes_common,
-    preceding_rotation,
-    succeeding_rotation,
+    prev_rotation,
+    next_rotation,
 ):
     """
     Returns True if `template`
@@ -85,27 +85,51 @@ def template_meets_constraints(
         - has num consecutive notes less than `n_consecutive max`
         - has at least `pct_notes_common` with both preceding & succeeding rotations
     """
-    if preceding_rotation:
+    if prev_rotation:
 
-        n_max = get_n_max_matches_between_templates(template, preceding_rotation)
+        n_max = get_n_max_matches_between_templates(template, prev_rotation)
 
         if not high_enough_match(
-            n_max, sum(template), sum(preceding_rotation), pct_notes_common
+            n_max, sum(template), sum(prev_rotation), pct_notes_common
         ):
             return False
 
-    if succeeding_rotation:
+    if next_rotation:
 
-        n_max = get_n_max_matches_between_templates(template, succeeding_rotation)
+        n_max = get_n_max_matches_between_templates(template, next_rotation)
 
         if not high_enough_match(
-            n_max, sum(template), sum(succeeding_rotation), pct_notes_common
+            n_max, sum(template), sum(next_rotation), pct_notes_common
         ):
             return False
 
     s = sum(template)
 
     return not (s < N_NOTES_MIN or s < pct_notes_common or s > N_NOTES_MAX)
+
+
+def is_voicing_spaced(voicing):
+    """Use the spacing of the harmonic series to inform voicing: highs closer and lows further apart.
+
+    Parameters
+    ----------
+    voicing: list[int]
+        An array of midi note numbers
+    """
+    notes_below_cutoff = sorted([n for n in voicing if n < SPACING_CUTOFF])
+
+    spacings_below_cutoff = []
+    for ix, n in enumerate(notes_below_cutoff):
+        if ix == 0:
+            continue
+
+        spacing = n - notes_below_cutoff[ix - 1]
+        spacings_below_cutoff.append(spacing)
+
+    if all([i >= MIN_SPACING for i in spacings_below_cutoff]):
+        return True
+
+    return False
 
 
 def select_voicing(rotation, note_range_low, note_range_high):
@@ -225,8 +249,8 @@ def choose_random_template(allowed_chord_types):
 def choose_template_with_constraints(
     allowed_chord_types,
     pct_notes_common,
-    preceding_rotation,
-    succeeding_rotation,
+    prev_rotation,
+    next_rotation,
 ):
 
     allowed_types = allowed_chord_types.copy()
@@ -236,8 +260,8 @@ def choose_template_with_constraints(
     while not template_meets_constraints(
         template,
         pct_notes_common,
-        preceding_rotation,
-        succeeding_rotation,
+        prev_rotation,
+        next_rotation,
     ):
 
         allowed_types.remove(template_type)
@@ -253,13 +277,19 @@ def choose_template_with_constraints(
 
 def select_chords(
     n_chords=5,
+    existing_chords=None,
+    locks=None,
     pct_notes_common=0,
     note_range_low=60,
     note_range_high=108,
-    allowed_chord_types=list(TYPE_TEMPLATES),
-    existing_chords=None,
-    locks=None,
+    allowed_chord_types=[],
 ):
+    print("Selecting chords")
+    print(f"{pct_notes_common=}")
+    print(f"{note_range_low=}")
+    print(f"{note_range_high=}")
+    print(f"{allowed_chord_types=}")
+
     # allow all chord types if none are specified
     if len(allowed_chord_types) == 0:
         allowed_chord_types = list(TYPE_TEMPLATES)[1:]  # exclude "unknown"
@@ -272,38 +302,45 @@ def select_chords(
         )
         locks = "1" * n_chords
 
-    logger.debug(f"Locks: {locks}")
+    if not existing_chords:
+        existing_chords = []
 
     open_ixs = [ix for ix, i in enumerate(locks) if i == "0"]
+
+    logger.debug(f"{locks=}")
+    logger.debug(f"{open_ixs=}")
+
+    # TODO: these chord properties can be consolidated
+    ids = [[]] * n_chords
+    durations = [[]] * n_chords
+    voicings = [[]] * n_chords
     rotations = [[]] * n_chords
-    chord_notes = [[]] * n_chords
 
     if existing_chords:
-        logger.debug(f"Existing chords: {existing_chords}")
+        logger.debug(f"{existing_chords=}")
 
-        for ix, midi_nums in enumerate(existing_chords):
-            rotations[ix] = get_template_from_midi_nums(midi_nums)
-            chord_notes[ix] = midi_nums
-
-    print(f"Indexes to fill: {open_ixs}")
-    logger.debug(f"Indexes to fill: {open_ixs}")
+        for ix, chord in enumerate(existing_chords):
+            ids[ix] = chord.id
+            durations[ix] = chord.duration
+            voicings[ix] = chord.midi_nums
+            rotations[ix] = chord.template
 
     for ix in open_ixs:
-        preceding_rotation = rotations[ix - 1] if ix > 0 else None
+        prev_rotation = rotations[ix - 1] if ix > 0 else None
 
-        succeeding_rotation = None
+        next_rotation = None
         if ix < n_chords - 1:
             rotation = rotations[ix + 1]
-            succeeding_rotation = rotation if rotation else None
+            next_rotation = rotation if rotation else None
 
         template, chord_type = choose_template_with_constraints(
             allowed_chord_types,
             pct_notes_common,
-            preceding_rotation,
-            succeeding_rotation,
+            prev_rotation,
+            next_rotation,
         )
 
-        surrounding_rotations = [preceding_rotation, succeeding_rotation]
+        surrounding_rotations = [prev_rotation, next_rotation]
 
         possible_rotations = get_possible_rotations(
             template, surrounding_rotations, pct_notes_common
@@ -313,37 +350,15 @@ def select_chords(
             logger.warning("NO POSSIBLE ROTATIONS")
 
         rotation = possible_rotations[np.random.randint(len(possible_rotations))]
-
-        voicing = select_voicing(rotation, note_range_low, note_range_high)
-
-        chord_notes[ix] = voicing
         rotations[ix] = rotation
 
-        logger.debug(f"Selected for ix {ix}: ( {voicing}, {chord_type} )")
+        voicings[ix] = select_voicing(rotation, note_range_low, note_range_high)
+        ids[ix] = None
+        durations[ix] = None
 
-    return [Chord(c) for c in chord_notes]
-
-
-def is_voicing_spaced(voicing):
-    """Use the harmonic series spacing to inform voicing - highs closer and lows farther apart.
-
-    Voicing is an array of midi note numbers
-    """
-    notes_below_c3 = sorted([n for n in voicing if n < SPACING_CUTOFF])
-
-    spacings_below_c3 = []
-    for ix, n in enumerate(notes_below_c3):
-        if ix == 0:
-            continue
-
-        spacing = n - notes_below_c3[ix - 1]
-
-        spacings_below_c3.append(spacing)
-
-    if all([i >= MIN_SPACING for i in spacings_below_c3]):
-        return True
-
-    return False
+    return [
+        Chord(id=i, notes=v, duration=d) for (i, v, d) in zip(ids, voicings, durations)
+    ]
 
 
 def shuffle_voicing(notes: list[str], note_range_low: int, note_range_high: int):
