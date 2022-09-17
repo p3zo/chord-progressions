@@ -30,6 +30,5 @@ edit_uri: ""
 nav:
   - Introduction: index.md
   - Extract: extract.md
-  - Analyze: analyze.md
-  - Generate: generate.md
+  - Generator settings: generate.md
   - Glossary: glossary.md

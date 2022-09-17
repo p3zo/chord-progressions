@@ -1,6 +1,6 @@
 # Extract
 
-Extract chord progressions from audio or midi.
+Experimental functions for automatically extracting chord progressions from audio and midi.
 
 ## Extract chords from a midi file
 
@@ -12,12 +12,18 @@ extracted = simplify_harmony('my_file.mid')
 harman_labels = label_midi(extracted)
 ```
 
-[//]: # (TODO: `label_midi_file&#40;&#41;` that takes the filepath directly and returns a progression obj)
-
 ## Extract chords from an audio file
 
 ```python
 from chord_progressions.extract.audio import extract_progression_from_audio
 
 progression = extract_progression_from_audio('my_file.wav')
+```
+
+## Eventual interface
+
+```python
+import chordico
+progression = chordico.Progression.from_audio('my_file.wav')
+progression = chordico.Progression.from_midi('my_file.mid')
 ```
