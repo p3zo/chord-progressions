@@ -42,7 +42,8 @@ class Chord:
         if any([i < 0 or i > 128 for i in midi_nums]):
             raise ValueError("The valid range of midi numbers is 0 to 128")
 
-        self.midi_nums = sorted(list(set(midi_nums)))
+        midi_nums = sorted(list(set(midi_nums)))
+        self.midi_nums = midi_nums
 
         self.duration = duration or 1
 
@@ -75,6 +76,13 @@ class Chord:
             "notes": self.notes,
             "metrics": self.metrics,
         }
+
+    @classmethod
+    def from_template(cls, template, duration: int = 1, id: str = None):
+        midi_nums = get_notes_from_template(
+            template, note_range_low=60, note_range_high=72
+        )
+        return cls(notes=midi_nums, duration=duration, id=id)
 
 
 def get_template_from_pitch_classes(pcs):
