@@ -87,12 +87,14 @@ class Progression:
 
         return result
 
-    def to_audio(self, n_overtones=2, outpath=None):
+    def to_audio(self, outpath=None, n_overtones=4):
         durations = [c.duration for c in self.chords]
         durations_seconds = [dur * (60 / self.bpm) for dur in durations]
         audio_buffer = make_audio_progression(
             self.chords, durations_seconds, n_overtones
         )
+
+        # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
         if outpath:
             save_audio_buffer(audio_buffer, outpath)
             logger.info(f"Audio saved to {outpath}")
@@ -129,3 +131,15 @@ class Progression:
         )
 
         return Progression(chords)
+
+    def lock(self, ix):
+        """Locks the chord at index `ix`"""
+        locks = list(self.locks)
+        locks[ix] = "1"
+        self.locks = "".join(locks)
+
+    def unlock(self, ix):
+        """Unlocks the chord at index `ix`"""
+        locks = list(self.locks)
+        locks[ix] = "0"
+        self.locks = "".join(locks)
