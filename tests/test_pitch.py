@@ -10,6 +10,7 @@ from chord_progressions.pitch import (
     get_note_name_from_note,
     get_octave_from_note,
     get_pitch_class_from_note,
+    get_midi_nums_list_from_midi_nums_str,
 )
 
 EXPECTATIONS = [
@@ -99,3 +100,16 @@ def test_create_notes_freqs_table():
 
     assert list(note_freqs) == MIDI_NOTES
     assert list(note_freqs.values()) == MIDI_NOTE_FREQUENCIES
+
+
+def test_get_midi_nums_list_from_midi_nums_str():
+    expectations = [
+        {"midi_nums_str": "60-48_62-50", "midi_nums_list": [[60, 48], [62, 50]]},
+        {"midi_nums_str": "60-48_", "midi_nums_list": [[60, 48]]},
+        {"midi_nums_str": "60-48_a", "midi_nums_list": [[60, 48]]},
+    ]
+    for ex in expectations:
+        assert (
+            get_midi_nums_list_from_midi_nums_str(ex["midi_nums_str"])
+            == ex["midi_nums_list"]
+        )

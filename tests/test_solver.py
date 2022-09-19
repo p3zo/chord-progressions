@@ -8,6 +8,7 @@ from chord_progressions.solver import (
     high_enough_match,
     select_chords,
     template_meets_constraints,
+    get_notes_from_template_range,
 )
 
 
@@ -164,3 +165,8 @@ def test_get_possible_rotations():
 
     possible = get_possible_rotations(template, surrounding_rotations, pct_notes_common)
     assert not possible
+
+
+def test_get_notes_from_template_range():
+    get_notes_from_template_range([1, 0, 0, 0, 1], 60) == ["C4", "E4"]
+    get_notes_from_template_range([1, 0, 0, 1, 0], 48) == ["C3", "D#3"]

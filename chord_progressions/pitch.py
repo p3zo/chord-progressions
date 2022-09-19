@@ -304,6 +304,29 @@ def get_note_name_from_note(note):
     return NOTE_NAMES[pitch_class]
 
 
+def get_notes_from_midi_nums_str(midi_nums_str):
+    """e.g. "60-48" -> ["C4", "C3"]"""
+    return [get_note_from_midi_num(s) for s in midi_nums_str.split("-")]
+
+
+def get_notes_list_from_midi_nums_str(midi_nums_str):
+    """e.g. "60-48_62-50" -> [["C4", "C3"], ["D4", "E3"]]"""
+    return [get_notes_from_midi_nums_str(s) for s in midi_nums_str.split("_")]
+
+
+def get_midi_nums_list_from_midi_nums_str(midi_nums_str):
+    """e.g. "60-48_62-50" -> [[60, 48], [62, 50]]
+    If any chord in `midi_nums_str` is invalid, returns an empty string for that chord"""
+    midi_nums_list = []
+    for m in midi_nums_str.split("_"):
+        try:
+            midi_nums_list.append([int(i) for i in m.split("-")])
+        except:
+            pass
+
+    return midi_nums_list
+
+
 def get_octave_from_note(note):
 
     note_name = get_note_name_from_note(note)

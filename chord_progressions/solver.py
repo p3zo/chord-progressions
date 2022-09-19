@@ -1,17 +1,16 @@
 import numpy as np
 from chord_progressions import logger
-from chord_progressions.chord import (
-    Chord,
-    get_notes_from_template,
-    get_template_from_midi_nums,
-    get_template_from_template_str,
-)
+from chord_progressions.chord import Chord
 from chord_progressions.pitch import (
+    get_note_list,
     get_midi_num_from_note,
     get_note_from_midi_num,
     get_pitch_class_from_note,
 )
-from chord_progressions.type_templates import TYPE_TEMPLATES
+from chord_progressions.type_templates import (
+    TYPE_TEMPLATES,
+    get_template_from_template_str,
+)
 from chord_progressions.utils import shift_arr_by_one
 
 # hard-code some constraints until there is a convincing use-case to make them variable
@@ -132,6 +131,19 @@ def is_voicing_spaced(voicing):
     return False
 
 
+def get_notes_from_template_range(pitches, range_start_note):
+    """A template range is like a template but can be of arbitrary length and start on an arbitrary pitch class
+
+    e.g. get_notes_from_template_range([1, 0, 0, 0, 1], 60) -> ["C4", "E4"]
+    e.g. get_notes_from_template_range([1, 0, 0, 1, 0], 48) -> ["C3", "D#3"]
+    """
+    all_notes = get_note_list(range_start_note, range_start_note + len(pitches))
+
+    notes = [all_notes[ix] if is_onset else 0 for ix, is_onset in enumerate(pitches)]
+
+    return [n for n in notes if n]
+
+
 def select_voicing(rotation, note_range_low, note_range_high):
     """
     Places a set of pitch classes into pitch space.
@@ -162,13 +174,12 @@ def select_voicing(rotation, note_range_low, note_range_high):
 
             pitch_class_assignments[slot] = choice
 
-        selected_pitches = [0] * n_notes
+        template_range = [0] * n_notes
         for ix in set(pitch_class_assignments.values()):
-            selected_pitches[ix] = 1
+            template_range[ix] = 1
 
-        selected_notes = get_notes_from_template(
-            selected_pitches, note_range_low, note_range_high
-        )
+        selected_notes = get_notes_from_template_range(template_range, note_range_low)
+
         voicing = [get_midi_num_from_note(n) for n in selected_notes]
 
         spaced = is_voicing_spaced(voicing)
