@@ -1,15 +1,12 @@
 """
-    A common heuristic is that an interval is consonant when the
-    ratio between the frequencies is simple.
+    Defines the metrics computed for every progression.
 
-    TODO: understand https://en.xen.wiki/w/Harmonic_Entropy
-
-    Resonance
-
-
-    Brilliance
-
-        "for maximum brilliance let the lower tones [be somehow equally spaced out as] their overtones"
+    TODO:
+        - A common heuristic is that an interval is consonant when the ratio between the frequencies is simple.
+        - Resonance
+        - Brilliance: "for maximum brilliance let the lower tones [be somehow equally spaced out as] their overtones"
+            - Vincent Persechetti, Twentieth-Century Harmony
+        - something like https://en.xen.wiki/w/Harmonic_Entropy
 """
 
 import itertools
@@ -21,26 +18,10 @@ from chord_progressions.pitch import (
     get_n_overtones_harmonic,
     get_pitch_class_from_note,
 )
-
-# created in `create_chord_classes.py`
-# TODO: replace this table with a formula
-MIN_MAX_EVENNESS_BY_CARDINALITY = [
-    [0.0, 0.0],
-    [0.5176380902050415, 2.0],
-    [2.035276180410083, 5.196152422706632],
-    [6.1815405503520555, 9.65685424949238],
-    [9.631030293135233, 15.287884542627612],
-    [16.226784405860382, 22.392304845413264],
-    [24.822538518585535, 30.479392768077915],
-    [35.350144283888824, 40.03987070039298],
-    [47.609800856760984, 50.77067709905754],
-    [61.28367099200624, 62.7660329018012],
-    [75.9575411272515, 75.9575411272515],
-    [91.14904935270181, 91.14904935270181],
-]
+from chord_progressions.type_templates import get_template_from_notes
 
 
-def get_interval_class_vector(chord):
+def get_interval_class_vector(notes):
     """
     Returns a vector of interval classes.
         0: minor second / major seventh (1 or 11 semitones)
@@ -52,7 +33,8 @@ def get_interval_class_vector(chord):
     """
     vec = [0] * 6
 
-    one_indices = [ix for ix, i in enumerate(chord.template) if i == 1]
+    template = get_template_from_notes(notes)
+    one_indices = [ix for ix, i in enumerate(template) if i == 1]
     pairs = list(itertools.combinations(one_indices, 2))
 
     intervals = [p[1] - p[0] for p in pairs]
@@ -67,11 +49,8 @@ def get_interval_class_vector(chord):
 
 def get_evenness(interval_class_vector):
     """
-    A rough measure of acoustic consonance.
-    Highly consonant chords divide the octave nearly evenly.
-
+    A rough measure of acoustic consonance. Highly consonant chords divide the octave nearly evenly.
     Note that acoustic consonance implies near-evenness, but not the reverse.
-
     For background on the equation see https://www.researchgate.net/profile/Jack_Douthett/publication/249881698_Vector_Products_and_Intervallic_Weighting/links/575061d708ae1c34b39aaa1b.pdf
     """
     weight_vector = [0] * 6
@@ -89,14 +68,27 @@ def get_evenness(interval_class_vector):
 
 def get_relative_evenness(evenness, cardinality):
     """
-    Calculate the evenness of a pcset relative to its possible range
-    because highly-even dyads will have a lower evenness than highly uneven hexachords.
-
+    Calculate the evenness of a pitch class set relative to its possible range.
+    A relative value is useful because highly-even dyads will have a lower evenness than highly uneven hexachords.
     The result is a value between 0 and 1.
     """
+    # TODO: replace this table with a formula
+    MIN_MAX_EVENNESS_BY_CARDINALITY = [
+        [0.0, 0.0],
+        [0.5176380902050415, 2.0],
+        [2.035276180410083, 5.196152422706632],
+        [6.1815405503520555, 9.65685424949238],
+        [9.631030293135233, 15.287884542627612],
+        [16.226784405860382, 22.392304845413264],
+        [24.822538518585535, 30.479392768077915],
+        [35.350144283888824, 40.03987070039298],
+        [47.609800856760984, 50.77067709905754],
+        [61.28367099200624, 62.7660329018012],
+        [75.9575411272515, 75.9575411272515],
+        [91.14904935270181, 91.14904935270181],
+    ]
 
     emin, emax = MIN_MAX_EVENNESS_BY_CARDINALITY[cardinality - 1]
-
     return (evenness - emin) / (emax - emin)
 
 
@@ -128,25 +120,19 @@ def evaluate_notes(notes):
 
     interval_class_vector = get_interval_class_vector(notes)
 
-    # overtone_agreement = get_overtone_agreement(notes)
-
     # evenness = get_evenness(interval_class_vector)
 
     pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
     assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-    # chord_type = get_type_from_notes(notes)
-
-    # metrics["type_id"] = get_type_num_from_type(chord_type)
-    # metrics["type_name"] = chord_type
     metrics["num_notes"] = len(notes)
     metrics["num_pitches"] = len(set(notes))
-    metrics["pc_cardinality"] = pc_cardinality
+    # metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
+    # metrics["ambitus"] = get_ambitus(notes)
     # metrics["evenness"] = evenness
-    # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
-    metrics["ambitus"] = get_ambitus(notes)
-    # metrics["overtone_agreement"] = overtone_agreement
+    # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
+    # metrics["overtone_agreement"] = get_overtone_agreement(notes)
 
     return metrics
 
@@ -170,7 +156,7 @@ def get_ambitus(macroharmony):
     return max(midi_notes) - min(midi_notes)
 
 
-def evaluate_notes_list(notes_list):
+def evaluate_progression(progression):
     metrics = {}
 
     # macroharmony = get_macroharmony(notes_list)
@@ -182,27 +168,10 @@ def evaluate_notes_list(notes_list):
     return metrics
 
 
-def evaluate_progression(progression):
-    notes_list = [chord.midi_nums for chord in progression]
-
-    return evaluate_notes_list(notes_list)
-
-
-def get_ofreqs_for_notes(notes, n_overtones):
+def get_n_overtones_for_notes(notes, n):
+    """Calculates `n` overtone frequencies for each note in `notes`"""
 
     freqs = [get_freq_from_note(n) for n in notes]
-    ofreqs = [get_n_overtones_harmonic(f, n_overtones) for f in freqs]
+    ofreqs = [get_n_overtones_harmonic(f, n) for f in freqs]
 
     return ofreqs
-
-
-def get_progression_key(progression):
-    return
-
-
-def get_chord_name(chord, progression, key=None):
-
-    if not key:
-        key = get_progression_key(progression)
-
-    return

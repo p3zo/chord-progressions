@@ -19,7 +19,6 @@ from chord_progressions.chord import (
     get_template_from_template_str,
     get_type_num_from_type,
 )
-from chord_progressions.evaluate import evaluate_notes
 from chord_progressions.extract import (
     DEFAULT_QUANTIZE_BEAT,
     DEFAULT_SHORTEST_NOTE,
@@ -369,8 +368,6 @@ def segment_and_label(p_all, s_m):
             logger.debug(f"  {vi}/{final_ix} - Continue: No notes in segment")
             continue
 
-        metrics = evaluate_notes(uv_notes)
-
         uv_score, uv_label = get_segment_label(uv_segment)
 
         wi = vi + 1  # index of the succeeding vertex
@@ -389,7 +386,6 @@ def segment_and_label(p_all, s_m):
                 "score": uv_score,
                 "midi_nums": uv_midi_nums,
                 "notes": uv_notes,
-                "metrics": metrics,
             }
 
             G.add_node(vi, marked=1, time=p.time)
@@ -404,10 +400,6 @@ def segment_and_label(p_all, s_m):
     final_segment = s_m[ui:final_ix]
     final_segment_midi_nums = get_segment_midi_nums(uv_segment)
     final_segment_notes = [get_note_from_midi_num(n) for n in final_segment_midi_nums]
-    final_segment_metrics = {}
-
-    if len(final_segment_midi_nums) > 0:
-        final_segment_metrics = evaluate_notes(final_segment_notes)
 
     final_score, final_label = get_segment_label(final_segment)
 
@@ -418,7 +410,6 @@ def segment_and_label(p_all, s_m):
         "score": final_score,
         "midi_nums": final_segment_midi_nums,
         "notes": final_segment_notes,
-        "metrics": final_segment_metrics,
     }
 
     G.add_edge(ui, final_ix, **final_edge_attributes)
@@ -448,8 +439,6 @@ def segment_and_label(p_all, s_m):
             "notes": edge["notes"],
             "chord": Chord(edge["midi_nums"]),
         }
-        row.update(edge["metrics"])
-
         rows.append(row)
 
     logger.debug(f"segment_and_label done in {time.time() - t0} seconds")
