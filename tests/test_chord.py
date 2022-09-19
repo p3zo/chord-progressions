@@ -1,5 +1,4 @@
 import pytest
-
 from chord_progressions.chord import Chord
 
 

@@ -6,7 +6,6 @@ from chord_progressions.pitch import (
 )
 from chord_progressions.utils import is_circular_match
 
-
 # from http://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
 TYPE_TEMPLATES = {
     "": "",

@@ -1,15 +1,15 @@
 from chord_progressions.type_templates import (
     TYPE_TEMPLATES,
+    get_template_from_midi_nums,
     get_template_from_notes,
     get_template_from_pitch_classes,
-    get_template_from_midi_nums,
     get_template_from_template_str,
-    get_type_from_type_num,
-    get_types_from_type_num_str,
-    get_type_num_from_type,
-    notes_match_chord_type,
-    get_type_from_notes,
     get_type_from_midi_nums,
+    get_type_from_notes,
+    get_type_from_type_num,
+    get_type_num_from_type,
+    get_types_from_type_num_str,
+    notes_match_chord_type,
 )
 
 

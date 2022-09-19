@@ -3,12 +3,12 @@ from chord_progressions.solver import (
     get_all_rotations_of_template,
     get_n_common_ones,
     get_n_max_matches_between_templates,
+    get_notes_from_template_range,
     get_possible_rotations,
     get_template_str,
     high_enough_match,
     select_chords,
     template_meets_constraints,
-    get_notes_from_template_range,
 )
 
 

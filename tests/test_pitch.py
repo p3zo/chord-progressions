@@ -5,12 +5,12 @@ from chord_progressions.pitch import (
     create_notes_freqs_table,
     get_freq_from_note,
     get_midi_num_from_note,
+    get_midi_nums_list_from_midi_nums_str,
     get_note_from_midi_num,
     get_note_list,
     get_note_name_from_note,
     get_octave_from_note,
     get_pitch_class_from_note,
-    get_midi_nums_list_from_midi_nums_str,
 )
 
 EXPECTATIONS = [

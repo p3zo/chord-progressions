@@ -2,9 +2,9 @@ import numpy as np
 from chord_progressions import logger
 from chord_progressions.chord import Chord
 from chord_progressions.pitch import (
-    get_note_list,
     get_midi_num_from_note,
     get_note_from_midi_num,
+    get_note_list,
     get_pitch_class_from_note,
 )
 from chord_progressions.type_templates import (
