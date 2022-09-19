@@ -20,23 +20,6 @@ from chord_progressions.pitch import (
 )
 from chord_progressions.type_templates import get_template_from_notes
 
-# created in `create_chord_classes.py`
-# TODO: replace this table with a formula
-MIN_MAX_EVENNESS_BY_CARDINALITY = [
-    [0.0, 0.0],
-    [0.5176380902050415, 2.0],
-    [2.035276180410083, 5.196152422706632],
-    [6.1815405503520555, 9.65685424949238],
-    [9.631030293135233, 15.287884542627612],
-    [16.226784405860382, 22.392304845413264],
-    [24.822538518585535, 30.479392768077915],
-    [35.350144283888824, 40.03987070039298],
-    [47.609800856760984, 50.77067709905754],
-    [61.28367099200624, 62.7660329018012],
-    [75.9575411272515, 75.9575411272515],
-    [91.14904935270181, 91.14904935270181],
-]
-
 
 def get_interval_class_vector(notes):
     """
@@ -66,11 +49,8 @@ def get_interval_class_vector(notes):
 
 def get_evenness(interval_class_vector):
     """
-    A rough measure of acoustic consonance.
-    Highly consonant chords divide the octave nearly evenly.
-
+    A rough measure of acoustic consonance. Highly consonant chords divide the octave nearly evenly.
     Note that acoustic consonance implies near-evenness, but not the reverse.
-
     For background on the equation see https://www.researchgate.net/profile/Jack_Douthett/publication/249881698_Vector_Products_and_Intervallic_Weighting/links/575061d708ae1c34b39aaa1b.pdf
     """
     weight_vector = [0] * 6
@@ -92,6 +72,22 @@ def get_relative_evenness(evenness, cardinality):
     A relative value is useful because highly-even dyads will have a lower evenness than highly uneven hexachords.
     The result is a value between 0 and 1.
     """
+    # TODO: replace this table with a formula
+    MIN_MAX_EVENNESS_BY_CARDINALITY = [
+        [0.0, 0.0],
+        [0.5176380902050415, 2.0],
+        [2.035276180410083, 5.196152422706632],
+        [6.1815405503520555, 9.65685424949238],
+        [9.631030293135233, 15.287884542627612],
+        [16.226784405860382, 22.392304845413264],
+        [24.822538518585535, 30.479392768077915],
+        [35.350144283888824, 40.03987070039298],
+        [47.609800856760984, 50.77067709905754],
+        [61.28367099200624, 62.7660329018012],
+        [75.9575411272515, 75.9575411272515],
+        [91.14904935270181, 91.14904935270181],
+    ]
+
     emin, emax = MIN_MAX_EVENNESS_BY_CARDINALITY[cardinality - 1]
     return (evenness - emin) / (emax - emin)
 
@@ -131,11 +127,11 @@ def evaluate_notes(notes):
 
     metrics["num_notes"] = len(notes)
     metrics["num_pitches"] = len(set(notes))
-    metrics["pc_cardinality"] = pc_cardinality
+    # metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
     # metrics["ambitus"] = get_ambitus(notes)
     # metrics["evenness"] = evenness
-    # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
+    # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
     # metrics["overtone_agreement"] = get_overtone_agreement(notes)
 
     return metrics

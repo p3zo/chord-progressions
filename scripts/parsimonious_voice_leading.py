@@ -1,5 +1,5 @@
 """
-A script to experiment with some counterpoint rules to construct parsimoniously voice-led progressions.
+Experimenting with some counterpoint rules to construct parsimoniously voice-led progressions.
 
 Rules:
     - 1 to n-1 notes can change each chord
