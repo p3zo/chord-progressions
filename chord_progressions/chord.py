@@ -13,7 +13,7 @@ MidiNumList = list[int]
 
 
 class Chord:
-    """A set of unique notes with duration.
+    """A set of unique notes.
 
     Parameters
     ----------
@@ -21,27 +21,20 @@ class Chord:
         The set of notes in the chord. Can be specified as a list of midi numbers or as a list of note names.
             e.g. Chord([60, 64, 67])
             e.g. Chord(["C4", "E4", "G4"])
-
-    duration: int, default 1
-        The duration of the chord, specified in seconds.
     """
 
-    def __init__(self, notes: list = [], duration: int = 1, id: str = None):
+    def __init__(self, notes: list = [], id: str = None):
         if isinstance(notes, list) and len(notes) > 0 and isinstance(notes[0], str):
             notes = [get_midi_num_from_note(n) for n in notes]
 
-        self.init_from_midi_nums(midi_nums=notes, duration=duration, id=id)
+        self.init_from_midi_nums(midi_nums=notes, id=id)
 
-    def init_from_midi_nums(
-        self, midi_nums: MidiNumList = [], duration: int = 1, id: str = None
-    ):
+    def init_from_midi_nums(self, midi_nums: MidiNumList = [], id: str = None):
         if any([i < 0 or i > 128 for i in midi_nums]):
             raise ValueError("The valid range of midi numbers is 0 to 128")
 
         midi_nums = sorted(list(set(midi_nums)))
         self.midi_nums = midi_nums
-
-        self.duration = duration or 1
 
         chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
@@ -66,7 +59,6 @@ class Chord:
         return {
             "id": self.id,
             "midi_nums": self.midi_nums,
-            "duration": self.duration,
             "type": self.type,
             "typeId": self.typeId,
             "notes": self.notes,

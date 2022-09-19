@@ -323,7 +323,6 @@ def select_chords(
 
     # TODO: these chord properties can be consolidated
     ids = [[]] * n_chords
-    durations = [[]] * n_chords
     voicings = [[]] * n_chords
     rotations = [[]] * n_chords
 
@@ -332,7 +331,6 @@ def select_chords(
 
         for ix, chord in enumerate(existing_chords):
             ids[ix] = chord.id
-            durations[ix] = chord.duration
             voicings[ix] = chord.midi_nums
             rotations[ix] = chord.template
 
@@ -365,11 +363,8 @@ def select_chords(
 
         voicings[ix] = select_voicing(rotation, note_range_low, note_range_high)
         ids[ix] = None
-        durations[ix] = None
 
-    return [
-        Chord(id=i, notes=v, duration=d) for (i, v, d) in zip(ids, voicings, durations)
-    ]
+    return [Chord(id=i, notes=v) for (i, v) in zip(ids, voicings)]
 
 
 def shuffle_voicing(notes: list[str], note_range_low: int, note_range_high: int):
