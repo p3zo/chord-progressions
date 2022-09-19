@@ -1,4 +1,3 @@
-from chord_progressions.chord import Chord
 from chord_progressions.evaluate import get_evenness, get_interval_class_vector
 
 EXPECTATIONS = [
@@ -33,13 +32,11 @@ EXPECTATIONS = [
 
 
 def test_get_interval_class_vector():
-
     for ex in EXPECTATIONS:
-        assert get_interval_class_vector(Chord(ex["notes"])) == ex["icv"]
+        assert get_interval_class_vector(ex["notes"]) == ex["icv"]
 
 
 def test_get_evenness():
-
     tolerance = 0.01
 
     for ex in EXPECTATIONS:

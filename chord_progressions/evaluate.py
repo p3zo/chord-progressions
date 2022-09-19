@@ -18,6 +18,7 @@ from chord_progressions.pitch import (
     get_n_overtones_harmonic,
     get_pitch_class_from_note,
 )
+from chord_progressions.type_templates import get_template_from_notes
 
 # created in `create_chord_classes.py`
 # TODO: replace this table with a formula
@@ -37,7 +38,7 @@ MIN_MAX_EVENNESS_BY_CARDINALITY = [
 ]
 
 
-def get_interval_class_vector(chord):
+def get_interval_class_vector(notes):
     """
     Returns a vector of interval classes.
         0: minor second / major seventh (1 or 11 semitones)
@@ -49,7 +50,8 @@ def get_interval_class_vector(chord):
     """
     vec = [0] * 6
 
-    one_indices = [ix for ix, i in enumerate(chord.template) if i == 1]
+    template = get_template_from_notes(notes)
+    one_indices = [ix for ix, i in enumerate(template) if i == 1]
     pairs = list(itertools.combinations(one_indices, 2))
 
     intervals = [p[1] - p[0] for p in pairs]
@@ -131,7 +133,7 @@ def evaluate_notes(notes):
     metrics["num_pitches"] = len(set(notes))
     metrics["pc_cardinality"] = pc_cardinality
     metrics["interval_class_vector"] = interval_class_vector
-    metrics["ambitus"] = get_ambitus(notes)
+    # metrics["ambitus"] = get_ambitus(notes)
     # metrics["evenness"] = evenness
     # metrics["relative_evenness"] = get_relative_evenness(evenness, cardinality)
     # metrics["overtone_agreement"] = get_overtone_agreement(notes)
@@ -158,7 +160,7 @@ def get_ambitus(macroharmony):
     return max(midi_notes) - min(midi_notes)
 
 
-def evaluate_notes_list(notes_list):
+def evaluate_progression(progression):
     metrics = {}
 
     # macroharmony = get_macroharmony(notes_list)
@@ -168,12 +170,6 @@ def evaluate_notes_list(notes_list):
     # metrics["density"] = len(macroharmony) / len(notes_list)
 
     return metrics
-
-
-def evaluate_progression(progression):
-    notes_list = [chord.midi_nums for chord in progression]
-
-    return evaluate_notes_list(notes_list)
 
 
 def get_n_overtones_for_notes(notes, n):
