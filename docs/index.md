@@ -22,7 +22,7 @@ Below is an example of a progression with two chords.
         "id": "40664268-1e68-44df-b259-2ce3bb8d4b70",
         "ix": 0,
         "type": "diminished-seventh chord",
-        "duration": "1m",
+        "duration": 1.0,
         "typeId": 139,
         "notes": [
             "A4",
@@ -37,7 +37,7 @@ Below is an example of a progression with two chords.
         "id": "87bc2fbf-8299-4070-b4db-70fa29c31e9c",
         "ix": 1,
         "type": "minor-major ninth chord",
-        "duration": "1m",
+        "duration": 1.0,
         "typeId": 101,
         "notes": [
             "C4",
