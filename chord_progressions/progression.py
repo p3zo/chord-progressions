@@ -6,6 +6,23 @@ from chord_progressions.io.audio import make_audio_progression, save_audio_buffe
 from chord_progressions.io.midi import get_midi_from_progression
 from chord_progressions.solver import select_chords
 
+"""
+    Durations are specified in Tone.Time.Notation format.
+    The number represents the subdivision. "t" represents a triplet. A "." adds a half.
+    e.g. "4n" is a quarter note, "4t" is a quarter note triplet, and "4n." is a dotted quarter note.
+
+    Tone.Time docs:
+        https://github.com/Tonejs/Tone.js/wiki/Time
+
+    Full list of Tone.js subdivisions:
+        https://github.com/Tonejs/Tone.js/blob/dbed4d27fe66ee606a7309b03ac0ba4f5a2a4ecb/Tone/core/type/Units.ts#L47-L55s
+"""
+DURATIONS = ["4n", "4n.", "2n", "2n.", "1m", "2m"]
+
+
+def get_seconds_from_duration(duration, bpm):
+    return duration * (60 / bpm)
+
 
 class Progression:
     """
@@ -18,8 +35,6 @@ class Progression:
     durations: list[str], default []
         The duration of the chords, specified in Tone.Time notation.
         See constants for an explanation.
-    durations: list[float], default []
-        The duration of each chord in seconds. Defaults to 1 second per chord.
     locks: str, default None
         Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
         Defaults to all unlocked if not provided.
@@ -32,7 +47,7 @@ class Progression:
     def __init__(
         self,
         chords: list[Chord] = [],
-        durations: list[float] = [],
+        durations: list[str] = [],
         locks: str = None,
         bpm: float = DEFAULT_BPM,
         name: str = "",
@@ -46,10 +61,10 @@ class Progression:
 
         self.chords = chords
 
-        if not isinstance(durations, list) and isinstance(durations[0], float):
-            raise ValueError("Durations must be a list of floats")
+        if not isinstance(durations, list) and isinstance(durations[0], str):
+            raise ValueError("Durations must be a list of Tone.Time notation strings")
 
-        durations = durations or [1.0] * len(chords)
+        durations = durations or ["1m"] * len(chords)
 
         if not len(durations) == len(chords):
             raise ValueError("Durations must be the same length as chords")
@@ -103,7 +118,8 @@ class Progression:
         return result
 
     def to_audio(self, outpath=None, n_overtones=4):
-        audio_buffer = make_audio_progression(self.chords, self.durations, n_overtones)
+        dur_secs = [get_seconds_from_duration(d, self.bpm) for d in self.durations]
+        audio_buffer = make_audio_progression(self.chords, dur_secs, n_overtones)
 
         # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
         if outpath:
@@ -141,7 +157,7 @@ class Progression:
             **constraints,
         )
 
-        durations = self.durations + [1.0]
+        durations = self.durations + ["1m"]
 
         return Progression(chords, durations=durations)
 

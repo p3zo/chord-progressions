@@ -25,8 +25,8 @@ def test_instantiate_progression():
     for arg in valid_inputs:
         assert Progression(arg)
 
-    p = Progression(["E4", "C4"], durations=[1.0, 2.0])
-    assert p.durations == [1.0, 2.0]
+    p = Progression(["E4", "C4"], durations=["1m", "2m"])
+    assert p.durations == ["1m", "2m"]
 
 
 def test_get_new_solution():
@@ -37,8 +37,8 @@ def test_get_new_solution():
     assert p.chords[1].id != p2.chords[1].id
 
     # Durations should be preserved
-    p3 = Progression(chords=TWO_CHORDS, durations=[1.0, 2.0])
-    assert p3.get_new_solution().durations == [1.0, 2.0]
+    p3 = Progression(chords=TWO_CHORDS, durations=["1m", "2m"])
+    assert p3.get_new_solution().durations == ["1m", "2m"]
 
 
 def test_get_addition():
@@ -52,5 +52,5 @@ def test_get_addition():
     assert len(p) + 1 == len(p2)
 
     # Durations should be preserved
-    p3 = Progression(chords=TWO_CHORDS, durations=[1.0, 2.0])
-    assert p3.get_addition().durations == [1.0, 2.0, 1.0]
+    p3 = Progression(chords=TWO_CHORDS, durations=["1m", "2m"])
+    assert p3.get_addition().durations == ["1m", "2m", "1m"]
