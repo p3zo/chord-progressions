@@ -1,6 +1,10 @@
 import pytest
 from chord_progressions.chord import Chord
-from chord_progressions.progression import Progression
+from chord_progressions.progression import (
+    Progression,
+    duration_to_seconds,
+    seconds_to_duration,
+)
 
 TWO_CHORDS = [Chord(["C2", "A4", "G6"]), Chord(["C-1", "A4", "G9"])]
 
@@ -54,3 +58,19 @@ def test_get_addition():
     # Durations should be preserved
     p3 = Progression(chords=TWO_CHORDS, durations=["1m", "2m"])
     assert p3.get_addition().durations == ["1m", "2m", "1m"]
+
+
+def test_duration_to_seconds():
+    assert duration_to_seconds("4n", 120) == 0.5
+    assert duration_to_seconds("2n", 120) == 1.0
+    assert duration_to_seconds("1m", 120) == 2.0
+
+
+def test_seconds_to_duration():
+    assert seconds_to_duration(0.0001, 120) == "8n"
+    assert seconds_to_duration(0.5, 120) == "4n"
+    assert seconds_to_duration(1, 120) == "2n"
+    assert seconds_to_duration(1.5, 120) == "2n."
+    assert seconds_to_duration(2.0, 120) == "1m"
+    assert seconds_to_duration(4.0, 120) == "2m"
+    assert seconds_to_duration(100.0, 120) == "2m"

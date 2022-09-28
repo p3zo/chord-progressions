@@ -8,6 +8,8 @@ from chord_progressions.solver import select_chords
 
 """
     Durations are specified in Tone.Time.Notation format.
+    **NOT ALL TONE TIME NOTATIONS ARE SUPPORTED.**
+
     The number represents the subdivision. "t" represents a triplet. A "." adds a half.
     e.g. "4n" is a quarter note, "4t" is a quarter note triplet, and "4n." is a dotted quarter note.
 
@@ -17,11 +19,38 @@ from chord_progressions.solver import select_chords
     Full list of Tone.js subdivisions:
         https://github.com/Tonejs/Tone.js/blob/dbed4d27fe66ee606a7309b03ac0ba4f5a2a4ecb/Tone/core/type/Units.ts#L47-L55s
 """
-DURATIONS = ["4n", "4n.", "2n", "2n.", "1m", "2m"]
+DURATIONS = ["8n", "4n", "4n.", "2n", "2n.", "1m", "2m"]
+
+# The number of beats per duration
+DURATION_BEAT_MAPPING = {
+    "8n": 0.5,
+    "4n": 1,
+    "4n.": 1.5,
+    "2n": 2,
+    "2n.": 3,
+    "1m": 4,
+    "2m": 8,
+}
 
 
-def get_seconds_from_duration(duration, bpm):
-    return duration * (60 / bpm)
+def duration_to_seconds(duration, bpm):
+    """Converts Tone.Time.notation to seconds"""
+    beats = DURATION_BEAT_MAPPING[duration]
+    seconds_per_beat = 60 / bpm
+    return beats * seconds_per_beat
+
+
+def get_closest(lst, K):
+    """Returns the number from `lst` closest to a float `K`"""
+    return min(range(len(lst)), key=lambda i: abs(lst[i] - K))
+
+
+def seconds_to_duration(seconds, bpm):
+    """Converts seconds to beats and quantizes to the closest supported beat notation"""
+    beats_per_second = bpm / 60
+    beats = seconds * beats_per_second
+    ix = get_closest(list(DURATION_BEAT_MAPPING.values()), beats)
+    return list(DURATION_BEAT_MAPPING.keys())[ix]
 
 
 class Progression:
@@ -30,11 +59,11 @@ class Progression:
 
     Parameters
     ----------
-    chords: list[Chord], default []
+    chords: list[Chord] or list[list[int]], default []
         The chords in the progression.
-    durations: list[str], default []
-        The duration of the chords, specified in Tone.Time notation.
-        See constants for an explanation.
+    durations: list[str] or list[float], default []
+        The duration of the chords, specified in Tone.Time notation or in seconds.
+        Seconds will be quantized to Tone.Time units.
     locks: str, default None
         Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
         Defaults to all unlocked if not provided.
@@ -55,25 +84,30 @@ class Progression:
         if not isinstance(chords, list):
             raise ValueError("Chords must be a list")
 
-        # If chords are passed as a midi_nums_list, convert them to Chords
+        # If chords are passed as a midi_nums_list (list[list[int]]), convert them to Chords
         if isinstance(chords, list) and len(chords) > 0 and isinstance(chords[0], list):
             chords = [Chord(c) for c in chords]
 
-        self.chords = chords
+        if not isinstance(durations, list):
+            raise ValueError("Durations must be a list")
 
-        if not isinstance(durations, list) and isinstance(durations[0], str):
-            raise ValueError("Durations must be a list of Tone.Time notation strings")
-
-        durations = durations or ["1m"] * len(chords)
+        if len(durations) == 0:
+            durations = ["1m"] * len(chords)
+        elif isinstance(durations[0], str):
+            pass
+        elif isinstance(durations[0], int) or isinstance(durations[0], float):
+            durations = [seconds_to_duration(d, bpm) for d in durations]
+        else:
+            raise ValueError("Durations must be Tone.Time notation strings or seconds.")
 
         if not len(durations) == len(chords):
-            raise ValueError("Durations must be the same length as chords")
+            raise ValueError("Durations must be the same length as chords.")
 
+        self.chords = chords
         self.durations = durations
-
-        self.locks = locks or "0" * len(chords)
         self.bpm = bpm
         self.name = name
+        self.locks = locks or "0" * len(chords)
         self.metrics = {}  # TODO: add metrics
 
     def __iter__(self):
@@ -118,7 +152,7 @@ class Progression:
         return result
 
     def to_audio(self, outpath=None, n_overtones=4):
-        dur_secs = [get_seconds_from_duration(d, self.bpm) for d in self.durations]
+        dur_secs = [duration_to_seconds(d, self.bpm) for d in self.durations]
         audio_buffer = make_audio_progression(self.chords, dur_secs, n_overtones)
 
         # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
