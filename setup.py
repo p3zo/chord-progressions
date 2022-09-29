@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-__version__ = "0.28.0"
+__version__ = "0.29.0"
 
 dev_requires = ["black", "flake8", "ipdb", "ipython", "isort", "bumpversion"]
 
