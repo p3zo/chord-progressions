@@ -144,9 +144,12 @@ def get_notes_from_template_range(pitches, range_start_note):
     return [n for n in notes if n]
 
 
-def select_voicing(rotation, note_range_low, note_range_high):
+def select_voicing(rotation, note_range_low=48, note_range_high=84):
     """
     Places a set of pitch classes into pitch space.
+
+    Takes a rotation of a template and returns a list of midi nums.
+    Defaults to the range C3 to C6.
 
     NOTE: this does not randomize the template
     TODO: fix this?

@@ -372,7 +372,7 @@ def create_notes_freqs_table():
     return notes
 
 
-def get_note_list(note_range_low, note_range_high):
+def get_note_list(note_range_low=0, note_range_high=127):
 
     start_ix = note_range_low
     end_ix = note_range_high
