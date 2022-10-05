@@ -34,7 +34,7 @@ class Chord:
             raise ValueError("The valid range of midi numbers is 0 to 128")
 
         midi_nums = sorted(list(set(midi_nums)))
-        self.midi_nums = midi_nums
+        self.midi_nums = [int(i) for i in midi_nums]
 
         chord_type = get_type_from_midi_nums(midi_nums)
         self.type = chord_type
