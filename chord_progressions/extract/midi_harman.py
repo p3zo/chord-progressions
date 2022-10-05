@@ -476,12 +476,7 @@ def write_labels(labels, inpath, outpath, arrangement_id=None):
         arrangement_id = os.path.splitext(os.path.basename(inpath))[0]
 
     df = pd.DataFrame(labels)
-
-    df[[f"icv{i}" for i in range(6)]] = pd.DataFrame(
-        df.interval_class_vector.tolist(), index=df.index
-    )
     df["arrangement_id"] = arrangement_id
-
     df.to_csv(outpath, sep="\t", index=False)
 
     # js_outpath = outpath.replace("csv", "json")
