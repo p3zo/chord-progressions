@@ -14,11 +14,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 from chord_progressions import logger
-from chord_progressions.chord import (
-    Chord,
-    get_template_from_template_str,
-    get_type_num_from_type,
-)
+from chord_progressions.chord import Chord
 from chord_progressions.extract import (
     DEFAULT_QUANTIZE_BEAT,
     DEFAULT_SHORTEST_NOTE,
@@ -32,7 +28,11 @@ from chord_progressions.pitch import (
 )
 from chord_progressions.progression import Progression
 from chord_progressions.solver import get_all_rotations_of_template
-from chord_progressions.type_templates import TYPE_TEMPLATES
+from chord_progressions.type_templates import (
+    TYPE_TEMPLATES,
+    get_template_from_template_str,
+    get_type_num_from_type,
+)
 
 # We pre-calculate all the templates we want to use as labels
 # TEMPLATE_LABELS will be {chord_type_id: (rotations, one_indices)}

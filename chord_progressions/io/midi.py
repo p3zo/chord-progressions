@@ -21,6 +21,7 @@ def load_midi_file(filepath):
 
 def get_midi_from_progression(
     chords,
+    durations_seconds,
     bpm=DEFAULT_BPM,
     name="",
     ticks_per_beat=DEFAULT_MIDI_TICKS_PER_BEAT,
@@ -37,8 +38,8 @@ def get_midi_from_progression(
     track.append(mido.MetaMessage(type="set_tempo", tempo=midi_tempo))
 
     # write the chord progression
-    for chord in chords:
-        tick_duration = get_midi_ticks_from_seconds(chord.duration, bpm, ticks_per_beat)
+    for chord, duration in zip(chords, durations_seconds):
+        tick_duration = get_midi_ticks_from_seconds(duration, bpm, ticks_per_beat)
         chord = make_midi_chord(chord, tick_duration)
 
         for msg in chord:

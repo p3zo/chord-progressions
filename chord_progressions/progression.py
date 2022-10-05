@@ -161,7 +161,8 @@ class Progression:
             logger.info(f"Audio saved to {outpath}")
 
     def to_midi(self, outpath=None):
-        mid = get_midi_from_progression(self.chords, self.bpm, self.name)
+        dur_secs = [duration_to_seconds(d, self.bpm) for d in self.durations]
+        mid = get_midi_from_progression(self.chords, dur_secs, self.bpm, self.name)
         if outpath:
             mid.filename = outpath
             mid.save(outpath)
