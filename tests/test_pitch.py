@@ -6,6 +6,7 @@ from chord_progressions.pitch import (
     get_freq_from_note,
     get_midi_num_from_note,
     get_midi_nums_list_from_midi_nums_str,
+    get_n_overtones_harmonic,
     get_note_from_midi_num,
     get_note_list,
     get_note_name_from_note,
@@ -113,3 +114,7 @@ def test_get_midi_nums_list_from_midi_nums_str():
             get_midi_nums_list_from_midi_nums_str(ex["midi_nums_str"])
             == ex["midi_nums_list"]
         )
+
+
+def test_get_n_overtones_harmonic():
+    assert get_n_overtones_harmonic(440, 4) == [440, 880, 1320, 1760, 2200]

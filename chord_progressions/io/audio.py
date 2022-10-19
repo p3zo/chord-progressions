@@ -6,9 +6,9 @@ from scipy.io import wavfile
 SAMPLE_RATE = 44100
 
 
-def mk_sin(freq, duration, a):
+def mk_sin(freq, duration, amp):
     s = [
-        a * np.sin(n * 2 * np.pi * freq / SAMPLE_RATE)
+        amp * np.sin(n * 2 * np.pi * freq / SAMPLE_RATE)
         for n in range(int(duration * SAMPLE_RATE))
     ]
     return np.array(s).reshape(-1, 1)

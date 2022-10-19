@@ -151,8 +151,11 @@ class Progression:
 
         return result
 
+    def get_durations_in_seconds(self):
+        return [duration_to_seconds(d, self.bpm) for d in self.durations]
+
     def to_audio(self, outpath=None, n_overtones=4):
-        dur_secs = [duration_to_seconds(d, self.bpm) for d in self.durations]
+        dur_secs = self.get_durations_in_seconds()
         audio_buffer = make_audio_progression(self.chords, dur_secs, n_overtones)
 
         # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
@@ -161,8 +164,7 @@ class Progression:
             logger.info(f"Audio saved to {outpath}")
 
     def to_midi(self, outpath=None):
-        dur_secs = [duration_to_seconds(d, self.bpm) for d in self.durations]
-        mid = get_midi_from_progression(self.chords, dur_secs, self.bpm, self.name)
+        mid = get_midi_from_progression(self)
         if outpath:
             mid.filename = outpath
             mid.save(outpath)

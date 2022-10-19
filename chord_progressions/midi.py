@@ -1,9 +1,8 @@
 import mido
 from chord_progressions import DEFAULT_MIDI_TICKS_PER_BEAT
-from chord_progressions.chord import Chord
 
 
-def make_midi_chord(chord: Chord, end_tick: int):
+def make_midi_chord(chord, end_tick: int):
     note_onsets = []
     note_offsets = []
 

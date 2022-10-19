@@ -1,6 +1,9 @@
 from uuid import uuid4
 
+from chord_progressions import logger
 from chord_progressions.evaluate import evaluate_notes
+from chord_progressions.io.audio import mk_chord_buffer, save_audio_buffer
+from chord_progressions.io.midi import get_midi_from_chord
 from chord_progressions.pitch import get_midi_num_from_note, get_note_from_midi_num
 from chord_progressions.type_templates import (
     get_template_from_notes,
@@ -64,3 +67,18 @@ class Chord:
             "notes": self.notes,
             "metrics": self.metrics,
         }
+
+    def to_audio(self, outpath=None, n_overtones=4):
+        audio_buffer = mk_chord_buffer(self.notes, 1, n_overtones)
+
+        # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
+        if outpath:
+            save_audio_buffer(audio_buffer, outpath)
+            logger.info(f"Audio saved to {outpath}")
+
+    def to_midi(self, outpath=None):
+        mid = get_midi_from_chord(self.chords, 1, 120, "-".join(self.notes))
+        if outpath:
+            mid.filename = outpath
+            mid.save(outpath)
+            logger.info(f"Midi saved to {outpath}")
