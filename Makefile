@@ -4,36 +4,19 @@ define run_docker_cmd
 		"$(1)"
 endef
 
-.PHONY: build clean dev format generate shell stop test
+.PHONY: build start shell stop test
 
 build:
-	@echo "Building image:"
 	docker compose build
 
-clean:
-	@echo "Cleaning up artifacts:"
-	rm -rf dist
-
-dev:
-	@echo "Starting container(s) in dev mode:"
+start:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
-format:
-	@echo "Formatting:"
-	$(call run_docker_cmd,isort chord_progressions tests && black chord_progressions tests)
-
-generate: dev
-	@echo "Generating a progression locally:"
-	docker compose exec app ./run.sh
-
-shell: dev
-	@echo "Getting a shell inside the container:"
+shell: start
 	docker compose exec app bash
 
 stop:
-	@echo "Bringing Docker down:"
 	docker compose down
 
 test:
-	@echo "Running tests:"
 	$(call run_docker_cmd,pytest)

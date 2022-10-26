@@ -17,7 +17,7 @@ setup(
         ]
     ),
     package_data={},
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     install_requires=[
         "matplotlib==3.5.1",
         "mido==1.2.10",
