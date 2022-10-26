@@ -69,16 +69,20 @@ class Chord:
         }
 
     def to_audio(self, outpath=None, n_overtones=4):
-        audio_buffer = mk_chord_buffer(self.notes, 1, n_overtones)
+        audio = mk_chord_buffer(self.notes, 1, n_overtones)
 
-        # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
         if outpath:
-            save_audio_buffer(audio_buffer, outpath)
+            save_audio_buffer(audio, outpath)
             logger.info(f"Audio saved to {outpath}")
+        else:
+            return audio
 
     def to_midi(self, outpath=None):
         mid = get_midi_from_chord(self.chords, 1, 120, "-".join(self.notes))
+
         if outpath:
             mid.filename = outpath
             mid.save(outpath)
             logger.info(f"Midi saved to {outpath}")
+        else:
+            return mid
