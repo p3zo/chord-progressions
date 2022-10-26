@@ -23,7 +23,7 @@ progression = extract_progression_from_audio('my_file.wav')
 ## Eventual interface
 
 ```python
-import chordico
-progression = chordico.Progression.from_audio('my_file.wav')
-progression = chordico.Progression.from_midi('my_file.mid')
+import chord_progressions
+progression = chord_progressions.Progression.from_audio('my_file.wav')
+progression = chord_progressions.Progression.from_midi('my_file.mid')
 ```

@@ -18,18 +18,9 @@ Analysis
 - [feature] get functional names for chords given key
 - [feature] extend interval class vectors to "polychord content" vectors
 
-Generation
-
-- [feature] VAE solver
-- [feature] output variable chord durations from solver
-- [feature] consider lower and upper structures in select_voicing
-- [feature] add the possibility of repeated notes in different octaves
-
 I/O
 
-- [feature] allow Progressions to be initialized `from_audio` and `from_midi` via extraction from a filepath
-- [feature] mk progressions from extracted harman labels
-- [feature] `io.midi.get_midi_from_progression` needs an `offset` param for when the first chord isn't at 0
+- [feature] add `from_audio` and `from_midi` constructors to Progression class
 - [maintainability] use a singular method of counting in `extract_harman.py`
     - `get_segment_label` uses counter
     - `get_segment_pc_weights` uses defaultdict
@@ -37,11 +28,19 @@ I/O
 - [performance] `extract.midi_harman.segment_and_label()` gets really slow for many consecutive segments. test that a
   maximum of six segment evaluations occur per note
 
+Generation
+
+- [feature] VAE solver
+- [feature] use variable chord durations
+- [feature] consider lower and upper structures in select_voicing
+- [feature] add the possibility of repeated notes in different octaves
+
 Misc
 
+- [feature] Host docs site
 - [feature] Generalize `noteNumberToFrequency` to use any periodic
-  tuning https://github.com/soul-lang/SOUL/pull/26/files
+  tuning (see https://github.com/soul-lang/SOUL/pull/26/files)
 - [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
 - [maintainability] mk `pitch_class` refer to "C" and call 0 `pitch_class_ix`
-- [maintainability] break out the merging of chord types into a function and test it
 - [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
+- [maintainability] test the merging of chord types
