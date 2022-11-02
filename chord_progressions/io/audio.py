@@ -14,11 +14,8 @@ def mk_sin(freq, duration, amp):
     return np.array(s).reshape(-1, 1)
 
 
-def mk_note_buffer(note, duration, n_overtones):
-
-    fundamental = get_freq_from_note(note)
-
-    freqs = get_n_overtones_harmonic(fundamental, n_overtones)
+def mk_freq_buffer(freq, duration, n_overtones):
+    freqs = get_n_overtones_harmonic(freq, n_overtones)
 
     # make each overtone progressively quieter
     sins = [mk_sin(f, duration, 1 / 2**i) for i, f in enumerate(freqs)]
@@ -31,22 +28,27 @@ def mk_note_buffer(note, duration, n_overtones):
     return sum(normed_sins)
 
 
-def combine_note_buffers(note_buffers):
+def mk_note_buffer(note, duration, n_overtones):
 
-    stacked = np.hstack(note_buffers)
+    freq = get_freq_from_note(note)
 
-    normed = stacked / len(note_buffers)
+    return mk_freq_buffer(freq, duration, n_overtones)
+
+
+def combine_buffers(buffers):
+    stacked = np.hstack(buffers)
+
+    normed = stacked / len(buffers)
 
     return np.sum(normed, axis=1).astype("float32")
 
 
 def mk_chord_buffer(chord, duration, n_overtones):
-
     logger.info(f"Generating {duration} second buffer for chord: {chord}")
 
     note_buffers = [mk_note_buffer(note, duration, n_overtones) for note in chord]
 
-    return combine_note_buffers(note_buffers)
+    return combine_buffers(note_buffers)
 
 
 def mk_arpeggiated_chord_buffer(chord, duration, seqs, n_overtones):
@@ -58,8 +60,6 @@ def mk_arpeggiated_chord_buffer(chord, duration, seqs, n_overtones):
     bufs = []
 
     for note, seq in zip(chord, selected_seqs):
-
-        # TODO: ideally this would be saved to the logfile
         logger.info(f"  {note} got rhythm {''.join(map(str, seq))}")
 
         pos_dur = duration / len(seq)
