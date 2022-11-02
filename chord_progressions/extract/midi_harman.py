@@ -15,11 +15,6 @@ import numpy as np
 import pandas as pd
 from chord_progressions import logger
 from chord_progressions.chord import Chord
-from chord_progressions.extract import (
-    DEFAULT_QUANTIZE_BEAT,
-    DEFAULT_SHORTEST_NOTE,
-    DEFAULT_SMOOTH_BEAT,
-)
 from chord_progressions.extract.midi import simplify_harmony
 from chord_progressions.io.midi import load_midi_file
 from chord_progressions.pitch import (
@@ -489,9 +484,9 @@ def write_labels(labels, inpath, outpath, arrangement_id=None):
 
 def extract_progression_from_midi(
     filepath,
-    shortest_note=DEFAULT_SHORTEST_NOTE,
-    smooth_beat=DEFAULT_SMOOTH_BEAT,
-    quantize_beat=DEFAULT_QUANTIZE_BEAT,
+    shortest_note=None,
+    smooth_beat=None,
+    quantize_beat=None,
     simplified_path=None,
     harman_labels_path=None,
 ):
@@ -511,7 +506,12 @@ def extract_progression_from_midi(
 
     midi = load_midi_file(filepath)
 
-    simplified = simplify_harmony(filepath, shortest_note, smooth_beat, quantize_beat)
+    simplified = simplify_harmony(
+        filepath,
+        shortest_note=shortest_note,
+        smooth_beat=smooth_beat,
+        quantize_beat=quantize_beat,
+    )
 
     if simplified_path:
         simplified.write(simplified_path)

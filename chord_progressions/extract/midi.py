@@ -5,12 +5,12 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import pretty_midi
-from chord_progressions.extract import (
-    DEFAULT_QUANTIZE_BEAT,
-    DEFAULT_SHORTEST_NOTE,
-    DEFAULT_SMOOTH_BEAT,
-)
 from chord_progressions.io.midi import load_midi_file
+
+# note values, e.g. 1/4 = quarter note, 1/64 = 64th note
+DEFAULT_SHORTEST_NOTE = 1 / 64
+DEFAULT_SMOOTH_BEAT = 1
+DEFAULT_QUANTIZE_BEAT = 1 / 2
 
 
 def parse_notes(pmid):
@@ -112,9 +112,9 @@ def mk_midi_from_notes(notes):
 
 def simplify_harmony(
     filepath,
-    shortest_note=DEFAULT_SHORTEST_NOTE,
-    smooth_beat=DEFAULT_SMOOTH_BEAT,
-    quantize_beat=DEFAULT_QUANTIZE_BEAT,
+    shortest_note,
+    smooth_beat,
+    quantize_beat,
 ):
     """Simplify midi to its essential harmonic content"""
 
@@ -136,6 +136,10 @@ def simplify_harmony(
     # TODO: calculate note durations based on time signature
     bpm = tempos[1][0]
     whole_note_dur = 60 / bpm * 4  # seconds
+
+    shortest_note = shortest_note or DEFAULT_SHORTEST_NOTE
+    smooth_beat = smooth_beat or DEFAULT_SMOOTH_BEAT
+    quantize_beat = quantize_beat or DEFAULT_QUANTIZE_BEAT
 
     # convert durations to seconds
     shortest_dur = whole_note_dur * shortest_note

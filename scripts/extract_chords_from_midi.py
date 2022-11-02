@@ -1,25 +1,10 @@
+"""Reads a midi file, extracts chord progressions, writes a new midi file"""
+
 import argparse
 import os
 
 from chord_progressions.extract.midi_harman import extract_progression_from_midi
 
-try:
-    THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-except:
-    THIS_DIR = os.getcwd()
-
-OUTPUT_DIR = os.path.join(THIS_DIR, "../assets/output")
-
-if not os.path.isdir(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-
-# note values, e.g. 1/4 = quarter note, 1/64 = 64th note
-# TODO: parse these from args
-SHORTEST_NOTE = 1 / 64
-SMOOTH_BEAT = 1
-QUANTIZE_BEAT = 1 / 2
-
-SAMPLE_FILEPATH = "../assets/midi/Sakamoto_MerryChristmasMrLawrence.mid"
 
 if __name__ == "__main__":
 
@@ -27,8 +12,31 @@ if __name__ == "__main__":
     parser.add_argument(
         "--filepath",
         type=str,
-        default=SAMPLE_FILEPATH,
         help="Path to a midi file",
+    )
+    parser.add_argument(
+        "--outdir",
+        type=str,
+        help="Directory in which to write the results",
+        default=".",
+    )
+    parser.add_argument(
+        "--shortest_note",
+        type=float,
+        help="Notes shorter than this duration will be filtered out. Use note values, e.g. 1/64 = 64th note.",
+        default=1 / 64,
+    )
+    parser.add_argument(
+        "--smooth_beat",
+        type=float,
+        help="",
+        default=1,
+    )
+    parser.add_argument(
+        "--quantize_beat",
+        type=float,
+        help="Note duration to quantize to.",
+        default=1 / 2,
     )
     parser.add_argument(
         "--sonify",
@@ -37,21 +45,28 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    filepath = args.filepath
+    outdir = args.outdir
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
 
-    track_name = os.path.splitext(os.path.basename(filepath))[0]
+    inpath = args.filepath
 
-    simplified_path = os.path.join(OUTPUT_DIR, f"chords-{track_name}.mid")
-    harman_labels_path = os.path.join(OUTPUT_DIR, f"harman-labels_{track_name}.csv")
+    track_name = os.path.splitext(os.path.basename(inpath))[0]
+
+    simplified_path = os.path.join(outdir, f"chords-{track_name}.mid")
+    harman_labels_path = os.path.join(outdir, f"harman-labels_{track_name}.csv")
     progression = extract_progression_from_midi(
-        filepath, simplified_path=simplified_path, harman_labels_path=harman_labels_path
+        inpath,
+        shortest_note=args.shortest_note,
+        smooth_beat=args.smooth_beat,
+        quantize_beat=args.quantize_beat,
+        simplified_path=simplified_path,
+        harman_labels_path=harman_labels_path,
     )
 
-    midi_progression_path = os.path.join(OUTPUT_DIR, f"harman-chords_{track_name}.mid")
+    midi_progression_path = os.path.join(outdir, f"harman-chords_{track_name}.mid")
     progression.to_midi(outpath=midi_progression_path)
 
     if args.sonify:
-        audio_progression_path = os.path.join(
-            OUTPUT_DIR, f"harman-chords_{track_name}.wav"
-        )
+        audio_progression_path = os.path.join(outdir, f"harman-chords_{track_name}.wav")
         progression.to_audio(outpath=audio_progression_path)
