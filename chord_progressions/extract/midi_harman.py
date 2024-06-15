@@ -59,10 +59,7 @@ for template_name, template_str in TYPE_TEMPLATES.items():
 
 
 class PartitionPoint:
-    """
-    A partition point occurs where the set of notes currently sounding changes
-    by the onset or offset of one or more notes.
-    """
+    """A partition point occurs where the set of sounding notes changes by the onset or offset of one or more notes."""
 
     def __init__(self, start):
         self.time = start
@@ -84,9 +81,7 @@ class PartitionPoint:
 
 
 class MinimalSegment:
-    """
-    A minimal segment is the interval between two sequential partition points.
-    """
+    """A minimal segment is the interval between two sequential partition points."""
 
     def __init__(self):
         self.start = 0  # seconds
@@ -127,7 +122,7 @@ class MinimalSegment:
 
 
 def parse_events(pmid):
-    """Parses a pretty_midi object into a 2D array with (time, note, is_onset) columns."""
+    """Parses a PrettyMIDI object into a 2D array with (time, note, is_onset) columns."""
 
     points = []
 
@@ -147,9 +142,7 @@ def parse_events(pmid):
 
 
 def get_partition_points(events):
-    """
-    Returns the partition points for a set of events, ordered by time.
-    """
+    """Returns the partition points for a set of events, ordered by time."""
 
     p_all = []
 
@@ -199,8 +192,7 @@ def get_segment_pc_weights(segment):
 
 
 def get_template_score(pc_weights, template, oix):
-    """
-    Scores a weighted set of pitch classes against a single template.
+    """Scores a weighted set of pitch classes against a single template.
 
     Uses the algorithm defined in Pardo 2002 Fig 4.
 
@@ -223,15 +215,14 @@ def get_template_score(pc_weights, template, oix):
         else:
             N += weight
 
-    for el in set(oix) - set(pc_weights):
+    for _ in set(oix) - set(pc_weights):
         M += 1
 
     return P - (M + N)
 
 
 def get_template_scores(pc_weights):
-    """
-    Scores a weighted set of pitch classes against all template labels.
+    """Scores a weighted set of pitch classes against all template labels.
 
     Returns a dict of {label: score}
     """
@@ -258,9 +249,7 @@ def get_template_scores(pc_weights):
 
 
 def get_minimal_segments(p_all):
-    """
-    Returns the minimal segments for a set of partition points, ordered by time.
-    """
+    """Returns the minimal segments for a set of partition points, ordered by time."""
 
     s_m = []
 
@@ -298,8 +287,7 @@ def get_minimal_segments(p_all):
 
 
 def get_segment_label(segment):
-    """
-    Aggregates the template scores of all minimal segments within a segment and returns the best label.
+    """Aggregates the template scores of all minimal segments within a segment and returns the best label.
 
     See Figure 3 in Pardo 2002
     """

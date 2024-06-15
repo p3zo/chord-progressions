@@ -1,10 +1,10 @@
 # Introduction
 
-Chord Progressions is a Python library with tools to help extract, analyze, and generate chord progressions.
+Chord Progressions is a Python library with tools to extract, analyze, and generate chord progressions.
 
 This library defines a chord as a set of two or more notes, and a chord progression as an ordered sequence of chords
 with specified durations. Various theories of music have more specific definitions of these concepts. This library
-imposes few constraints in order to be useful for many musical contexts.
+imposes few constraints in order to be useful in many musical contexts.
 
 ## Installation
 
@@ -13,6 +13,11 @@ imposes few constraints in order to be useful for many musical contexts.
 ## Progressions
 
 The core class of this library is the `Progression`.
+
+```python
+from chord_progressions.progression import Progression
+Progression()
+```
 
 Below is an example of a progression with two chords.
 
@@ -51,3 +56,14 @@ Below is an example of a progression with two chords.
     }
 ]
 ```
+
+### Attributes
+
+    id
+    ix
+    type
+    duration
+    typeId
+    notes
+    locked
+    metrics

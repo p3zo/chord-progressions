@@ -44,7 +44,7 @@ def combine_buffers(buffers):
 
 
 def mk_chord_buffer(chord, duration, n_overtones):
-    logger.info(f"Generating {duration} second buffer for chord: {chord}")
+    logger.debug(f"Generating {duration} second buffer for chord: {chord}")
 
     note_buffers = [mk_note_buffer(note, duration, n_overtones) for note in chord]
 
@@ -53,14 +53,14 @@ def mk_chord_buffer(chord, duration, n_overtones):
 
 def mk_arpeggiated_chord_buffer(chord, duration, seqs, n_overtones):
 
-    logger.info(f"Generating {duration} second arpeggiated buffer for chord: {chord}")
+    logger.debug(f"Generating {duration} second arpeggiated buffer for chord: {chord}")
 
     selected_seqs = [seqs[np.random.randint(len(seqs))] for i in range(len(chord))]
 
     bufs = []
 
     for note, seq in zip(chord, selected_seqs):
-        logger.info(f"  {note} got rhythm {''.join(map(str, seq))}")
+        logger.debug(f"  {note} got rhythm {''.join(map(str, seq))}")
 
         pos_dur = duration / len(seq)
 

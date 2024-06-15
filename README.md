@@ -34,6 +34,7 @@ Generation
 - [feature] use variable chord durations
 - [feature] consider lower and upper structures in select_voicing
 - [feature] add the possibility of repeated notes in different octaves
+- [feature] ability to constrain key
 
 Misc
 
