@@ -282,7 +282,7 @@ def choose_template_with_constraints(
 
         if len(allowed_types) == 0:
             logger.warning("No chord types meet constraints.")
-            return None, None
+            return "", ""
 
         template, template_type = choose_random_template(allowed_types)
 
@@ -333,9 +333,10 @@ def select_chords(
         logger.debug(f"{existing_chords=}")
 
         for ix, chord in enumerate(existing_chords):
-            ids[ix] = chord.id
-            voicings[ix] = chord.midi_nums
-            rotations[ix] = chord.template
+            if chord.midi_nums:
+                ids[ix] = chord.id
+                voicings[ix] = chord.midi_nums
+                rotations[ix] = chord.template
 
     for ix in open_ixs:
         prev_rotation = rotations[ix - 1] if ix > 0 else None
@@ -352,18 +353,16 @@ def select_chords(
             next_rotation,
         )
 
-        surrounding_rotations = [prev_rotation, next_rotation]
+        surrounding_rotations = (prev_rotation, next_rotation)
 
         possible_rotations = get_possible_rotations(
             template, surrounding_rotations, pct_notes_common
         )
 
-        if not possible_rotations:
-            logger.warning("NO POSSIBLE ROTATIONS")
+        if possible_rotations:
+            rotation = possible_rotations[np.random.randint(len(possible_rotations))]
 
-        rotation = possible_rotations[np.random.randint(len(possible_rotations))]
         rotations[ix] = rotation
-
         voicings[ix] = select_voicing(rotation, note_range_low, note_range_high)
         ids[ix] = None
 

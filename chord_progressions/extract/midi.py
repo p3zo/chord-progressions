@@ -12,6 +12,23 @@ from chord_progressions.extract import (
 )
 from chord_progressions.io.midi import load_midi_file
 
+def determine_key_from_file(midi):
+    # TODO integrate this into lib
+    """import music21
+
+    filename = 'filename.mid'
+
+    s = music21.converter.parse(filename)
+
+    kd1 = music21.analysis.discrete.KrumhanslSchmuckler()
+    kd2 = music21.analysis.discrete.TemperleyKostkaPayne()
+    kd3 = music21.analysis.discrete.BellmanBudge()
+
+    key1 = kd1.getSolution(s).name
+    key2 = kd2.getSolution(s).name
+    key3 = kd3.getSolution(s).name
+
+    print(f"KrumhanslSchmuckler: {key1}\nTemperleyKostkaPayne: {key2}\nBellmanBudge: {key3}")"""
 
 def parse_notes(pmid):
     """Parses a pretty_midi object into a 2D array with (start, end, note) columns."""
@@ -110,15 +127,23 @@ def mk_midi_from_notes(notes):
     return midi
 
 
-def simplify_harmony(
+def simplify_harmony_from_file(
     filepath,
     shortest_note=DEFAULT_SHORTEST_NOTE,
     smooth_beat=DEFAULT_SMOOTH_BEAT,
     quantize_beat=DEFAULT_QUANTIZE_BEAT,
 ):
-    """Simplify midi to its essential harmonic content"""
-
     midi = load_midi_file(filepath)
+    return simplify_harmony(midi, shortest_note, smooth_beat, quantize_beat)
+
+
+def simplify_harmony(
+    midi,
+    shortest_note=DEFAULT_SHORTEST_NOTE,
+    smooth_beat=DEFAULT_SMOOTH_BEAT,
+    quantize_beat=DEFAULT_QUANTIZE_BEAT,
+):
+    """Simplify midi to its essential harmonic content"""
 
     notes = parse_notes(midi)
 

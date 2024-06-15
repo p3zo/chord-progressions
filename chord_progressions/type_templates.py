@@ -6,7 +6,31 @@ from chord_progressions.pitch import (
 )
 from chord_progressions.utils import is_circular_match
 
-# from http://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
+"""
+From http://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
+
+Further readings:
+
+Forte, Allen. The Structure of Atonal Music. New Haven: Yale, 1973
+
+Solomon, Larry. "The List of Chords, Their Properties, and Uses", Interface, Journal of New Music Research, Vol. 11 (1982)
+
+Strauss, Joseph N. Post-Tonal Theory, Prentice-Hall, 1990.
+
+Ideally we'd like to reduce this to a smaller set, say by remapping.
+I wonder if there is a perceptual study that can be done for this.
+
+remap = {
+ 'minor-ninth chord': 'minor-seventh chord',
+ 'major-ninth chord': 'major-seventh chord',
+ 'diminished chord': 'tritone',
+ 'dominant-ninth,major-minor|prometheus pentamirror': 'tritone',
+ 'italian sixth|incomplete dominant-seventh chord 1': 'tritone',
+ 'dominanth-11th|natural / genuine / lydian hexachord': 'tritone',
+ 'pyramid': 'tritone',
+}
+"""
+
 TYPE_TEMPLATES = {
     "": "",
     "unison": "100000000000",
@@ -163,7 +187,7 @@ TYPE_TEMPLATES = {
     "dorian hexachord": "101101010100",
     "guidon / arezzo / natural / genuine / persian hexachord|quartal hexamirror": "101011010100",
     "messiaen's truncated 2|minor-bitonal hexachord": "110100110100",
-    "dominanth-11th|natural / genuine / lydian hexachord": "101010110100",
+    "dominant-11th|natural / genuine / lydian hexachord": "101010110100",
     "gypsy|moravian pistalkova (whistle)|alternating heptachord 1": "110110110100",
     "blues octatonic 1": "111110110100",
     "indian|chromatic inverse": "111001110100",
@@ -223,6 +247,16 @@ def get_template_from_midi_nums(midi_nums):
 def get_template_from_template_str(template_str):
     """e.g. "101010101010" -> [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]"""
     return [int(i) for i in list(template_str)]
+
+
+def get_type_from_template(template):
+    for chord_type in list(TYPE_TEMPLATES):
+        if is_circular_match(
+            template,
+            get_template_from_template_str(TYPE_TEMPLATES[chord_type]),
+        ):
+            return chord_type
+    return None
 
 
 def get_type_from_type_num(num):
