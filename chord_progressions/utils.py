@@ -56,7 +56,6 @@ def is_circular_match(list_1, list_2):
 
 
 def get_random_word():
-
     with open(WORDS_FILEPATH) as words_file:
         words = words_file.read().split()
 

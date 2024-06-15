@@ -6,7 +6,7 @@ import csv
 import os
 
 import numpy as np
-from chord_progressions import META_OUTPUT_DIR, MIDI_OUTPUT_DIR, WAV_OUTPUT_DIR, logger
+from chord_progressions import OUTPUT_DIR, logger
 from chord_progressions.progression import Progression
 from chord_progressions.solver import select_chords
 from chord_progressions.utils import get_run_id, round_to_base
@@ -74,14 +74,14 @@ def generate_progression(
 
     progression = Progression(chords, durations, name=run_id)
 
-    audio_progression_path = os.path.join(WAV_OUTPUT_DIR, f"{run_id}.wav")
+    audio_progression_path = os.path.join(OUTPUT_DIR, f"{run_id}.wav")
     progression.to_audio(outpath=audio_progression_path)
 
-    midi_progression_path = os.path.join(MIDI_OUTPUT_DIR, f"{run_id}.mid")
+    midi_progression_path = os.path.join(OUTPUT_DIR, f"{run_id}.mid")
     progression.to_midi(outpath=midi_progression_path)
 
     # metadata
-    meta_filepath = os.path.join(META_OUTPUT_DIR, f"{run_id}.csv")
+    meta_filepath = os.path.join(OUTPUT_DIR, f"{run_id}.csv")
 
     with open(meta_filepath, "w") as fh:
         writer = csv.writer(fh, delimiter="\t")
