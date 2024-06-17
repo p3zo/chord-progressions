@@ -1,21 +1,42 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "chord-progressions"
-version = "0.33.0"
+dynamic = ["version"]
+description = "A Python package for extracting, analyzing, and generating chord progressions "
+readme = "README.md"
+license = { file = "LICENSE" }
 authors = [
     { name = "p3zo", email = "p3zo@users.noreply.github.com" },
 ]
-description = "A Python package for extracting, analyzing, and generating chord progressions "
-readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
 ]
+dependencies = [
+    "matplotlib~=3.5.1",
+    "mido~=1.2.10",
+    "networkx~=2.8",
+    "numpy~=1.22.3",
+    "pandas~=1.4.2",
+    "pretty_midi~=0.2.10",
+    "scipy~=1.8.0",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.setuptools.dynamic]
+version = {attr = "chord_progressions.__version__"}
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "black", "flake8", "ipdb", "ipython", "isort", "bumpversion", "mkdocs-material"]
+test = ["pytest", "pytest-cov"]
 
 [project.urls]
 Homepage = "https://github.com/p3zo/chord-progressions"
