@@ -1,6 +1,14 @@
 # Chord progressions
 
-`chord-progressions` is a provides utility functions for extracting, analyzing, and generating chord progressions.
+`chord-progressions` provides utility functions for extracting, analyzing, and generating chord progressions.
+
+It can be installed from PyPI:
+
+```
+pip install chord-progressions
+```
+
+See documentation at https://p3zo.github.io/chord-progressions/.
 
 ## Development
 
