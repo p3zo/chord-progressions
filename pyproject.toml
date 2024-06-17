@@ -1,3 +1,22 @@
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "chord-progressions"
+version = "0.33.0"
+authors = [
+    { name = "p3zo", email = "p3zo@users.noreply.github.com" },
+]
+description = "A Python package for extracting, analyzing, and generating chord progressions "
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/p3zo/chord-progressions"
+Issues = "https://github.com/p3zo/chord-progressions/issues"
