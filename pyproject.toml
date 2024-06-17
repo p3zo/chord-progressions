@@ -28,8 +28,10 @@ dependencies = [
     "scipy~=1.8.0",
 ]
 
-[tool.setuptools]
-py-modules = []
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["chord_progressions"]
+exclude = ["scripts", "docs", "site", "assets", "tests", "dist"]
 
 [tool.setuptools.dynamic]
 version = {attr = "chord_progressions.__version__"}
