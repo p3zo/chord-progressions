@@ -1,4 +1,4 @@
-# Generaton settings
+# Generate
 
 ## Constraints
 

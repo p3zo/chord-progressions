@@ -19,11 +19,3 @@ from chord_progressions.extract.audio import extract_progression_from_audio
 
 progression = extract_progression_from_audio('my_file.wav')
 ```
-
-## Eventual interface
-
-```python
-import chord_progressions
-progression = chord_progressions.Progression.from_audio('my_file.wav')
-progression = chord_progressions.Progression.from_midi('my_file.mid')
-```

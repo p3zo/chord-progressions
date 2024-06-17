@@ -1,8 +1,14 @@
 # Chord progressions
 
-## Usage
+`chord-progressions` is a provides utility functions for extracting, analyzing, and generating chord progressions.
 
-See the [Makefile](Makefile) for available actions.
+## Development
+
+Configuration for local development with Docker is provided. Run `make build` to build the container, `make shell` to
+get a shell inside of it for ad-hoc usage, and `make test` to run all unit tests inside the container. See
+the [Makefile](Makefile) for all available actions.
+
+To upgrade the version and trigger a new release, use `bump-my-version bump minor chord_progressions/__init__.py`.
 
 ## Docs
 
@@ -20,7 +26,8 @@ Analysis
 
 I/O
 
-- [feature] add `from_audio` and `from_midi` constructors to Progression class
+- [feature] add `from_audio` and `from_midi` constructors to Progression class to enable
+  e.g. `progression = chord_progressions.Progression.from_midi('my_file.mid')`
 - [maintainability] use a singular method of counting in `extract_harman.py`
     - `get_segment_label` uses counter
     - `get_segment_pc_weights` uses defaultdict

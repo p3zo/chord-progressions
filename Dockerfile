@@ -8,7 +8,7 @@ COPY chord_progressions $APP_DIR/chord_progressions/
 COPY tests $APP_DIR/tests/
 COPY requirements.txt $APP_DIR/requirements.txt
 COPY setup.cfg $APP_DIR/setup.cfg
-COPY setup.py $APP_DIR/setup.py
+COPY pyproject.toml $APP_DIR/pyproject.toml
 
 WORKDIR $APP_DIR
 
