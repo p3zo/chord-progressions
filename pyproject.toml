@@ -37,9 +37,26 @@ exclude = ["scripts", "docs", "site", "assets", "tests", "dist"]
 version = {attr = "chord_progressions.__version__"}
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "black", "flake8", "ipdb", "ipython", "isort", "bumpversion", "mkdocs-material"]
+dev = ["pytest", "pytest-cov", "black", "flake8", "ipdb", "ipython", "isort", "bump-my-version", "mkdocs-material"]
 test = ["pytest", "pytest-cov"]
 
 [project.urls]
 Homepage = "https://github.com/p3zo/chord-progressions"
 Issues = "https://github.com/p3zo/chord-progressions/issues"
+
+[tool.bumpversion]
+current_version = "0.33.0"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = ""
