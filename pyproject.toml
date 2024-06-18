@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["chord_progressions"]
+packages = ["chord_progressions", "chord_progressions.io", "chord_progressions.extract"]
 
 [tool.setuptools.dynamic]
 version = {attr = "chord_progressions.__version__"}
