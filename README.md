@@ -1,12 +1,16 @@
 # Chord progressions
 
-`chord-progressions` provides utility functions for extracting and analyzing chord progressions.
+[![PyPI Latest Release](https://img.shields.io/pypi/v/chord-progressions.svg)](https://pypi.org/project/chord-progressions/)
 
-It can be installed from PyPI:
+A library for working with chord progressions.
+
+## Install
 
 ```
 pip install chord-progressions
 ```
+
+## Usage
 
 See documentation at https://p3zo.github.io/chord-progressions/.
 
@@ -18,11 +22,8 @@ the [Makefile](Makefile) for all available actions.
 
 To upgrade the version and trigger a new release, use `bump-my-version bump minor chord_progressions/__init__.py`.
 
-### Docs
-
 The documentation uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build a static site from
-Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving.
-Use `mkdocs build` to build the site.
+Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving. Build the site with `mkdocs build` and deploy with `mkdocs gh-deploy`.
 
 ### TODO
 
@@ -49,3 +50,4 @@ Misc
 - [maintainability] mk `pitch_class` refer to "C" and call 0 `pitch_class_ix`
 - [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
 - [maintainability] test the merging of chord types
+- [maintainability] github action to build & deploy docs
