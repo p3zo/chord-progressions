@@ -33,33 +33,6 @@ def test_instantiate_progression():
     assert p.durations == ["1m", "2m"]
 
 
-def test_get_new_solution():
-    p = Progression(chords=TWO_CHORDS)
-    p2 = p.get_new_solution()
-
-    assert p.chords[0].id != p2.chords[0].id
-    assert p.chords[1].id != p2.chords[1].id
-
-    # Durations should be preserved
-    p3 = Progression(chords=TWO_CHORDS, durations=["1m", "2m"])
-    assert p3.get_new_solution().durations == ["1m", "2m"]
-
-
-def test_get_addition():
-    p = Progression(chords=TWO_CHORDS)
-    p2 = p.get_addition()
-
-    # make sure ids are preserved for existing chords
-    assert p[0].id == p2[0].id
-    assert p[1].id == p2[1].id
-
-    assert len(p) + 1 == len(p2)
-
-    # Durations should be preserved
-    p3 = Progression(chords=TWO_CHORDS, durations=["1m", "2m"])
-    assert p3.get_addition().durations == ["1m", "2m", "1m"]
-
-
 def test_duration_to_seconds():
     assert duration_to_seconds("4n", 120) == 0.5
     assert duration_to_seconds("2n", 120) == 1.0

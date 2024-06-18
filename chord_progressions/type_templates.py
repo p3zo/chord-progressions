@@ -7,7 +7,7 @@ from chord_progressions.pitch import (
 from chord_progressions.utils import is_circular_match
 
 """
-From http://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
+From https://web.archive.org/web/20221116234056/https://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
 
 Further readings:
 

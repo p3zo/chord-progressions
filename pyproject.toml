@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "chord-progressions"
 dynamic = ["version"]
-description = "A Python package for extracting, analyzing, and generating chord progressions "
+description = "A Python package for working with chord progressions "
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [

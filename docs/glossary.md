@@ -1,6 +1,6 @@
 # Glossary
 
-Terms used in the code
+Terms used throughout the library.
 
 | Name                             | Type            | Description                                  | Example                              |
 |----------------------------------|-----------------|----------------------------------------------|--------------------------------------|
@@ -27,7 +27,6 @@ Terms used in the code
 | template_str                     | str             |                                              | 101010101010                         |
 | rotation                         | list[int]       | A template transposed by any number of steps |                                      |
 | freq                             | float           |                                              | 440.0                                |
-| locks (todo: rename to lock_str) | str             |                                              | 00100                                |
 | voicing                          | list[str]       | A notes_list                                 |                                      |
 | chord                            | Chord           |                                              |                                      |
 | progression                      | Progression     |                                              |                                      |
