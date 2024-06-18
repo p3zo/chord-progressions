@@ -4,7 +4,6 @@ from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
-from chord_progressions.solver import select_chords
 
 """
     Durations are specified in Tone.Time.Notation format.
@@ -55,7 +54,7 @@ def seconds_to_duration(seconds, bpm):
 
 class Progression:
     """
-    A sequence of Chords with metadata such as bpm & chord locks.
+    A sequence of Chords with metadata such as bpm.
 
     Parameters
     ----------
@@ -64,9 +63,6 @@ class Progression:
     durations: list[str] or list[float], default []
         The duration of the chords, specified in Tone.Time notation or in seconds.
         Seconds will be quantized to Tone.Time units.
-    locks: str, default None
-        Binary string with length equal to the number of existing chords, e.g. 101011, where 1 = locked, 0 = unlocked.
-        Defaults to all unlocked if not provided.
     bpm: float, default DEFAULT_BPM
         The beats per minute (BPM) of the progression.
     name: str, default ""
@@ -77,7 +73,6 @@ class Progression:
         self,
         chords: list[Chord] = [],
         durations: list[str] = [],
-        locks: str = None,
         bpm: float = DEFAULT_BPM,
         name: str = "",
     ):
@@ -107,7 +102,6 @@ class Progression:
         self.durations = durations
         self.bpm = bpm
         self.name = name
-        self.locks = locks or "0" * len(chords)
         self.metrics = {}  # TODO: add metrics
 
     def __iter__(self):
@@ -122,7 +116,7 @@ class Progression:
         return "Progression " + self.to_string()
 
     def __getitem__(self, ix):
-        # TODO: include progression-chord metadata, e.g. its duration & lock status
+        # TODO: include progression-chord metadata, e.g. its duration
         return self.chords[ix]
 
     def to_string(self):
@@ -132,15 +126,12 @@ class Progression:
         # TODO: include progression-level attrs like name, bpm
         result = []
 
-        for ix, (chord, duration, locked) in enumerate(
-            list(zip(self.chords, self.durations, self.locks))
-        ):
+        for ix, (chord, duration) in enumerate(list(zip(self.chords, self.durations))):
             result.append(
                 {
                     "id": chord.id,
                     "ix": ix,
                     "duration": duration,
-                    "locked": locked,
                     "type": chord.type,
                     "typeId": chord.typeId,
                     "notes": chord.notes,
@@ -169,43 +160,3 @@ class Progression:
             mid.filename = outpath
             mid.save(outpath)
             logger.info(f"Midi saved to {outpath}")
-
-    def get_new_solution(self, **constraints):
-        """Given existing locked chords and constraints, returns a new chord progression of the same length"""
-
-        existing_chords = self.chords
-
-        chords = select_chords(
-            n_chords=len(existing_chords),
-            existing_chords=existing_chords,
-            locks=self.locks,
-            **constraints,
-        )
-
-        return Progression(chords, durations=self.durations)
-
-    def get_addition(self, **constraints):
-        existing_chords = self.chords
-
-        chords = select_chords(
-            n_chords=len(existing_chords) + 1,
-            existing_chords=existing_chords,
-            locks="1" * len(existing_chords) + "0",
-            **constraints,
-        )
-
-        durations = self.durations + ["1m"]
-
-        return Progression(chords, durations=durations)
-
-    def lock(self, ix):
-        """Locks the chord at index `ix`"""
-        locks = list(self.locks)
-        locks[ix] = "1"
-        self.locks = "".join(locks)
-
-    def unlock(self, ix):
-        """Unlocks the chord at index `ix`"""
-        locks = list(self.locks)
-        locks[ix] = "0"
-        self.locks = "".join(locks)
