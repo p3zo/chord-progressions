@@ -519,7 +519,7 @@ def extract_progression_from_midi(
 
     midi = load_midi_file(filepath)
 
-    simplified = simplify_harmony(filepath, shortest_note, smooth_beat, quantize_beat)
+    simplified = simplify_harmony(midi, shortest_note, smooth_beat, quantize_beat)
 
     if simplified_path:
         simplified.write(simplified_path)
