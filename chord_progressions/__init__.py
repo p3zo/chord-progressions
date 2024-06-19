@@ -7,9 +7,6 @@ THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
 OUTPUT_DIR = os.path.join(THIS_DIR, "../assets/output")
 
-# a copy of /usr/share/dict/web2 from a macbook air (early 2014)
-WORDS_FILEPATH = os.path.join(THIS_DIR, "..", "words")
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("chord-progressions")
 

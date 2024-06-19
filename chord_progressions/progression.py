@@ -149,7 +149,7 @@ class Progression:
         dur_secs = self.get_durations_in_seconds()
         audio_buffer = make_audio_progression(self.chords, dur_secs, n_overtones)
 
-        # TODO: create outpath from random word + datetime if not provided? add flag to opt for this?
+        # TODO: create outpath from datetime if not provided? add flag to opt for this?
         if outpath:
             save_audio_buffer(audio_buffer, outpath)
             logger.info(f"Audio saved to {outpath}")
