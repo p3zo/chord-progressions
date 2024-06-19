@@ -23,7 +23,8 @@ the [Makefile](Makefile) for all available actions.
 To upgrade the version and trigger a new release, use `bump-my-version bump minor chord_progressions/__init__.py`.
 
 The documentation uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build a static site from
-Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving. Build the site with `mkdocs build` and deploy with `mkdocs gh-deploy`.
+Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving.
+Build the site with `mkdocs build` and deploy with `mkdocs gh-deploy`.
 
 ### TODO
 
@@ -35,16 +36,13 @@ Analysis
 
 I/O
 
-- [maintainability] use a singular method of counting in `extract_harman.py`
-    - `get_segment_label` uses counter
-    - `get_segment_pc_weights` uses defaultdict
-    - `MinimalSegment.get_pitch_class_weights` uses list.count()
 - [performance] `extract.midi_harman.segment_and_label()` is slow for many consecutive segments. test that a
   maximum of six segment evaluations occur per note
 
 Misc
 
-- [feature] Generalize `noteNumberToFrequency` to use any periodic tuning (see https://github.com/soul-lang/SOUL/pull/26/files)
+- [feature] Generalize `noteNumberToFrequency` to use any periodic tuning (
+  see https://github.com/soul-lang/SOUL/pull/26/files)
 - [feature] implement `is_partial_circular_match`, `chord_contained_in_type`, and `get_possible_types_of_chord`
 - [maintainability] mk `pitch_class` refer to "C" and call 0 `pitch_class_ix`
 - [maintainability] pass midi note numbers everywhere as "notes" and include note names as "noteNames"
