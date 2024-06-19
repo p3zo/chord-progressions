@@ -1,21 +1,21 @@
 # Extract
 
-Experimental functions for automatically extracting chord progressions from audio and midi.
+An API is provided to automatically extract chord progressions from audio and midi. These functions are experimental and
+the quality of the results may vary greatly between types of music.
 
 ## Extract chords from a midi file
 
 ```python
-from chord_progressions.extract.midi import simplify_harmony
-from chord_progressions.extract.midi_harman import label_midi
 
-extracted = simplify_harmony('my_file.mid')
-harman_labels = label_midi(extracted)
+from chord_progressions import extract_progression_from_midi
+
+progression = extract_progression_from_midi('my_file.mid')
 ```
 
 ## Extract chords from an audio file
 
 ```python
-from chord_progressions.extract.audio import extract_progression_from_audio
+from chord_progressions import extract_progression_from_audio
 
 progression = extract_progression_from_audio('my_file.wav')
 ```

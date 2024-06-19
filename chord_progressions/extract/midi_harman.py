@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from chord_progressions import logger
 from chord_progressions.chord import Chord
-from chord_progressions.extract import (
+from chord_progressions.extract.midi import (
     DEFAULT_QUANTIZE_BEAT,
     DEFAULT_SHORTEST_NOTE,
     DEFAULT_SMOOTH_BEAT,

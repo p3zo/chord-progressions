@@ -5,12 +5,12 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import pretty_midi
-from chord_progressions.extract import (
-    DEFAULT_QUANTIZE_BEAT,
-    DEFAULT_SHORTEST_NOTE,
-    DEFAULT_SMOOTH_BEAT,
-)
 from chord_progressions.io.midi import load_midi_file
+
+# note values, e.g. 1/4 = quarter note, 1/64 = 64th note
+DEFAULT_SHORTEST_NOTE = 1 / 64
+DEFAULT_SMOOTH_BEAT = 1
+DEFAULT_QUANTIZE_BEAT = 1 / 2
 
 def determine_key_from_file(midi):
     # TODO integrate this into lib

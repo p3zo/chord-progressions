@@ -1,10 +1,10 @@
-# Chord progressions
+# Chord Progressions
 
 [![PyPI Latest Release](https://img.shields.io/pypi/v/chord-progressions.svg)](https://pypi.org/project/chord-progressions/)
 
 A library for working with chord progressions.
 
-## Install
+## Installation
 
 ```
 pip install chord-progressions
@@ -35,7 +35,6 @@ Analysis
 
 I/O
 
-- [feature] add `from_audio` and `from_midi` constructors to Progression class to enable e.g. `Progression.from_midi('my_file.mid')`
 - [maintainability] use a singular method of counting in `extract_harman.py`
     - `get_segment_label` uses counter
     - `get_segment_pc_weights` uses defaultdict
