@@ -17,7 +17,6 @@ DEFAULT_MIDI_TICKS_PER_BEAT = 480
 
 from chord_progressions.chord import Chord
 from chord_progressions.extract import (
-    extract_progression_from_audio,
     extract_progression_from_midi,
 )
 from chord_progressions.pitch import (
@@ -40,7 +39,6 @@ from chord_progressions.type_templates import (
 # Use __all__ to let type checkers know what is part of the public API
 __all__ = [
     Chord,
-    extract_progression_from_audio,
     extract_progression_from_midi,
     get_midi_num_from_note,
     get_note_from_midi_num,

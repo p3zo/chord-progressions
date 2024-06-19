@@ -14,8 +14,10 @@ progression = extract_progression_from_midi('my_file.mid')
 
 ## Extract chords from an audio file
 
+NOTE: this requires installing [Essentia](http://essentia.upf.edu/documentation/installing.html) with Python bindings which is not included in this library.
+
 ```python
-from chord_progressions import extract_progression_from_audio
+from chord_progressions.extract import extract_progression_from_audio
 
 progression = extract_progression_from_audio('my_file.wav')
 ```
