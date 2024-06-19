@@ -27,18 +27,38 @@ from chord_progressions.pitch import (
     get_pitch_class_from_midi_num,
 )
 from chord_progressions.progression import Progression
-from chord_progressions.solver import get_all_rotations_of_template
 from chord_progressions.type_templates import (
     TYPE_TEMPLATES,
     get_template_from_template_str,
     get_type_num_from_type,
 )
+from chord_progressions.utils import shift_arr_by_one
 
 # We pre-calculate all the templates we want to use as labels
 # TEMPLATE_LABELS will be {chord_type_id: (rotations, one_indices)}
 MIN_NUM_NOTES = 3
 MAX_NUM_NOTES = 6
 TEMPLATE_LABELS = {}
+
+
+def get_template_str(template):
+    return "".join([str(i) for i in template])
+
+
+def get_all_rotations_of_template(template):
+    rotation_strs = set()
+    rotation_strs.add(get_template_str(template))
+
+    prev = template
+
+    for i in range(len(template) - 1):
+        rotated = shift_arr_by_one(prev)
+        rotation_strs.add(get_template_str(rotated))
+
+        prev = rotated
+
+    return [[int(j) for j in list(i)] for i in rotation_strs]
+
 
 for template_name, template_str in TYPE_TEMPLATES.items():
 
