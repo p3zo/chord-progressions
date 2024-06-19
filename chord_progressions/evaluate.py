@@ -118,21 +118,26 @@ def evaluate_notes(notes):
 
     metrics = {}
 
-    interval_class_vector = get_interval_class_vector(notes)
+    try:
 
-    # evenness = get_evenness(interval_class_vector)
+        interval_class_vector = get_interval_class_vector(notes)
 
-    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
-    assert pc_cardinality <= 12, "Pitch class cardinality > 12"
+        evenness = get_evenness(interval_class_vector)
 
-    metrics["num_notes"] = len(notes)
-    metrics["num_pitches"] = len(set(notes))
-    # metrics["pc_cardinality"] = pc_cardinality
-    metrics["interval_class_vector"] = interval_class_vector
-    # metrics["ambitus"] = get_ambitus(notes)
-    # metrics["evenness"] = evenness
-    # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
-    # metrics["overtone_agreement"] = get_overtone_agreement(notes)
+        pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
+        assert pc_cardinality <= 12, "Pitch class cardinality > 12"
+
+        metrics["num_notes"] = len(notes)
+        metrics["num_pitches"] = len(set(notes))
+        metrics["pc_cardinality"] = pc_cardinality
+        metrics["interval_class_vector"] = interval_class_vector
+        metrics["ambitus"] = get_ambitus(notes)
+        metrics["evenness"] = evenness
+        # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
+        # metrics["overtone_agreement"] = get_overtone_agreement(notes)
+
+    except:
+        pass
 
     return metrics
 
@@ -150,20 +155,25 @@ def get_macroharmony(progression):
 
 
 def get_ambitus(macroharmony):
-    """Ambitus, int, # semitones between the lowest and highest note"""
-    midi_notes = [get_midi_num_from_note(n) for n in macroharmony]
+    """Ambitus <int>: the number of semitones between the lowest and highest note"""
+    ambitus = 0
 
-    return max(midi_notes) - min(midi_notes)
+    midi_notes = [get_midi_num_from_note(n) for n in macroharmony]
+    if midi_notes:
+        ambitus = max(midi_notes) - min(midi_notes)
+
+    return ambitus
 
 
 def evaluate_progression(progression):
     metrics = {}
 
-    # macroharmony = get_macroharmony(notes_list)
-
-    # metrics["ambitus"] = get_ambitus(macroharmony)
-
-    # metrics["density"] = len(macroharmony) / len(notes_list)
+    # try:
+    #     macroharmony = get_macroharmony(notes_list)
+    #     metrics["ambitus"] = get_ambitus(macroharmony)
+    #     metrics["density"] = len(macroharmony) / len(notes_list)
+    # except:
+    #     pass
 
     return metrics
 
@@ -172,6 +182,6 @@ def get_n_overtones_for_notes(notes, n):
     """Calculates `n` overtone frequencies for each note in `notes`"""
 
     freqs = [get_freq_from_note(n) for n in notes]
-    ofreqs = [get_n_overtones_harmonic(f, n) for f in freqs]
+    o_freqs = [get_n_overtones_harmonic(f, n) for f in freqs]
 
-    return ofreqs
+    return o_freqs
