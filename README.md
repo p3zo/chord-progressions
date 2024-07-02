@@ -12,7 +12,7 @@ pip install chord-progressions
 
 ## Usage
 
-See documentation at https://p3zo.github.io/chord-progressions/.
+See documentation at https://p3zo.github.io/chord-progressions.
 
 ## Development
 

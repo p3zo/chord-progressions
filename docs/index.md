@@ -1,59 +1,97 @@
 # Introduction
 
-Chord Progressions is a Python library with tools to extract and analyze chord progressions.
+`Chord Progressions` is a Python library of utility functions for working with chord progressions.
 
 ## Installation
 
     $ pip install chord-progressions
 
-## Progressions
+## Usage
 
-The core class of this library is the `Progression`. A progression is a sequence of chords, which can be specified with
-a list of MIDI note numbers.
+The simplest way to create a `Progression` is with a list of chords specified in MIDI note numbers.
 
 ```python
-from chord_progressions.progression import Progression
+from chord_progressions import Progression
 
 progression = Progression(chords=[[69, 84, 90, 99], [60, 67, 71, 87, 98]])
 ```
 
 ```json
 [
-  {
-    "id": "40664268-1e68-44df-b259-2ce3bb8d4b70",
-    "ix": 0,
-    "type": "diminished-seventh chord",
-    "duration": "1m",
-    "typeId": 139,
-    "notes": [
-      "A4",
-      "C6",
-      "F#6",
-      "D#7"
-    ],
-    "metrics": {}
-  },
-  {
-    "id": "87bc2fbf-8299-4070-b4db-70fa29c31e9c",
-    "ix": 1,
-    "type": "minor-major ninth chord",
-    "duration": "1m",
-    "typeId": 101,
-    "notes": [
-      "C4",
-      "G4",
-      "B4",
-      "D#6",
-      "D7"
-    ],
-    "metrics": {}
-  }
+    {
+        "id": "ea1b9a6a-e309-4e6a-bad8-04643e652015",
+        "ix": 0,
+        "duration": "1m",
+        "type": "diminished-seventh chord",
+        "typeId": 139,
+        "notes": [
+            "A4",
+            "C6",
+            "F#6",
+            "D#7"
+        ],
+        "midi_nums": [
+            69,
+            84,
+            90,
+            99
+        ],
+        "metrics": {
+            "num_notes": 4,
+            "num_pitches": 4,
+            "pc_cardinality": 4,
+            "interval_class_vector": [
+                0,
+                0,
+                4,
+                0,
+                0,
+                2
+            ],
+            "ambitus": 30,
+            "evenness": 9.65685424949238
+        }
+    },
+    {
+        "id": "f36d4b52-9f8f-4b72-8693-34b60f23a564",
+        "ix": 1,
+        "duration": "1m",
+        "type": "minor-major ninth chord",
+        "typeId": 101,
+        "notes": [
+            "C4",
+            "G4",
+            "B4",
+            "D#6",
+            "D7"
+        ],
+        "midi_nums": [
+            60,
+            67,
+            71,
+            87,
+            98
+        ],
+        "metrics": {
+            "num_notes": 5,
+            "num_pitches": 5,
+            "pc_cardinality": 5,
+            "interval_class_vector": [
+                2,
+                1,
+                2,
+                3,
+                2,
+                0
+            ],
+            "ambitus": 38,
+            "evenness": 13.923559033019178
+        }
+    }
 ]
 ```
 
-## Chords
-
-The `Chord` class has the following attributes:
+Each `Chord` in a `Progression` has the following attributes:
 
 - `id`: a UUID
 - `ix`: the index of the chord in the progression
