@@ -6,6 +6,8 @@ A library for working with chord progressions.
 
 ## Installation
 
+Requires Python 3.12 or newer.
+
 ```
 pip install chord-progressions
 ```
