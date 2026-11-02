@@ -11,7 +11,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "p3zo", email = "p3zo@users.noreply.github.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -19,13 +19,13 @@ classifiers = [
     "Development Status :: 3 - Alpha",
 ]
 dependencies = [
-    "matplotlib~=3.5.1",
-    "mido~=1.2.10",
-    "networkx~=2.8",
-    "numpy~=1.22.3",
-    "pandas~=1.4.2",
-    "pretty_midi~=0.2.10",
-    "scipy~=1.8.0",
+    "matplotlib>=3.9.2,<4",
+    "mido>=1.3.3,<2",
+    "networkx>=3.4,<4",
+    "numpy>=2.1,<3",
+    "pandas>=2.2.3,<3",
+    "pretty_midi>=0.2.11.post0,<0.3",
+    "scipy>=1.14.1,<2",
 ]
 
 [tool.setuptools]
@@ -47,7 +47,7 @@ Homepage = "https://github.com/p3zo/chord-progressions"
 Issues = "https://github.com/p3zo/chord-progressions/issues"
 
 [tool.bumpversion]
-current_version = "0.37.1"
+current_version = "0.38.0"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
