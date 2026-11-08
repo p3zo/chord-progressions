@@ -102,3 +102,14 @@ Each `Chord` in a `Progression` has the following attributes:
   of `["8n", "4n", "4n.", "2n", "2n.", "1m", "2m"]`
 - `notes`: the MIDI note names of the notes in the chord
 - `metrics`: a dictionary of attributes computed based on the notes in the chord
+
+## Key
+
+`Progression.key` estimates the major or minor key of a progression with the Krumhansl-Schmuckler
+algorithm (Krumhansl, _Cognitive Foundations of Musical Pitch_, 1990), weighting each note by the
+duration of its chord.
+
+```python
+Progression(chords=[[48, 64, 67], [53, 65, 69], [55, 59, 65], [48, 64, 67, 72]]).key
+# 'C major'
+```
