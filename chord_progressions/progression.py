@@ -4,10 +4,7 @@ from chord_progressions import DEFAULT_BPM, logger
 from chord_progressions.chord import Chord
 from chord_progressions.io.audio import make_audio_progression, save_audio_buffer
 from chord_progressions.io.midi import get_midi_from_progression
-from chord_progressions.key import (
-    get_key_from_pitch_class_durations,
-    get_pitch_class_durations,
-)
+from chord_progressions.key import get_key
 
 """
     Durations are specified in Tone.Time.Notation format.
@@ -149,9 +146,9 @@ class Progression:
     @property
     def key(self):
         """The major or minor key that best fits the progression, e.g. "C major" """
-        beats = [DURATION_BEAT_MAPPING[d] for d in self.durations]
-        pc_durations = get_pitch_class_durations([c.midi_nums for c in self.chords], beats)
-        return get_key_from_pitch_class_durations(pc_durations)
+        # A beat is a quarter note in DURATION_BEAT_MAPPING
+        quarter_lengths = [DURATION_BEAT_MAPPING[d] for d in self.durations]
+        return get_key([c.midi_nums for c in self.chords], quarter_lengths)
 
     def get_durations_in_seconds(self):
         return [duration_to_seconds(d, self.bpm) for d in self.durations]
