@@ -1,3 +1,5 @@
+import itertools
+
 from chord_progressions.type_templates import (
     TYPE_TEMPLATES,
     get_template_from_midi_nums,
@@ -6,6 +8,7 @@ from chord_progressions.type_templates import (
     get_template_from_template_str,
     get_type_from_midi_nums,
     get_type_from_notes,
+    get_type_from_template,
     get_type_from_type_num,
     get_type_num_from_type,
     get_types_from_type_num_str,
@@ -95,3 +98,17 @@ def test_each_set_class_has_a_single_type():
         if is_circular_match(template_1, template_2)
     ]
     assert duplicates == []
+
+
+def test_every_set_of_pitch_classes_has_a_type():
+    untyped = [
+        pcs
+        for size in range(1, 13)
+        for pcs in itertools.combinations(range(12), size)
+        if get_type_from_template(get_template_from_pitch_classes(pcs)) is None
+    ]
+    assert untyped == []
+
+
+def test_incomplete_major_seventh_chord_has_a_type():
+    assert get_type_from_notes(["C4", "E4", "B4"]) == "pitch-class set 0-1-5"
