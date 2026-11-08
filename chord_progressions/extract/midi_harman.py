@@ -7,7 +7,6 @@ https://interactiveaudiolab.github.io/assets/papers/pardo-birmingham-cmj02.pdf
 
 import os
 import time
-from collections import Counter, defaultdict
 from copy import deepcopy
 
 import networkx as nx
@@ -23,6 +22,7 @@ from chord_progressions.extract.midi import (
 from chord_progressions.extract.midi import simplify_harmony
 from chord_progressions.io.midi import load_midi_file
 from chord_progressions.pitch import (
+    NOTE_NAMES,
     get_note_from_midi_num,
     get_pitch_class_from_midi_num,
 )
@@ -32,50 +32,40 @@ from chord_progressions.type_templates import (
     get_template_from_template_str,
     get_type_num_from_type,
 )
-from chord_progressions.utils import shift_arr_by_one
 
-# We pre-calculate all the templates we want to use as labels
-# TEMPLATE_LABELS will be {chord_type_id: (rotations, one_indices)}
+# Each label is a chord type at one transposition, so C major and F major are different labels.
+# Row i of LABEL_TEMPLATES is the template of type LABEL_TYPE_IDS[i] transposed up by
+# LABEL_TRANSPOSITIONS[i] semitones. The transposition is not the musical root: the dominant-seventh
+# template, for example, starts on its third.
 MIN_NUM_NOTES = 3
 MAX_NUM_NOTES = 6
-TEMPLATE_LABELS = {}
 
-
-def get_template_str(template):
-    return "".join([str(i) for i in template])
-
-
-def get_all_rotations_of_template(template):
-    rotation_strs = set()
-    rotation_strs.add(get_template_str(template))
-
-    prev = template
-
-    for i in range(len(template) - 1):
-        rotated = shift_arr_by_one(prev)
-        rotation_strs.add(get_template_str(rotated))
-
-        prev = rotated
-
-    return [[int(j) for j in list(i)] for i in rotation_strs]
-
+label_type_ids = []
+label_transpositions = []
+label_templates = []
 
 for template_name, template_str in TYPE_TEMPLATES.items():
-
-    template_id = get_type_num_from_type(template_name)
     template = get_template_from_template_str(template_str)
 
-    if sum(template) >= MIN_NUM_NOTES and sum(template) <= MAX_NUM_NOTES:
-        if template_id not in TEMPLATE_LABELS:
-            TEMPLATE_LABELS[template_id] = []
+    if not MIN_NUM_NOTES <= sum(template) <= MAX_NUM_NOTES:
+        continue
 
-        rotations = get_all_rotations_of_template(template)
+    seen = set()
+    for transposition in range(12):
+        transposed = template[-transposition:] + template[:-transposition]
 
-        one_indices = []
-        for rotation in rotations:
-            one_indices.append([ix for ix, i in enumerate(rotation) if i == 1])
+        # Symmetric chords like the augmented triad repeat under transposition
+        if tuple(transposed) in seen:
+            continue
+        seen.add(tuple(transposed))
 
-        TEMPLATE_LABELS[template_id] = (rotations, one_indices)
+        label_type_ids.append(get_type_num_from_type(template_name))
+        label_transpositions.append(transposition)
+        label_templates.append(transposed)
+
+LABEL_TYPE_IDS = np.array(label_type_ids)
+LABEL_TRANSPOSITIONS = np.array(label_transpositions)
+LABEL_TEMPLATES = np.array(label_templates)
 
 
 class PartitionPoint:
@@ -107,7 +97,6 @@ class MinimalSegment:
         self.start = 0  # seconds
         self.end = 0  # seconds
         self.midi_nums = []  # midi note numbers
-        self.template_scores = {}
 
     def update_midi_nums(self, midi_nums, add):
         if add:
@@ -116,17 +105,10 @@ class MinimalSegment:
             for p in midi_nums:
                 self.midi_nums.remove(p)
 
-    def get_pitch_classes(self):
-        return [get_pitch_class_from_midi_num(p) for p in self.midi_nums]
-
     def get_pitch_class_weights(self):
-        pcs = self.get_pitch_classes()
-        return {pc: pcs.count(pc) for pc in pcs}
-
-    def get_template_scores(self):
-        pcs = self.get_pitch_classes()
-        pc_weights = {pc: pcs.count(pc) for pc in pcs}
-        return get_template_scores(pc_weights)
+        """Returns the number of sounding notes of each pitch class as a length-12 array"""
+        pcs = [get_pitch_class_from_midi_num(p) for p in self.midi_nums]
+        return np.bincount(pcs, minlength=12)
 
     def get_notes(self):
         return [get_note_from_midi_num(n) for n in self.midi_nums]
@@ -196,76 +178,24 @@ def get_partition_points(events):
     return p_all
 
 
-def get_segment_pc_weights(segment):
-    """Aggregates the pitch class weights of all minimal segments within a segment."""
+def get_label_scores(pc_weights):
+    """Scores the weighted pitch classes of a minimal segment against all labels.
 
-    segment_pc_weights = defaultdict(int)
-
-    for s in segment:
-        pc_weights = s.get_pitch_class_weights()
-
-        for pc, weight in pc_weights.items():
-            print(pc, weight)
-            segment_pc_weights[pc] += weight
-
-    return segment_pc_weights
-
-
-def get_template_score(pc_weights, template, oix):
-    """Scores a weighted set of pitch classes against a single template.
-
-    Uses the algorithm defined in Pardo 2002 Fig 4.
+    Uses the algorithm defined in Pardo 2002 Fig 4: S = P - (M + N), where P is the weight of
+    notes in the template, N the weight of notes outside it, and M the number of template notes
+    that are not sounding.
 
     Input:
-        pc_weights, a dict of {pc: weight}
-        template, the template against which to score. Example: [1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0]
-        oix, the one-indices for the template, pre-computed for performance. Example: [0, 4, 9]
+        pc_weights, a length-12 array of the number of sounding notes of each pitch class
 
     Returns:
-        S, an integer score
+        an array with one score per label
     """
+    positive = LABEL_TEMPLATES @ pc_weights
+    negative = pc_weights.sum() - positive
+    misses = LABEL_TEMPLATES @ (pc_weights == 0)
 
-    P = 0  # positive evidence
-    N = 0  # negative evidence
-    M = 0  # misses
-
-    for pc, weight in pc_weights.items():
-        if template[pc]:
-            P += weight
-        else:
-            N += weight
-
-    for _ in set(oix) - set(pc_weights):
-        M += 1
-
-    return P - (M + N)
-
-
-def get_template_scores(pc_weights):
-    """Scores a weighted set of pitch classes against all template labels.
-
-    Returns a dict of {label: score}
-    """
-    scores = {}
-
-    for template_name, (rotations, one_indices) in TEMPLATE_LABELS.items():
-
-        rotation_scores = []
-
-        for ix, rotation in enumerate(rotations):
-            score = get_template_score(pc_weights, rotation, one_indices[ix])
-
-            rotation_scores.append(score)
-
-        # TODO: use dim7 resolution as tiebreaker (see Fig 4 in Pardo 2002)
-        best_rotation_score = max(rotation_scores)
-
-        if template_name not in scores:
-            scores[template_name] = best_rotation_score
-        else:
-            scores[template_name] += best_rotation_score
-
-    return scores
+    return positive - (misses + negative)
 
 
 def get_minimal_segments(p_all):
@@ -296,37 +226,24 @@ def get_minimal_segments(p_all):
 
     logger.debug(f"\n--- {len(s_m)} minimal segments ---")
 
-    ## Uncomment for debug output
-    # for ix, sm in enumerate(s_m):
-    #     logger.debug(f"  sm{ix}")
-    #     # sm.pprint()
-    #     pc_weights = sm.get_pitch_class_weights()
-    #     sm.template_scores = get_template_scores(pc_weights)
-
     return s_m
 
 
-def get_segment_label(segment):
-    """Aggregates the template scores of all minimal segments within a segment and returns the best label.
+def get_segment_label(label_scores):
+    """Returns the best score and label of a segment, given its summed label scores.
 
     See Figure 3 in Pardo 2002
     """
+    # TODO: tiebreak by root weight, template probability, and dim7 resolution (Pardo 2002 Fig 4).
+    # Until then the first maximum wins, i.e. the earliest entry in TYPE_TEMPLATES.
+    best_label = int(np.argmax(label_scores))
 
-    if not len(segment) > 0:
-        raise ValueError("Empty segment")
+    return int(label_scores[best_label]), best_label
 
-    counter = Counter(segment[0].get_template_scores())
 
-    for ms in segment[1:]:
-        counter.update(Counter(ms.get_template_scores()))
-
-    if not len(counter) > 0:
-        raise ValueError("No scores for segment")
-
-    # TODO: it's common for multiple templates to have the same score. How should we tiebreak?
-    best_template, best_score = counter.most_common(1)[0]
-
-    return best_score, best_template
+def describe_label(label):
+    chord_type = list(TYPE_TEMPLATES)[LABEL_TYPE_IDS[label]]
+    return f"{chord_type} transposed to {NOTE_NAMES[LABEL_TRANSPOSITIONS[label]]}"
 
 
 def get_segment_midi_nums(segment):
@@ -359,33 +276,45 @@ def segment_and_label(p_all, s_m):
 
     final_ix = len(p_all) - 1
 
+    # A segment scores the sum of its minimal segment scores rather than the score of its summed
+    # pitch class weights as in Pardo 2002. The templates go up to six notes, so with summed
+    # weights two neighboring triads always fit some hexachord perfectly and would merge.
+    # Summed scores also let each minimal segment be scored only once.
+    G.add_node(0, marked=1, time=p_all[0].time)
+
     ui = 0  # index of the preceding vertex
+    uv_scores = np.zeros(len(LABEL_TEMPLATES), dtype=int)  # summed scores of s_m[ui:vi]
+    uv_num_notes = 0
 
-    for vi, p in enumerate(p_all):
+    vw_scores = get_label_scores(s_m[0].get_pitch_class_weights())  # scores of s_m[vi]
+    vw_num_notes = len(s_m[0].midi_nums)
 
-        if vi in [0, final_ix]:
-            G.add_node(vi, marked=1, time=p.time)
-            continue
+    for vi in range(1, final_ix):
+        p = p_all[vi]
 
-        uv_segment = s_m[ui:vi]  # preceding segment
-        uv_midi_nums = get_segment_midi_nums(uv_segment)
-        uv_notes = [get_note_from_midi_num(n) for n in uv_midi_nums]
+        # the minimal segment that ended at this point joins the preceding segment
+        uv_scores = uv_scores + vw_scores
+        uv_num_notes += vw_num_notes
+
+        vw_scores = get_label_scores(s_m[vi].get_pitch_class_weights())  # succeeding segment
+        vw_num_notes = len(s_m[vi].midi_nums)
 
         # a minimal segment without notes is a rest for all instruments
-        if len(uv_midi_nums) == 0:
+        if uv_num_notes == 0:
             logger.debug(f"  {vi}/{final_ix} - Continue: No notes in segment")
             continue
 
-        uv_score, uv_label = get_segment_label(uv_segment)
-
-        wi = vi + 1  # index of the succeeding vertex
-        vw_score, vw_label = get_segment_label(s_m[vi:wi])  # succeeding segment
-        uw_score, uw_label = get_segment_label(s_m[ui:wi])  # full segment
+        uv_score, uv_label = get_segment_label(uv_scores)
+        vw_score, vw_label = get_segment_label(vw_scores)
+        uw_score, uw_label = get_segment_label(uv_scores + vw_scores)  # full segment
 
         if uw_score < (uv_score + vw_score):
             logger.debug(
-                f"  {vi}/{final_ix} - New: {uw_label} ({uw_score}) < {uv_label} ({uv_score}) + {vw_label} ({vw_score})"
+                f"  {vi}/{final_ix} - New: {describe_label(uw_label)} ({uw_score}) < {describe_label(uv_label)} ({uv_score}) + {describe_label(vw_label)} ({vw_score})"
             )
+
+            uv_midi_nums = get_segment_midi_nums(s_m[ui:vi])
+            uv_notes = [get_note_from_midi_num(n) for n in uv_midi_nums]
 
             edge_attributes = {
                 "start_segment": ui,
@@ -400,16 +329,23 @@ def segment_and_label(p_all, s_m):
             G.add_edge(ui, vi, **edge_attributes)
 
             ui = vi
+            uv_scores = np.zeros(len(LABEL_TEMPLATES), dtype=int)
+            uv_num_notes = 0
         else:
             logger.debug(
-                f"  {vi}/{final_ix} - Continue: {uw_label} ({uw_score}) >= {uv_label} ({uv_score}) + {vw_label} ({vw_score})"
+                f"  {vi}/{final_ix} - Continue: {describe_label(uw_label)} ({uw_score}) >= {describe_label(uv_label)} ({uv_score}) + {describe_label(vw_label)} ({vw_score})"
             )
 
+    G.add_node(final_ix, marked=1, time=p_all[final_ix].time)
+
+    # the last minimal segment closes the final segment
+    uv_scores = uv_scores + vw_scores
+
     final_segment = s_m[ui:final_ix]
-    final_segment_midi_nums = get_segment_midi_nums(uv_segment)
+    final_segment_midi_nums = get_segment_midi_nums(final_segment)
     final_segment_notes = [get_note_from_midi_num(n) for n in final_segment_midi_nums]
 
-    final_score, final_label = get_segment_label(final_segment)
+    final_score, final_label = get_segment_label(uv_scores)
 
     final_edge_attributes = {
         "start_segment": ui,
@@ -441,8 +377,8 @@ def segment_and_label(p_all, s_m):
             "end_segment": edge["end_segment"],
             "end_time": end,
             "duration": end - start,
-            "label_id": edge["label"],
-            "label": template_names[edge["label"]],
+            "label_id": int(LABEL_TYPE_IDS[edge["label"]]),
+            "label": template_names[LABEL_TYPE_IDS[edge["label"]]],
             "midi_nums": edge["midi_nums"],
             "notes": edge["notes"],
             "chord": Chord(edge["midi_nums"]),
