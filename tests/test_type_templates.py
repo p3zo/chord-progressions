@@ -11,6 +11,7 @@ from chord_progressions.type_templates import (
     get_types_from_type_num_str,
     notes_match_chord_type,
 )
+from chord_progressions.utils import is_circular_match
 
 
 def test_type_templates_format():
@@ -77,3 +78,20 @@ def test_get_template_from_notes():
     ]
     for ex in expectations:
         assert get_template_from_notes(ex["notes"]) == ex["template"]
+
+
+def test_each_set_class_has_a_single_type():
+    # Names that share a set class are merged into one entry, e.g. "rite chord 2|tritone-fourth 1".
+    # get_type_from_template returns the first match, so a second entry would never be found.
+    types = [
+        (chord_type, get_template_from_template_str(template_str))
+        for chord_type, template_str in TYPE_TEMPLATES.items()
+        if template_str
+    ]
+    duplicates = [
+        (type_1, type_2)
+        for ix, (type_1, template_1) in enumerate(types)
+        for type_2, template_2 in types[ix + 1 :]
+        if is_circular_match(template_1, template_2)
+    ]
+    assert duplicates == []
