@@ -1,4 +1,5 @@
 import pytest
+from music21.analysis.discrete import DiscreteAnalysisException
 from chord_progressions.chord import Chord
 from chord_progressions.progression import (
     Progression,
@@ -75,5 +76,10 @@ def test_key_weighs_chords_by_duration():
 
 
 def test_key_of_empty_progression_raises():
-    with pytest.raises(ValueError):
+    with pytest.raises(DiscreteAnalysisException):
         Progression().key
+
+
+def test_key_of_chromatic_progression_raises():
+    with pytest.raises(ValueError):
+        Progression([list(range(60, 72))]).key
