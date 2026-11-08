@@ -26,4 +26,4 @@ To upgrade the version and trigger a new release, use `bump-my-version bump mino
 
 The documentation uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build a static site from
 Markdown files. Use `mkdocs serve` to start a live preview server of the site that automatically rebuilds upon saving.
-Build the site with `mkdocs build` and deploy with `mkdocs gh-deploy`.
+Pushes to `main` that touch the docs build and deploy the site to GitHub Pages.

@@ -1,0 +1,35 @@
+name: deploy_docs
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - ".github/workflows/deploy_docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # mkdocs gh-deploy pushes the built site to the gh-pages branch
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install MkDocs
+        run: python -m pip install "mkdocs-material>=9.6,<10"
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Build and deploy
+        run: mkdocs gh-deploy --strict --force
