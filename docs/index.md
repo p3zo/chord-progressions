@@ -113,3 +113,30 @@ duration of its chord.
 Progression(chords=[[48, 64, 67], [53, 65, 69], [55, 59, 65], [48, 64, 67, 72]]).key
 # 'C major'
 ```
+
+## Progression measures
+
+`chord_progressions.progression_measures` measures a whole progression over time. Each function
+takes one pitch-class set and/or one length in quarter-note beats per chord, so long chords count
+for more than short ones; `DURATION_BEAT_MAPPING` converts Tone.js durations to beats.
+
+- `get_mean_tension`: mean Huron dyadic tension over time.
+- `get_pitch_class_emphasis`: the share of time each pitch class sounds.
+- `get_contour_fit`: how closely per-chord values, such as tension, follow a target contour over
+  time, as a weighted correlation from -1 to 1.
+- `get_metric_conflict`: the share of chord changes that fight a 4/4 meter.
+- `get_final_lengthening`: the last chord's length relative to the mean.
+- `get_transposed_repetition`: how much of the progression restates itself at a new pitch level, as
+  in a sequence.
+- `returns_to_opening`: whether the progression ends on its opening chord.
+
+```python
+from chord_progressions.progression_measures import get_contour_fit, get_metric_conflict
+
+tensions = [-0.6, -0.2, 0.4, -0.6]
+beats = [4, 4, 4, 4]
+get_contour_fit(tensions, beats, times=(0, 0.6, 1), targets=(0, 1, 0))  # rise, then release
+# 0.98...
+get_metric_conflict([1.5, 2.5, 4])  # the second chord starts off the beat
+# 0.333...
+```
