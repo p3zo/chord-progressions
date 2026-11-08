@@ -6,8 +6,24 @@ short one. Use `DURATION_BEAT_MAPPING` from `chord_progressions.progression` to
 convert Tone.js durations to beats.
 """
 
+from functools import lru_cache
+
 import numpy as np
 from chord_progressions.evaluate import get_set_tension
+
+
+def _mask(pitch_classes):
+    """A pitch-class set as a 12-bit integer, C in the lowest bit; cheap to compare and transpose."""
+    return sum(1 << pc for pc in set(pitch_classes))
+
+
+def _transpose(mask, step):
+    return ((mask << step) | (mask >> (12 - step))) & 0xFFF
+
+
+@lru_cache(maxsize=4096)
+def _tension(mask):
+    return get_set_tension([pc for pc in range(12) if mask >> pc & 1])
 
 
 def _weights(beats):
@@ -19,7 +35,7 @@ def _weights(beats):
 
 def get_mean_tension(pitch_class_sets, beats):
     """Mean `get_set_tension` over time: each chord weighted by its length."""
-    tensions = [get_set_tension(pcs) for pcs in pitch_class_sets]
+    tensions = [_tension(_mask(pcs)) for pcs in pitch_class_sets]
     return float(_weights(beats) @ tensions)
 
 
@@ -94,10 +110,6 @@ def get_final_lengthening(beats):
     return float(lengths[-1] / lengths.mean())
 
 
-def _transpose(pcs, step):
-    return frozenset((pc + step) % 12 for pc in pcs)
-
-
 def get_transposed_repetition(pitch_class_sets, periods=(1, 2, 3)):
     """How much of a progression restates itself at a new pitch level, from 0 to 1.
 
@@ -106,7 +118,7 @@ def get_transposed_repetition(pitch_class_sets, periods=(1, 2, 3)):
     largest share of chords explained this way. A chord equal to the chord just
     before it is stasis, not repetition, so it never counts.
     """
-    sets = [frozenset(pcs) for pcs in pitch_class_sets]
+    sets = [_mask(pcs) for pcs in pitch_class_sets]
     n = len(sets)
     best = 0.0
     for period in periods:
@@ -124,5 +136,5 @@ def get_transposed_repetition(pitch_class_sets, periods=(1, 2, 3)):
 
 def returns_to_opening(pitch_class_sets):
     """Whether a progression of three or more chords that moves ends on its opening chord."""
-    sets = [frozenset(pcs) for pcs in pitch_class_sets]
+    sets = [_mask(pcs) for pcs in pitch_class_sets]
     return len(sets) >= 3 and sets[-1] == sets[0] and len(set(sets)) > 1
