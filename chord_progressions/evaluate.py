@@ -31,14 +31,18 @@ def get_interval_class_vector(notes):
         4: perfect fourth / perfect fifth (5 or 7 semitones)
         5: tritone (6 semitones)
     """
+    template = get_template_from_notes(notes)
+    pitch_classes = [ix for ix, i in enumerate(template) if i == 1]
+
+    return get_interval_class_vector_from_pitch_classes(pitch_classes)
+
+
+def get_interval_class_vector_from_pitch_classes(pitch_classes):
+    """Interval-class vector of a pitch-class set, e.g. [0, 4, 7] -> [0, 0, 1, 1, 1, 0]"""
     vec = [0] * 6
 
-    template = get_template_from_notes(notes)
-    one_indices = [ix for ix, i in enumerate(template) if i == 1]
-    pairs = list(itertools.combinations(one_indices, 2))
-
-    intervals = [p[1] - p[0] for p in pairs]
-
+    pairs = itertools.combinations(sorted(set(pitch_classes)), 2)
+    intervals = [b - a for a, b in pairs]
     modded = [12 - i if i > 6 else i for i in intervals]
 
     for i in range(6):
@@ -111,6 +115,106 @@ def get_overtone_agreement(notes):
         sum_of_differences += diff
 
     return sum_of_differences
+
+
+# Huron (1994), "Interval-class content in equally tempered pitch-class sets:
+# common scales exhibit optimum tonal consonance", consonance of interval classes 1-6.
+HURON_CONSONANCE = np.array([-1.428, -0.582, 0.594, 0.386, 1.240, -0.453])
+
+# Parncutt (1988) root-support weights: interval above a candidate root -> support.
+ROOT_SUPPORT = {0: 10, 7: 5, 4: 3, 10: 2, 2: 1}
+
+# Sethares (1993) parametrization of the Plomp-Levelt dissonance curve.
+_PL_DSTAR, _PL_S1, _PL_S2, _PL_B1, _PL_B2 = 0.24, 0.0207, 18.96, 3.51, 5.75
+_N_PARTIALS = 6
+_PARTIAL_AMPLITUDES = 0.88 ** np.arange(_N_PARTIALS)
+
+
+def get_set_tension(pitch_classes):
+    """Mean dyadic dissonance of a pitch-class set (Huron), roughly -1.24 to 1.43.
+
+    A single pitch class has no dyads; it is scored like the most consonant dyad,
+    the perfect fifth, since a lone harmonic tone is at least that smooth.
+    """
+    vector = np.array(get_interval_class_vector_from_pitch_classes(pitch_classes))
+    n_dyads = vector.sum()
+    if n_dyads == 0:
+        return float(-HURON_CONSONANCE.max())
+    return float(-(vector @ HURON_CONSONANCE) / n_dyads)
+
+
+def get_fourier_coefficients(pitch_classes):
+    """DFT of a pitch-class set's indicator vector, coefficients 1-6, divided by cardinality.
+
+    Magnitudes measure resemblance to the perfectly even sets (Quinn 2006; Amiot 2016):
+    f5 diatonicity, f4 octatonicity, f3 hexatonicity, f6 whole-tone-ness.
+    The phase of f5 locates a set on the circle of fifths.
+    """
+    pitch_classes = np.array(sorted(set(pitch_classes)))
+    k = np.arange(1, 7)[:, None]
+    return np.exp(-2j * np.pi * k * pitch_classes / 12).sum(axis=1) / len(pitch_classes)
+
+
+def get_voice_leading_distance(midi_nums_1, midi_nums_2):
+    """Smallest total semitone motion between two voicings (Tymoczko 2006).
+
+    Voices may split or merge (doubling) but never cross, which on sorted notes is
+    dynamic time warping with an absolute-difference cost.
+    """
+    a, b = sorted(midi_nums_1), sorted(midi_nums_2)
+    # Plain lists and one rolling row: callers use this inside search loops.
+    previous = [0.0] + [float("inf")] * len(b)
+    for note in a:
+        row = [float("inf")]
+        for j, other in enumerate(b):
+            row.append(abs(note - other) + min(previous[j], previous[j + 1], row[j]))
+        previous = row
+    return float(previous[-1])
+
+
+def get_pitch_class_voice_leading_distance(pitch_classes_1, pitch_classes_2):
+    """Smallest total motion between pitch-class sets, in semitones around the octave.
+
+    Tries every cyclic alignment of the two sorted sets, so octave equivalence holds.
+    """
+    a, b = sorted(set(pitch_classes_1)), sorted(set(pitch_classes_2))
+    best = float("inf")
+    for shift in range(len(b)):
+        rotated = b[shift:] + [pc + 12 for pc in b[:shift]]
+        for offset in (-12, 0, 12):
+            best = min(
+                best, get_voice_leading_distance(a, [pc + offset for pc in rotated])
+            )
+    return best
+
+
+def get_roughness(midi_nums):
+    """Total Plomp-Levelt sensory roughness of a voicing with six harmonic partials."""
+    if len(midi_nums) == 0:
+        return 0.0
+    f0 = 440.0 * 2 ** ((np.asarray(midi_nums, dtype=float) - 69) / 12)
+    freqs = (f0[:, None] * np.arange(1, _N_PARTIALS + 1)).ravel()
+    amps = np.tile(_PARTIAL_AMPLITUDES, len(f0))
+    order = np.argsort(freqs)
+    freqs, amps = freqs[order], amps[order]
+    low, high = np.triu_indices(len(freqs), k=1)
+    s = _PL_DSTAR / (_PL_S1 * freqs[low] + _PL_S2)
+    diff = freqs[high] - freqs[low]
+    curve = np.exp(-_PL_B1 * s * diff) - np.exp(-_PL_B2 * s * diff)
+    return float((amps[low] * amps[high] * curve).sum())
+
+
+def get_root_salience(pitch_classes):
+    """Parncutt root-support score of every pitch class in the set."""
+    pitch_classes = set(pitch_classes)
+    return {
+        root: sum(
+            w
+            for interval, w in ROOT_SUPPORT.items()
+            if (root + interval) % 12 in pitch_classes
+        )
+        for root in pitch_classes
+    }
 
 
 def evaluate_notes(notes):
