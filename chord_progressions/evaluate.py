@@ -222,26 +222,21 @@ def evaluate_notes(notes):
 
     metrics = {}
 
-    try:
+    interval_class_vector = get_interval_class_vector(notes)
 
-        interval_class_vector = get_interval_class_vector(notes)
+    evenness = get_evenness(interval_class_vector)
 
-        evenness = get_evenness(interval_class_vector)
+    pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
+    assert pc_cardinality <= 12, "Pitch class cardinality > 12"
 
-        pc_cardinality = len(set([get_pitch_class_from_note(n) for n in notes]))
-        assert pc_cardinality <= 12, "Pitch class cardinality > 12"
-
-        metrics["num_notes"] = len(notes)
-        metrics["num_pitches"] = len(set(notes))
-        metrics["pc_cardinality"] = pc_cardinality
-        metrics["interval_class_vector"] = interval_class_vector
-        metrics["ambitus"] = get_ambitus(notes)
-        metrics["evenness"] = evenness
-        # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
-        # metrics["overtone_agreement"] = get_overtone_agreement(notes)
-
-    except:
-        pass
+    metrics["num_notes"] = len(notes)
+    metrics["num_pitches"] = len(set(notes))
+    metrics["pc_cardinality"] = pc_cardinality
+    metrics["interval_class_vector"] = interval_class_vector
+    metrics["ambitus"] = get_ambitus(notes)
+    metrics["evenness"] = evenness
+    # metrics["relative_evenness"] = get_relative_evenness(evenness, pc_cardinality)
+    # metrics["overtone_agreement"] = get_overtone_agreement(notes)
 
     return metrics
 
