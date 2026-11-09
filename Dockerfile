@@ -12,6 +12,9 @@ COPY pyproject.toml $APP_DIR/pyproject.toml
 
 WORKDIR $APP_DIR
 
+# .git is not copied into the image, so setuptools-scm cannot read the version from tags
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CHORD_PROGRESSIONS=0.0.0+docker
+
 RUN python -m pip install --upgrade pip
 RUN python -m pip install -r requirements.txt
 
