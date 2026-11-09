@@ -1,7 +1,6 @@
 name: run_tests
+# Merges to main are tested again by the publish workflow before anything is uploaded
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
