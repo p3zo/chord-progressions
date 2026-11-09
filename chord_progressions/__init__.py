@@ -1,7 +1,8 @@
 import logging
 import os
+from importlib.metadata import version
 
-__version__ = "0.39.0"  # updated by bumpversion, do not change
+__version__ = version("chord-progressions")
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 

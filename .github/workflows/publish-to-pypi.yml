@@ -4,11 +4,67 @@ on:
   push:
     branches: [ main ]
 
+# Runs wait for each other so every run sees the tag the previous one created.
+concurrency:
+  group: publish-to-pypi
+  cancel-in-progress: false
+
 jobs:
+  version:
+    name: Choose the next version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the next version is computed from the latest tag
+      - name: Read the labels of the merged pull request
+        id: labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          labels=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" --jq '[.[].labels[].name] | join(",")')
+          echo "Labels: $labels"
+          echo "labels=$labels" >> "$GITHUB_OUTPUT"
+      - name: Raise the version of the latest tag
+        id: next
+        env:
+          LABELS: ${{ steps.labels.outputs.labels }}
+        run: |
+          if [[ ",$LABELS," == *",no-release,"* ]]; then
+            echo "Labelled no-release; skipping the release"
+            exit 0
+          fi
+          if [[ ",$LABELS," == *",release:major,"* && ",$LABELS," == *",release:patch,"* ]]; then
+            echo "::error::Both release:major and release:patch are set"
+            exit 1
+          fi
+          latest=$(git describe --tags --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*')
+          IFS=. read -r major minor patch <<< "${latest#v}"
+          if [[ ",$LABELS," == *",release:major,"* ]]; then
+            version="$((major + 1)).0.0"
+          elif [[ ",$LABELS," == *",release:patch,"* ]]; then
+            version="$major.$minor.$((patch + 1))"
+          else
+            version="$major.$((minor + 1)).0"
+          fi
+          echo "$latest -> v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   build:
-    if: "contains(github.event.head_commit.message, 'Bump version')"
+    needs:
+      - version
+    if: needs.version.outputs.version != ''
     name: Build distribution
     runs-on: ubuntu-latest
+    env:
+      # The new tag does not exist until the release job creates it, so hand setuptools-scm the version directly
+      SETUPTOOLS_SCM_PRETEND_VERSION: ${{ needs.version.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +85,8 @@ jobs:
           python3 -m pytest -o addopts='' -q
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
+      - name: Check the built version
+        run: ls dist/chord_progressions-$SETUPTOOLS_SCM_PRETEND_VERSION-py3-none-any.whl dist/chord_progressions-$SETUPTOOLS_SCM_PRETEND_VERSION.tar.gz
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
@@ -36,7 +94,6 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    if: "contains(github.event.head_commit.message, 'Bump version')"
     name: >-
       Publish distribution to PyPI
     needs:
@@ -58,11 +115,11 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
   github-release:
-    if: "contains(github.event.head_commit.message, 'Bump version')"
     name: >-
       Sign the Python distribution with Sigstore
       and upload them to GitHub Release
     needs:
+      - version
       - publish-to-pypi
     runs-on: ubuntu-latest
 
@@ -85,9 +142,9 @@ jobs:
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        # Also creates the vX.Y.Z tag that the next run raises
         run: |
-          version=$(python3 -c "from pathlib import Path; print(next(Path('dist').glob('*.whl')).name.split('-')[1])")
-          gh release create "v$version" --target '${{ github.sha }}' --repo '${{ github.repository }}' --notes ""
+          gh release create "v${{ needs.version.outputs.version }}" --target '${{ github.sha }}' --repo '${{ github.repository }}' --notes ""
       - name: Upload artifact signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -95,5 +152,4 @@ jobs:
         # `dist/` contains the built packages, and the
         # sigstore-produced signatures and certificates.
         run: |
-          version=$(python3 -c "from pathlib import Path; print(next(Path('dist').glob('*.whl')).name.split('-')[1])")
-          gh release upload "v$version" dist/** --repo '${{ github.repository }}'
+          gh release upload "v${{ needs.version.outputs.version }}" dist/** --repo '${{ github.repository }}'
