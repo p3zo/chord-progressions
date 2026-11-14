@@ -3,6 +3,11 @@ name: Publish to PyPI
 on:
   push:
     branches: [ main ]
+    # The documentation site is not part of the package; deploy_docs.yml publishes it.
+    paths-ignore:
+      - "docs/**"
+      - "mkdocs.yml"
+      - ".github/workflows/deploy_docs.yml"
 
 # Runs wait for each other so every run sees the tag the previous one created.
 concurrency:
