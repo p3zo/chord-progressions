@@ -123,7 +123,8 @@ for more than short ones; `DURATION_BEAT_MAPPING` converts Tone.js durations to 
 - `get_mean_tension`: mean Huron dyadic tension over time.
 - `get_pitch_class_emphasis`: the share of time each pitch class sounds.
 - `get_contour_fit`: how closely per-chord values, such as tension, follow a target contour over
-  time, as a weighted correlation from -1 to 1.
+  time, as a weighted correlation from -1 to 1. Given one row per progression, it measures many
+  progressions in one call.
 - `get_metric_conflict`: the share of chord changes that fight a 4/4 meter.
 - `get_final_lengthening`: the last chord's length relative to the mean.
 - `get_transposed_repetition`: how much of the progression restates itself at a new pitch level, as
