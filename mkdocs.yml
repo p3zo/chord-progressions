@@ -29,5 +29,9 @@ edit_uri: ""
 
 nav:
   - Introduction: index.md
+  - Chords: chords.md
+  - Progressions: progressions.md
+  - Notes and chord types: notes-and-types.md
+  - Measures: measures.md
   - Extract: extract.md
   - Glossary: glossary.md
