@@ -1,7 +1,6 @@
 import numpy as np
 from chord_progressions import logger
 from chord_progressions.pitch import get_freq_from_note, get_n_overtones_harmonic
-from scipy.io import wavfile
 
 SAMPLE_RATE = 44100
 
@@ -103,4 +102,7 @@ def make_audio_progression(chords, durations, n_overtones):
 
 
 def save_audio_buffer(buf, outpath):
+    # Imported here so that importing the package does not load scipy (about 25 MB).
+    from scipy.io import wavfile
+
     wavfile.write(outpath, SAMPLE_RATE, buf)

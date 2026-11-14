@@ -1,6 +1,3 @@
-from music21 import chord, stream
-from music21.analysis.discrete import KrumhanslSchmuckler
-
 from chord_progressions.pitch import NOTE_NAMES
 
 
@@ -9,6 +6,10 @@ def get_key(midi_nums_list, quarter_lengths):
 
     Uses the Krumhansl-Schmuckler algorithm, which weights each pitch class by how long it sounds.
     """
+    # Imported here so that importing the package does not load music21 (about 50 MB).
+    from music21 import chord, stream
+    from music21.analysis.discrete import KrumhanslSchmuckler
+
     s = stream.Stream()
     for midi_nums, quarter_length in zip(midi_nums_list, quarter_lengths, strict=True):
         s.append(chord.Chord(midi_nums, quarterLength=quarter_length))
