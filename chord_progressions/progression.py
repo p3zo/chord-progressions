@@ -157,10 +157,11 @@ class Progression:
         dur_secs = self.get_durations_in_seconds()
         audio_buffer = make_audio_progression(self.chords, dur_secs, n_overtones)
 
-        # TODO: create outpath from datetime if not provided? add flag to opt for this?
         if outpath:
             save_audio_buffer(audio_buffer, outpath)
             logger.info(f"Audio saved to {outpath}")
+        else:
+            return audio_buffer
 
     def to_midi(self, outpath=None):
         mid = get_midi_from_progression(self)
@@ -168,3 +169,5 @@ class Progression:
             mid.filename = outpath
             mid.save(outpath)
             logger.info(f"Midi saved to {outpath}")
+        else:
+            return mid
