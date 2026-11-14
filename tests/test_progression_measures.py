@@ -45,6 +45,26 @@ def test_contour_fit_measures_shape_over_time():
     assert get_contour_fit(tensions, [6, 1, 1], *rise_and_fall) < 1
 
 
+def test_contour_fit_of_many_progressions_matches_one_call_each():
+    rise_and_fall = ((0, 0.6, 1), (0, 1, 0))
+    values = [[0.0, 1.0, 0.0, 0.2], [0.3, 0.3, 0.3, 0.3], [1.0, 0.5, 0.2, 0.0]]
+    beats = [[4, 4, 4, 4], [1, 2, 1, 4], [8, 1.5, 2.5, 4]]
+    each = [get_contour_fit(v, b, *rise_and_fall) for v, b in zip(values, beats)]
+    assert each[1] == 0  # constant values
+    assert get_contour_fit(values, beats, *rise_and_fall) == pytest.approx(each)
+    # One row of values against every row of beats, and the reverse.
+    assert get_contour_fit(values[0], beats, *rise_and_fall) == pytest.approx(
+        [get_contour_fit(values[0], b, *rise_and_fall) for b in beats]
+    )
+    assert get_contour_fit(values, beats[2], *rise_and_fall) == pytest.approx(
+        [get_contour_fit(v, beats[2], *rise_and_fall) for v in values]
+    )
+    with pytest.raises(ValueError):
+        get_contour_fit(
+            values, [[4, 4, 4, 4], [1, 2, 0, 4], [1, 1, 1, 1]], *rise_and_fall
+        )
+
+
 @pytest.mark.parametrize(
     "beats, conflict",
     [

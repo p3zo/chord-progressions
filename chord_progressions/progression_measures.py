@@ -28,9 +28,9 @@ def _tension(mask):
 
 def _weights(beats):
     beats = np.asarray(beats, dtype=float)
-    if len(beats) == 0 or np.any(beats <= 0):
+    if beats.shape[-1] == 0 or np.any(beats <= 0):
         raise ValueError("Every chord needs a positive length in beats")
-    return beats / beats.sum()
+    return beats / beats.sum(axis=-1, keepdims=True)
 
 
 def get_mean_tension(pitch_class_sets, beats):
@@ -64,18 +64,28 @@ def get_contour_fit(values, beats, times, targets):
     For example, with `get_set_tension` values and breakpoints (0, 0.6, 1) to
     (0, 1, 0), it measures how well tension rises to a peak 60% of the way through
     and then releases.
+
+    To measure many progressions of the same number of chords in one call, which is
+    much faster than one call each, give `values`, `beats` or both one row per
+    progression; the result is then an array with one fit per row. A single row of
+    one is measured against every row of the other.
     """
     weights = _weights(beats)
     lengths = np.asarray(beats, dtype=float)
-    midpoints = (np.cumsum(lengths) - lengths / 2) / lengths.sum()
+    midpoints = (np.cumsum(lengths, axis=-1) - lengths / 2) / lengths.sum(
+        axis=-1, keepdims=True
+    )
     target = np.interp(midpoints, times, targets)
     values = np.asarray(values, dtype=float)
-    values_dev = values - weights @ values
-    target_dev = target - weights @ target
-    spread = np.sqrt((weights @ values_dev**2) * (weights @ target_dev**2))
-    if spread == 0:
-        return 0.0
-    return float((weights @ (values_dev * target_dev)) / spread)
+    values_dev = values - np.vecdot(weights, values, keepdims=True)
+    target_dev = target - np.vecdot(weights, target, keepdims=True)
+    spread = np.sqrt(
+        np.vecdot(weights, values_dev**2) * np.vecdot(weights, target_dev**2)
+    )
+    covariance = np.vecdot(weights, values_dev * target_dev)
+    if spread.ndim == 0:
+        return float(covariance / spread) if spread else 0.0
+    return np.divide(covariance, spread, out=np.zeros_like(spread), where=spread != 0)
 
 
 def get_metric_conflict(beats):
