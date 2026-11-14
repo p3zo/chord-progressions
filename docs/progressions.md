@@ -102,6 +102,8 @@ progression.to_json()
 #  …]
 ```
 
-`to_json()` returns one entry per chord, with its position (`ix`) and duration.
+Without a path, `to_midi()` returns a [`mido.MidiFile`](https://mido.readthedocs.io/en/stable/files/midi.html)
+and `to_audio()` returns the samples as a NumPy array at 44.1 kHz. `to_json()` returns one entry per chord,
+with its position (`ix`) and duration.
 
 [krumhansl]: https://doi.org/10.1093/acprof:oso/9780195148367.001.0001

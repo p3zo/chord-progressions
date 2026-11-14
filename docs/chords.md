@@ -61,9 +61,12 @@ chord.to_json()
 # {'id': '…', 'midi_nums': [60, 64, 67], 'type': 'major chord', 'typeId': 63,
 #  'notes': ['C4', 'E4', 'G4'], 'metrics': {…}}
 
+chord.to_midi("chord.mid")   # one second of the chord at 120 bpm
 chord.to_audio("chord.wav")  # one second of the chord, synthesized with 4 overtones per note
-samples = chord.to_audio()   # without a path, returns the samples as a NumPy array at 44.1 kHz
 ```
+
+Without a path, `to_midi()` returns a [`mido.MidiFile`](https://mido.readthedocs.io/en/stable/files/midi.html)
+and `to_audio()` returns the samples as a NumPy array at 44.1 kHz.
 
 [ladma]: https://web.archive.org/web/20221116234056/https://vladimir_ladma.sweb.cz/english/music/structs/mus_rot.htm
 [douthett]: https://doi.org/10.2307/843826
