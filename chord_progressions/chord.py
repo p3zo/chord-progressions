@@ -78,7 +78,7 @@ class Chord:
             return audio
 
     def to_midi(self, outpath=None):
-        mid = get_midi_from_chord(self.chords, 1, 120, "-".join(self.notes))
+        mid = get_midi_from_chord(self, "-".join(self.notes))
 
         if outpath:
             mid.filename = outpath
