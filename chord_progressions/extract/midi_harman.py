@@ -446,11 +446,10 @@ def extract_progression_from_midi(
         smooth_beat: float, see params for `simplify_harmony()`
         quantize_beat: float, see params for `simplify_harmony()`
         simplified_path: str, if passed writes a midi file with simplified harmony. Useful for debugging.
-        simplified_path: str, if passed writes a csv file with the output harman labels. Useful for debugging.
+        harman_labels_path: str, if passed writes a csv file with the output harman labels. Useful for debugging.
 
     Returns
         progression: Progression, the extracted progression object
-        segment_start_times: list(float): the start times of each chord in seconds
     """
 
     midi = load_midi_file(filepath)
