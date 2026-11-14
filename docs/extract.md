@@ -39,11 +39,11 @@ with this library.
 ```python
 from chord_progressions.extract.audio import extract_progression_from_audio
 
-progression = extract_progression_from_audio("song.wav", plot_dir="plots", marked_audio_dir="beats")
+progression = extract_progression_from_audio("song.wav")
 ```
 
-`plot_dir` receives a plot of the pitch-class profile over time and `marked_audio_dir` a copy of the audio with
-the detected beats marked. Both directories must exist.
+To inspect the steps, pass `plot_dir` to write a plot of the pitch-class profile over time, and
+`marked_audio_dir` to write a copy of the audio with the detected beats marked. Both directories must exist.
 
 Method: pitch-class profiles (HPCP) from [Gómez, 2006, as implemented in Essentia][hpcp], averaged over each bar.
 
