@@ -12,7 +12,7 @@ Join frames together into segments corresponding to each beat of the track.
 
 For each segment:
     4. Avg and normalize HPCPs
-    5. Match avg'd HPCPs to Chordico's tone profiles
+    5. Keep the pitch classes whose averaged HPCP is above a threshold
 """
 
 import os
@@ -152,7 +152,7 @@ def extract_progression_from_audio(filepath, plot_dir=None, marked_audio_dir=Non
     Params
         filepath: str, Path to an audio file
         plot_dir: str, if passed, writes intermediate plots. Useful for debugging.
-        marked_audio_dir: str, writes an audio file with beat position markers. Useful for debugging.
+        marked_audio_dir: str, if passed, writes an audio file with beat position markers. Useful for debugging.
 
     Returns
         progression: Progression, the extracted progression object
@@ -166,10 +166,12 @@ def extract_progression_from_audio(filepath, plot_dir=None, marked_audio_dir=Non
     hpcp = feats["hpcp"]
     logger.info(f"  HPCP shape: {hpcp.shape}")
 
-    hpcp_figpath = os.path.join(plot_dir, f"{trackid}_hpcp.png")
-    plot_hpcp(hpcp, hpcp_figpath)
+    if plot_dir:
+        plot_hpcp(hpcp, os.path.join(plot_dir, f"{trackid}_hpcp.png"))
 
-    marked_audio_path = os.path.join(marked_audio_dir, f"{trackid}_beats.mp3")
+    marked_audio_path = None
+    if marked_audio_dir:
+        marked_audio_path = os.path.join(marked_audio_dir, f"{trackid}_beats.mp3")
     beats, bpm = get_beats(x, marked_audio_path)
 
     meter = get_meter(x, beats)
